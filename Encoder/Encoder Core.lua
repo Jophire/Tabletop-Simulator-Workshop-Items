@@ -551,7 +551,6 @@ function togglePropMenu(o)
 end
 function toggleProperty(o,p)
   if EncodedObjects[o.getGUID()] == nil then
-    --How the fuck did you get here?!
   else
     propTable = EncodedObjects[o.getGUID()].encoded[p]
     if propTable == nil then
