@@ -1,0 +1,1846 @@
+[ {
+  "attributes": {
+    "active": "true",
+    "id": "Encoder",
+    "version": "VERSION_NUMBER",
+    "visibilty": ""
+  },
+  "children": [ {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "WhiteMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|White",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "WhiteDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "WhiteMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "WhiteDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "WhitePropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "WhitePropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "WhiteToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "WhiteToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "BrownMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Brown",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "BrownDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "BrownMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "BrownDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "BrownPropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "BrownPropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "BrownToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "BrownToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "RedMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Red",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "RedDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "RedMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "RedDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "RedPropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "RedPropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "RedToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "RedToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "OrangeMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Orange",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "OrangeDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "OrangeMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "OrangeDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "OrangePropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "OrangePropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "OrangeToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "OrangeToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "YellowMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Yellow",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "YellowDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "YellowMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "YellowDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "YellowPropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "YellowPropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "YellowToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "YellowToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "GreenMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Green",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "GreenDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "GreenMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "GreenDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "GreenPropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "GreenPropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "GreenToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "GreenToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "TealMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Teal",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "TealDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "TealMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "TealDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "TealPropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "TealPropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "TealToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "TealToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "BlueMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Blue",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "BlueDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "BlueMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "BlueDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "BluePropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "BluePropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "BlueToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "BlueToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "PurpleMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Purple",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "PurpleDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "PurpleMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "PurpleDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "PurplePropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "PurplePropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "PurpleToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "PurpleToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "PinkMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Pink",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "PinkDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "PinkMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "PinkDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "PinkPropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "PinkPropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "PinkToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "PinkToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "GreyMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Grey",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "GreyDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "GreyMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "GreyDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "GreyPropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "GreyPropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "GreyToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "GreyToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  }, {
+    "attributes": {
+      "active": "True",
+      "allowDragging": "true",
+      "color": "white",
+      "height": "30",
+      "id": "BlackMenu",
+      "position": "-700 400",
+      "returnToOriginalPositionWhenReleased": "False",
+      "visibility": "Safety|Black",
+      "width": "198"
+    },
+    "children": [ {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "BlackDroplistBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-60 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "_"
+    }, {
+      "attributes": {
+        "color": "white",
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "height": "30",
+        "id": "BlackMenuBut",
+        "onClick": "GUID_HERE/minimize",
+        "position": "-85 0",
+        "width": "30"
+      },
+      "children": [],
+      "tag": "Button",
+      "value": "X"
+    }, {
+      "attributes": {
+        "fontSize": "15",
+        "fontStyle": "bold",
+        "position": "20 0"
+      },
+      "children": [],
+      "tag": "Text",
+      "value": "Encoder Menu"
+    }, {
+      "attributes": {
+        "active": "False",
+        "color": "white",
+        "height": "30",
+        "id": "BlackDroplist",
+        "position": "0 -30"
+      },
+      "children": [ {
+        "attributes": {
+          "autoCalculateHeight": "True"
+        },
+        "children": [ {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "BlackPropListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Properties"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "BlackPropList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "preferredHeight": "30"
+          },
+          "children": [ {
+            "attributes": [],
+            "children": [ {
+              "attributes": {
+                "fontSize": "15",
+                "fontStyle": "normal",
+                "id": "BlackToolListBut",
+                "onClick": "GUID_HERE/minimize"
+              },
+              "children": [],
+              "tag": "Button",
+              "value": "Tools"
+            } ],
+            "tag": "Cell"
+          } ],
+          "tag": "Row"
+        }, {
+          "attributes": {
+            "active": "False",
+            "id": "BlackToolList",
+            "preferredHeight": "206"
+          },
+          "children": [ {
+            "attributes": {
+              "color": "white",
+              "height": "205",
+              "verticalScrollbarVisibility": "AutoHideAndExpandViewport",
+              "width": "200"
+            },
+            "children": [ {
+              "attributes": {
+                "autoCalculateHeight": "True"
+              },
+              "children": [],
+              "tag": "TableLayout"
+            } ],
+            "tag": "VerticalScrollView"
+          } ],
+          "tag": "Row"
+        } ],
+        "tag": "TableLayout"
+      } ],
+      "tag": "Panel"
+    } ],
+    "tag": "Panel"
+  } ],
+  "tag": "Panel"
+} ]
