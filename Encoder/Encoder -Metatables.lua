@@ -1,49 +1,103 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3
-version_string = "Clean up"
+version = 2
+version_string = "The UI fix."
 
-URLS={
-  XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json',
-  VERSION=''
-  }
+WorkshopID='https://steamcommunity.com/sharedfiles/filedetails/?id=828894732'
+WebRequest.get(WorkshopID,self,'versionCheck')
 
-EncodedObjects = {}
---[[
-Object Structure
-EncodedObjects[objID] = {
-	this = Object
-	oName = Original Name
-	encoded = {}
-  menus = {}
-	editing = nil
-  flip = 1
-]]
-Properties = {}
---[[
-  propID = internal name,
-  name = external name,
-  dataStruct = {},
-  funcOwner = obj,
-  callOnActivate = true,
-  activateFunc ='callEditor'
-]]
-Tools = {}
---[[
-  toolID = internal name
-  name = external name
-  funcOwner = function owner
-  activateFunc = string
-  display = bool
-]]
-Zones = {}
---[[
-  name=Zone name
-  activateFunc = function to call
-]]
+-- Metatables
+EncObj = {
+	this = nil,
+	oName = "",
+	encoded = {},
+	menus = {},
+	editing = nil,
+	flip = 1,
+	disable = false
+	}
+function EncObj:new(o)
+	o = o or {}
+	setmetatable(o,self)
+	self.__index = self
+	return o
+end
+function EncObj:newEncode(obj)
+	o = {}
+	setmetatable(o,self)
+	self.__index = self
+	self.this = obj
+	self.oName = obj.getName()
+	return o
+end
+function EncObj:flip()
+	if self.flip ~= 1 then
+		self.flip = 1
+		self.this.hide_when_face_down = true
+		self.this.flip()
+	else
+		self.flip = -1
+		self.this.hide_when_face_down = false
+		self.this.flip()
+	end
+end
+function EncObj:toggleProperty(prop)
+	if not self.encoded[prop] then
+		self.encoded[prop] = Propteries[prop]:newData()
+	end
+end
+function EncObj:buildButtons()
+	local o = self.this
+	o.clearButtons()
+	o.clearInputs()
+	if o.disable ~= true then
+		local flip = o.flip
+		local scaler = {x=1,y=1,z=1}
+		local zpos = 0.28*flip*scaler.z
+		
+	end
+end
+EncodedObjects = {} -- EncodedObjects[objID] = EncObj:newEncode(obj)
+EncProp = {
+	ID = "",
+	name = "",
+	dataStruct = {},
+	funcOwner = nil,
+	callOnActivate = true,
+	activateFunc = 'callEditor'
+	}
+function EncProp:new(o)
+end
+function EncProp:newProperty(prop)
+end
+function EncProp:createButtons(obj)
+end
+Properties = {} -- Properties[propID] = EncProp:newProperty(prop)
+EncMenu = {
+	ID = "",
+	name = "",
+	pos = {x=0,y=1,z=0,0,1,0}
+	rot = {x=0,y=0,z=0,0,0,0}
+	open = false
+	children = {}
+	}
+function EncMenu:newMenu(id,name,pos,rot)
+	o = {}
+	setmetatable(o,self)
+	self.__index = self
+	self.ID = id
+	self.name = name
+	self.pos = pos
+	self.rot = rot
+	return o
+end
+Menu = EncMenu:new("C","Home")
 
 
+---------------------Needs Updating Below this Line!----------------------------
+
+local players = {}
 basic_buttons = {}
 
 -- Preps the core code for module integration as well
@@ -104,16 +158,13 @@ function onLoad(saved_data)
         end
       end
     end
-    if loaded_data.zones ~= nil then
-      Zones = JSON.decode(loaded_data.zones)
-    end
   end
   for i,v in pairs(EncodedObjects) do 
     buildButtons(v.this)
   end
-  buildZones()
   createEncoderButtons()
-	WebRequest.get(URLS['XML'],self,"buildUI")
+	buildPlayerData()
+	buildUI()
 end
 
 -- Saves core data on save triggers.
@@ -123,7 +174,6 @@ function onSave()
   data_to_save["cards"] = {}
   data_to_save["properties"] = {}
   data_to_save["tools"] = {}
-  data_to_save["zones"] = JSON.encode(Zones)
   
   for i,v in pairs(EncodedObjects) do
     --Removing Object reference before encoding.
@@ -158,58 +208,96 @@ end
 
 -- Version check code given to me by Amuzet.
 function versionCheck(wr)
+  local _,b=wr.text:find(mod_name..' Version ')
+  local v=wr.text:sub(b,b+10):match('%d+%p%d+')
+  --This matches the first instance of Number Punctuation Number (1.1)
+  local txt='How to Use this Item'
+  --Version Checking
+  if version<tonumber(v)then
+    txt=txt..'\n[fff600]There is an Update for '..mod_name
+  end
+  self.setDescription(txt)
+  print(txt)
+end
 
+-- Gather the available colors for the player table.
+--   Used for the XML UI.
+function buildPlayerData()
+	for k, v in pairs(Player.getColors()) do
+		players[v] = {visibleMain=false}
+	end
 end
 
 -- Configure the XML UI, building the various menus and buttons.
-function buildUI(wr)
-  wr = wr.text
-  wr = string.gsub(wr,"VERSION_NUMBER",version)
-  wr = string.gsub(wr,"GUID_HERE",self.getGUID())
-	local xml = UI.getXmlTable()
-  local found = 0
-  for k,v in pairs(xml) do
-    if v.attributes.id ~= nil and v.attributes.id == "Encoder" then
-      found = k
-      break
-    end
-  end
-  if found == 0 then
-    table.insert(xml,JSON.decode(wr)[1])
-  else
-    xml[found] = JSON.decode(wr)[1]
-  end
-	UI.setXmlTable(xml)
+function buildUI()
+	-- Lets not write over existing XML UI elements.
+	local txt = UI.getXml().."\n"
+	local g = self.getGUID()
+	for k,v in pairs(players) do
+		if v ~= "Grey" then
+			if UI.getAttribute(k.."EncMainMenu","active") == nil then
+				txt = txt..[[
+				<Panel id="]]..k..[[EncMainMenu" active="True" visibility="]]..k..[[" width="198" height="30" position="-700 400" color="white" allowDragging="true" returnToOriginalPositionWhenReleased="False">
+					<Button id="]]..k..[[DroplistBut" onClick="]]..g..[[/minimize" width="30" height="30" color="white" position="-60 0" fontStyle="bold" fontSize="15">_</Button>
+					<Button id="]]..k..[[EncMainMenuBut" onClick="]]..g..[[/minimize" width="30" height="30" color="white" position="-85 0" fontStyle="bold" fontSize="15">X</Button>
+					<Text position="20 0" fontStyle="bold" fontSize="15">Encoder Menu</Text>
+					<Panel id="]]..k..[[Droplist" active="False" height="30" position="0 -30" color="white">
+						<TableLayout autoCalculateHeight="True">
+							<Row preferredHeight="30"><Cell><Button id="]]..k..[[PropListBut" onClick="]]..g..[[/minimize" fontStyle="normal" fontSize="15" >Properties</Button></Cell></Row>
+							<Row preferredHeight="206" id="]]..k..[[PropList" active="False">
+								<VerticalScrollView width="200" height="205" color="white" verticalScrollbarVisibility="AutoHideAndExpandViewport">
+									<TableLayout autoCalculateHeight="True">
+									</TableLayout>
+								</VerticalScrollView>
+							</Row>
+							<Row preferredHeight="30"><Cell><Button id="]]..k..[[ToolListBut" onClick="]]..g..[[/minimize" fontStyle="normal" fontSize="15">Tools</Button></Cell></Row>
+							<Row preferredHeight="206" id="]]..k..[[ToolList" active="False">
+								<VerticalScrollView width="200" height="205" color="white" verticalScrollbarVisibility="AutoHideAndExpandViewport">
+									<TableLayout autoCalculateHeight="True">
+									</TableLayout>
+								</VerticalScrollView>
+							</Row>
+						</TableLayout>
+					</Panel>
+				</Panel>	
+				]]
+			end
+		end
+	end
+	UI.setXml(txt)
 end
 
 function updateUI()
 	local g = self.getGUID()
 	local tab = UI.getXmlTable()
 	local ps = {}
+	local count = 1
 	for m,n in pairsByKeys(Properties) do
 		if n.funcOwner ~= nil then
-			table.insert(ps,{tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.propID,onClick=g.."/"..n.propID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}})
+			ps[count] = {tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.propID,onClick=g.."/"..n.propID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}}
+			count = count+1
 		end
 	end 
 	local ts = {}
+	local count = 1
 	for m,n in pairsByKeys(Tools) do
 		if n.funcOwner ~= nil then
-			table.insert(ts,{tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.toolID,onClick=g.."/"..n.toolID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}})
+			ts[count] = {tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.toolID,onClick=g.."/"..n.toolID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}}
+			count = count+1
 		end
 	end 
 	
-  local index = 0
-  for k,v in pairs(tab) do
-    if v.attributes ~= nil and v.attributes.id == "Encoder" then
-      index = k
-      break
-    end
-  end
 	
-	for k,v in pairs(Player.getColors()) do
+	for k,v in pairs(players) do
 		if k ~= "Grey" then
-			tab[index]["children"][k]["children"][4]["children"][1]["children"][2]["children"][1]["children"][1]["children"] = ps
-			tab[index]["children"][k]["children"][4]["children"][1]["children"][4]["children"][1]["children"][1]["children"] = ts
+			for m,n in pairs(tab) do
+				log(n)
+				if n.attributes ~= nil and n.attributes.id == k.."EncMainMenu" then
+					tab[m]["children"][4]["children"][1]["children"][2]["children"][1]["children"][1]["children"] = ps
+					tab[m]["children"][4]["children"][1]["children"][4]["children"][1]["children"][1]["children"] = ts
+					break
+				end
+			end
 		end
 	end
 	UI.setXmlTable(tab)	
@@ -226,61 +314,6 @@ function minimize(plr,n,id)
 	end
 end
 
-function buildZones()
-  ZtoG = {}
-  for k,v in pairs(Zones) do
-    ZtoG[v.name]=k
-  end
-  for k,v in pairs(Player.getColors()) do
-    if v ~= "Grey" then
-    for i=1,Player[v].getHandCount() do
-      z = getObjectFromGUID(ZtoG[v..''..i])
-      if z == nil then
-        h = Player[v].getHandTransform(i)
-        params = {}
-        params.type = "scriptingTrigger"
-        params.position = h.position
-        params.rotation = h.rotation
-        params.scale = h.scale
-        params.sound = false
-        params.callback_function = function(obj) Zones[obj.guid] = {
-          name = v..''..i,
-          func_enter = 'hideCardDetails',
-          func_leave = 'showCardDetails',
-          color = v
-          }
-          end
-        spawnObject(params)
-      end
-    end
-    end
-  end
-end
-
-function hideCardDetails(tar)
-  tar= tar[1]
-  if EncodedObjects[tar.getGUID()] ~= nil then 
-    tar.clearButtons()
-    tar.clearInputs()  
-  end
-end
-function showCardDetails(tar)
-  tar = tar[1]
-  if EncodedObjects[tar.getGUID()] ~= nil and tar.getButtons() == nil then
-    buildButtons(tar)
-  end
-end
-
-function onObjectEnterScriptingZone(zone, obj)
-  if Zones[zone.getGUID()] ~= nil then
-    self.call(Zones[zone.getGUID()].func_enter,{obj})
-  end
-end
-function onObjectLeaveScriptingZone(zone, obj)
-  if Zones[zone.getGUID()] ~= nil then
-    self.call(Zones[zone.getGUID()].func_leave,{obj})
-  end
-end
 
 function onObjectDestroyed(obj)
   if obj == self then
@@ -288,17 +321,36 @@ function onObjectDestroyed(obj)
       v.this.clearButtons()
       v.this.setName(v.name)
     end
-		for k,v in pairs(Player.getColors()) do
+		for k,v in pairs(players) do
 			if v ~= "Grey" then
 				UI.setAttribute(k.."MainMenu","active",false)
 			end
 		end
   end
 end
+
+
 function onObjectDropped(c,obj)
 	--print(obj)
   if (Global.getVar('Encoder') == nil or Global.getVar('Encoder').getVar('version') < version) and mod_name == 'Encoder' then
     Global.setVar('Encoder',self)
+  end
+  if EncodedObjects[obj.getGUID()] ~= nil and c ~= "Black" then
+    local inHand = false
+    for k=1,Player[c].getHandCount() do
+      for i,v in pairs (Player[c].getHandObjects(k)) do
+        if v == obj then
+          inHand = true
+        end
+      end
+    end
+    if inHand == false and obj.getButtons() == nil then
+			--print(obj)
+      buildButtons(obj)
+    elseif inHand == true then
+      obj.clearButtons()
+      obj.clearInputs()
+    end
   end
 end
 
@@ -560,6 +612,7 @@ function togglePropMenu(o)
 end
 function toggleProperty(o,p)
   if EncodedObjects[o.getGUID()] == nil then
+    --How the fuck did you get here?!
   else
     propTable = EncodedObjects[o.getGUID()].encoded[p]
     if propTable == nil then

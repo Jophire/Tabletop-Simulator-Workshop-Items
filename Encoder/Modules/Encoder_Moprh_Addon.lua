@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 encVersion = 1.2
 pID = "MTG_Morph"
-version = 1.4
+version = 1.5
 
 function onload()
   self.createButton({
@@ -13,7 +13,8 @@ function onload()
 end
 
 
-image_URL = "https://www.cardkingdom.com/images/magic-the-gathering/khans-of-tarkir/morph-token-41016-medium.jpg"
+--image_URL = "https://www.cardkingdom.com/images/magic-the-gathering/khans-of-tarkir/morph-token-41016-medium.jpg"
+image_URL = 'https://img.scryfall.com/cards/png/front/e/9/e9375cbe-93c0-41a5-a6e3-fb4416f54a69.png?1572370830'
 
 function registerModule()
   enc = Global.getVar('Encoder')
@@ -38,7 +39,7 @@ function createButtons(t)
     temp = " Morph "
     barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=120,max_len=90,xJust=0,yJust=0})
     t.object.createButton({
-    label=temp, click_function='removeMorph', function_owner=self,
+    label=temp, click_function='tMorph', function_owner=self,
     position={(0+offset_x)*flip*scaler.x,0.3*flip*scaler.z,(-1.38+offset_y)*scaler.y}, height=170, width=barSize, font_size=fSize,
     rotation={0,0,90-90*flip,font_color={1,1,1,1}}
     })
@@ -65,92 +66,52 @@ function tMorph(object,ply)
 	enc = Global.getVar('Encoder')
   if enc ~= nil then
     flip = enc.call("APIgetFlip",{obj=object})
-    
-		
-		object.setName(" Morph ")
-    if flip >= 0 then
-      enc.call("APIFlip",{obj=object})
+    data = enc.call("APIgetObjectData",{obj=object,propID=pID})
+    if data ~= nil then 
+      if data.enabled ~= true then
+        object.setName(" Morph ")
+        if flip >= 0 then
+          enc.call("APIFlip",{obj=object})
+        end
+        hasDecal = false
+        if object.getDecals() ~= nil then
+        for k,v in pairs(object.getDecals()) do
+          if v.name == "Morph" then
+            hasDecal = true
+            break
+          end
+        end
+        end
+        if hasDecal == false then
+          object.addDecal({name="Morph",url=image_URL,position={0,-0.2,0},rotation={-90,0,0},scale={2.15,3.15,1}})
+        end
+      else
+        data.enabled = false
+        enc.call("APIsetObjectData",{obj=object,propID=pID,data=data})
+        object.setName(enc.call("APIgetOName",{obj=object}))
+        if flip < 0 then
+          enc.call("APIFlip",{obj=object})
+        end
+        local decals = object.getDecals()
+        if decals ~= nil then
+          for k,v in pairs(decals) do
+            if v.name == "Morph" then
+              table.remove(decals,k)
+            end
+          end
+          object.setDecals(decals)
+        end
+        if type(ply) == "string" then
+        local selection =Player[ply].getSelectedObjects()
+        if selection ~= nil then
+          for k,v in pairs(selection) do
+            if v ~= tar and enc.call("APIobjectExist",{obj=v}) == true then 
+              removeMorph(v,0)
+            end
+          end
+        end
+      end
     end
-				
-		local jtab = JSON.decode(object.getJSON())
-		if jtab["AttachedDecals"] == nil then
-			jtab["AttachedDecals"] = {}
-		end
-		local hasSticker = false
-		for k,v in pairs(jtab["AttachedDecals"]) do
-			if v.CustomDecal.Name == "mtg_morph_module_image" then
-				--hasSticker = true
-			end
-		end
-		if hasSticker == false then
-			log("Applying Sticker")
-			s = #jtab["AttachedDecals"]
-			jtab["AttachedDecals"][s+1] = {Transform={posX=0,
-																								 posY=-0.2,
-																								 posZ=0,
-																								 rotX=-90,
-																								 rotY=0,
-																								 rotZ=0,
-																								 scaleX=2.15,
-																								 scaleY=3.15,
-																								 scaleZ=1},
-																			CustomDecal={Name="mtg_morph_module_image",
-																									 ImageURL=image_URL,
-																									 Size=1}}
-			object.destruct()
-			spawnObjectJSON({json=JSON.encode(jtab)})
-		end
-    		
-    enc.call("APIrebuildButtons",{obj=object})
-  end
-end
-
-function removeMorph(object,ply)
-  enc = Global.getVar('Encoder')
-  if enc ~= nil then
-    flip = enc.call("APIgetFlip",{obj=object})
-		
-		data = enc.call("APIgetObjectData",{obj=object,propID=pID})
-		if data ~= nil and data.enabled == true then
-			data.enabled = false
-			enc.call("APIsetObjectData",{obj=object,propID=pID,data=data})
-
-			
-			object.setName(enc.call("APIgetOName",{obj=object}))
-			
-			if flip < 0 then
-				enc.call("APIFlip",{obj=object})
-			end
-    end
-		
-		local jtab = JSON.decode(object.getJSON())
-		if jtab["AttachedDecals"] == nil then
-			jtab["AttachedDecals"] = {}
-		end
-		
-		local removeList = {}
-		for k,v in pairs(jtab["AttachedDecals"]) do
-			if v.CustomDecal.Name == "mtg_morph_module_image" then
-				table.insert(removeList,k)
-			end
-		end
-		while #removeList > 0 do
-			table.remove(jtab["AttachedDecals"],table.remove(removeList))
-			log(#removeList)
-		end
-		object.destruct()
-		object = spawnObjectJSON({json=JSON.encode(jtab)})
-		
-		if type(ply) == "string" then
-			local selection =Player[ply].getSelectedObjects()
-			if selection ~= nil then
-				for k,v in pairs(selection) do
-					if v ~= tar and enc.call("APIobjectExist",{obj=v}) == true then 
-						removeMorph(v,0)
-					end
-				end
-			end
-		end
     enc.call("APIrebuildButtons",{obj=object})
   end
 end
