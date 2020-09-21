@@ -161,7 +161,11 @@ function versionCheck(wr)
 
 end
 
+<<<<<<< Updated upstream
 -- Configure the XML UI, building the various menus and buttons.
+=======
+-- Readies the XML UI, updating version and objects GUID.
+>>>>>>> Stashed changes
 function buildUI(wr)
   wr = wr.text
   wr = string.gsub(wr,"VERSION_NUMBER",version)
