@@ -1,8 +1,8 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3
-version_string = "Clean up"
+version = 3.1
+version_string = "Minor bug fixes. Sorry for the wait >-<"
 
 URLS={
   XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json',
@@ -161,11 +161,6 @@ function versionCheck(wr)
 
 end
 
-<<<<<<< Updated upstream
--- Configure the XML UI, building the various menus and buttons.
-=======
--- Readies the XML UI, updating version and objects GUID.
->>>>>>> Stashed changes
 function buildUI(wr)
   wr = wr.text
   wr = string.gsub(wr,"VERSION_NUMBER",version)
@@ -186,6 +181,7 @@ function buildUI(wr)
 	UI.setXmlTable(xml)
 end
 
+-- Update the XML UI to show new modules as they are registered.
 function updateUI()
 	local g = self.getGUID()
 	local tab = UI.getXmlTable()
@@ -219,6 +215,7 @@ function updateUI()
 	UI.setXmlTable(tab)	
 end
 
+-- Hide the XML UI.
 function minimize(plr,n,id)
 	id = string.sub(id,0,-4)
 	log(id)
@@ -230,6 +227,8 @@ function minimize(plr,n,id)
 	end
 end
 
+-- NEW- Creates scripting zones around each players hands.
+-- This is used to more reliably hide/reveal card buttons as it transitions zones.
 function buildZones()
   ZtoG = {}
   for k,v in pairs(Zones) do
@@ -261,6 +260,7 @@ function buildZones()
   end
 end
 
+-- Functions to hide or show card details as it transitions from hand to table and back.
 function hideCardDetails(tar)
   tar= tar[1]
   if EncodedObjects[tar.getGUID()] ~= nil then 
@@ -285,6 +285,9 @@ function onObjectLeaveScriptingZone(zone, obj)
     self.call(Zones[zone.getGUID()].func_leave,{obj})
   end
 end
+function onObjectLeaveContainer(__,obj)
+  showCardDetails({obj})
+end
 
 function onObjectDestroyed(obj)
   if obj == self then
@@ -304,6 +307,7 @@ function onObjectDropped(c,obj)
   if (Global.getVar('Encoder') == nil or Global.getVar('Encoder').getVar('version') < version) and mod_name == 'Encoder' then
     Global.setVar('Encoder',self)
   end
+  
 end
 
 function doNothing()
@@ -315,6 +319,7 @@ function createEncoderButtons()
   end
 end
 
+-- If the encoder is deleted, make sure to cleanup. 
 function encodeObject(o)
   if EncodedObjects[o.getGUID()] == nil and o ~= self then
     EncodedObjects[o.getGUID()] = buildBaseForm(o)
@@ -724,6 +729,9 @@ end
 function APIregisterTool(p)
   Tools[p.toolID] = deepcopy(p)
   print(Tools[p.toolID].toolID.." Registered")
+end
+function APIregisterXML(p)
+
 end
 function printPropertyGuide()
     guide = {}
