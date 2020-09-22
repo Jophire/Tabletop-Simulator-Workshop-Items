@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3.7
+version = 3.8
 version_string = "Did someone say context menu and auto updates?"
 beta=true
 
@@ -569,13 +569,13 @@ function flipMenu(o,p)
   if flip ~= 1 then
     EncodedObjects[o.getGUID()].flip = 1
 		o.hide_when_face_down = true
-    if o.is_face_down then
+    if ~o.is_face_down then
       o.flip()
     end
   else
     EncodedObjects[o.getGUID()].flip = -1
 		o.hide_when_face_down = false
-    if not o.is_face_down then
+    if o.is_face_down then
       o.flip()
     end
   end
