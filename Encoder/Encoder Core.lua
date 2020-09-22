@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3.4
+version = 3.5
 version_string = "Did someone say context menu and auto updates?"
 beta=true
 
@@ -564,11 +564,15 @@ function flipMenu(o,p)
   if flip ~= 1 then
     EncodedObjects[o.getGUID()].flip = 1
 		o.hide_when_face_down = true
-		o.flip()
+    if o.is_face_down then
+      o.flip()
+    end
   else
     EncodedObjects[o.getGUID()].flip = -1
 		o.hide_when_face_down = false
-		o.flip()
+    if not o.is_face_down then
+      o.flip()
+    end
   end
   if type(p) == "string" then
     local selection =Player[p].getSelectedObjects()
