@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3.3
+version = 3.4
 version_string = "Did someone say context menu and auto updates?"
 beta=true
 
@@ -116,7 +116,7 @@ function onLoad(saved_data)
   buildZones()
   createEncoderButtons()
   
-  addContextMenuItem('Switch to test build.', function(p) 
+  addContextMenuItem('Test Toggle', function(p) 
     broadcastToAll(p.color.." toggled test build of encoder.")
     beta = not beta
     callVersionCheck()
