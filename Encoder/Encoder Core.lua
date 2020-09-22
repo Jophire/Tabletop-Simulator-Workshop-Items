@@ -1,12 +1,14 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3.1
-version_string = "Minor bug fixes. Sorry for the wait >-<"
+version = 3.3
+version_string = "Did someone say context menu and auto updates?"
+beta=true
 
 URLS={
-  XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json',
-  VERSION=''
+  ENCODER='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Encoder%20Core.lua',
+  ENCODER_BETA='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/Encoder%20Core.lua',
+  XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json'
   }
 
 EncodedObjects = {}
@@ -113,7 +115,16 @@ function onLoad(saved_data)
   end
   buildZones()
   createEncoderButtons()
+  
+  addContextMenuItem('Switch to test build.', function(p) 
+    broadcastToAll(p.color.." toggled test build of encoder.")
+    beta = not beta
+    callVersionCheck()
+  end
+  )
+  
 	WebRequest.get(URLS['XML'],self,"buildUI")
+  callVersionCheck()
 end
 
 -- Saves core data on save triggers.
@@ -156,9 +167,20 @@ function onSave()
   return saved_data
 end
 
--- Version check code given to me by Amuzet.
+function callVersionCheck()
+  if beta then
+    WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
+  else
+    WebRequest.get(URLS['ENCODER'],self,"versionCheck")
+  end
+end
 function versionCheck(wr)
-
+  wr = wr.text
+  ver = string.match(wr,"postfix = '.-'%s+version = (.*)")
+  if ver ~= version then
+    self.script_code = wr
+    self.reload()
+  end
 end
 
 function buildUI(wr)
@@ -178,7 +200,6 @@ function buildUI(wr)
   else
     xml[found] = JSON.decode(wr)[1]
   end
-	UI.setXmlTable(xml)
 end
 
 -- Update the XML UI to show new modules as they are registered.
@@ -275,6 +296,7 @@ function showCardDetails(tar)
   end
 end
 
+-- Event Triggers
 function onObjectEnterScriptingZone(zone, obj)
   if Zones[zone.getGUID()] ~= nil then
     self.call(Zones[zone.getGUID()].func_enter,{obj})
@@ -288,12 +310,15 @@ end
 function onObjectLeaveContainer(__,obj)
   showCardDetails({obj})
 end
-
+function onPlayerConnect(__)
+  callVersionCheck()
+end
 function onObjectDestroyed(obj)
   if obj == self then
     for i,v in pairs(EncodedObjects) do 
       v.this.clearButtons()
       v.this.setName(v.name)
+      v.this.clearContextMenu()
     end
 		for k,v in pairs(Player.getColors()) do
 			if v ~= "Grey" then
@@ -324,6 +349,7 @@ function encodeObject(o)
   if EncodedObjects[o.getGUID()] == nil and o ~= self then
     EncodedObjects[o.getGUID()] = buildBaseForm(o)
     buildButtons(o)
+    buildContextMenu(o)
   end
 end
 
@@ -355,6 +381,10 @@ function updateSize(text,font_size,max_len,x_just,y_just)
   offset_y = 0--y_just*((depth/2*fsize)+8)
   barSize = size*((fsize/(150/83)))+20
   return barSize,fsize,offset_x,offset_y
+end
+
+function buildContextMenu(o)
+  o.addContextMenuItem('Flip Menu',function(ply) flipMenu(o,ply) end)
 end
 
 function buildButtons(o)
