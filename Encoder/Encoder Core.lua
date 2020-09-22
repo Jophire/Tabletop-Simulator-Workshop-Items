@@ -177,9 +177,10 @@ end
 function versionCheck(wr)
   wr = wr.text
   ver = string.match(wr,"postfix = '.-'%s+version = (.*)")
+  print(ver.." "..version)
   if ''..ver ~= ''..version then
     self.script_code = wr
-    self.reload()
+    --self.reload()
   end
 end
 
