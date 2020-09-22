@@ -174,8 +174,8 @@ function onSave()
 end
 
 function callVersionCheck()
-  if time()-lastcheck > 1000 then
-    lastcheck = time() -- STOP THE SPAM ops.
+  if Time.time-lastcheck > 1000 then
+    lastcheck = Time.time -- STOP THE SPAM ops.
     if beta then
       WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
     else
