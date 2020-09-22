@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '3.10'
+version = '3.11'
 version_string = "Did someone say context menu and auto updates?"
 beta=true
 lastcheck = 0
@@ -181,6 +181,8 @@ function callVersionCheck()
     else
       WebRequest.get(URLS['ENCODER'],self,"versionCheck")
     end
+  else
+    print("Please wait a bit before checking for an update.")
   end
 end
 function versionCheck(wr)
