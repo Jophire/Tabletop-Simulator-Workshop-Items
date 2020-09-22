@@ -3,7 +3,7 @@ mod_name = "Encoder"
 postfix = ''
 version = '3.11'
 version_string = "Did someone say context menu and auto updates?"
-beta=true
+beta=false
 lastcheck = 0
 
 URLS={
