@@ -1,9 +1,10 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3.10
+version = '3.10'
 version_string = "Did someone say context menu and auto updates?"
 beta=true
+lastcheck = 0
 
 URLS={
   ENCODER='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Encoder%20Core.lua',
@@ -173,15 +174,18 @@ function onSave()
 end
 
 function callVersionCheck()
-  if beta then
-    WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
-  else
-    WebRequest.get(URLS['ENCODER'],self,"versionCheck")
+  if time()-lastcheck > 1000 then
+    lastcheck = time() -- STOP THE SPAM ops.
+    if beta then
+      WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
+    else
+      WebRequest.get(URLS['ENCODER'],self,"versionCheck")
+    end
   end
 end
 function versionCheck(wr)
   wr = wr.text
-  ver = string.match(wr,"version = (.-)%s")
+  ver = string.match(wr,"version = '(.-)'")
   print(ver.." "..version)
   if ''..ver ~= ''..version then
     self.script_code = wr
