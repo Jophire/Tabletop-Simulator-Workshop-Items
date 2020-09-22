@@ -119,11 +119,11 @@ function onLoad(saved_data)
   self.clearContextMenu()
   self.addContextMenuItem('Test Toggle', function(p) 
     beta = not beta
-    broadcastToAll(p.color.." toggled test build to ".. beta and "True" or "False")
+    broadcastToAll(p.." toggled test build to ".. beta and "True" or "False")
   end
   )
   self.addContextMenuItem('Version Check', function(p) 
-    broadcastToAll(p.color.." is checking for updates.")
+    broadcastToAll(p.." is checking for updates.")
     callVersionCheck()
   end
   )
