@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3.9
+version = 3.10
 version_string = "Did someone say context menu and auto updates?"
 beta=true
 
@@ -390,7 +390,7 @@ function updateSize(text,font_size,max_len,x_just,y_just)
 end
 
 function buildContextMenu(o)
-  o.addContextMenuItem('Flip Menu',function(ply) flipMenu(o,ply) end)
+  o.addContextMenuItem('Flip Menu',function(ply) flipMenu(o,0) end)
 end
 
 function buildButtons(o)
