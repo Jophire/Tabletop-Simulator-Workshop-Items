@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = 3.6
+version = 3.7
 version_string = "Did someone say context menu and auto updates?"
 beta=true
 
