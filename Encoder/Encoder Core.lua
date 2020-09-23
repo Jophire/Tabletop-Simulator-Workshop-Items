@@ -142,7 +142,7 @@ function onLoad(saved_data)
     end
     )
   end
-  self.addContextMenuItem('Version Check', function(p) 
+  self.addContextMenuItem('Update Check', function(p) 
     if Player[p].admin then
       callVersionCheck()
       broadcastToAll('Preforming an update check.')
@@ -196,7 +196,7 @@ function onSave()
 end
 
 function callVersionCheck()
-  if Time.time-lastcheck > 1000 then
+  if Time.time-lastcheck > 120 then
     lastcheck = Time.time -- STOP THE SPAM ops.
     if beta then
       WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
