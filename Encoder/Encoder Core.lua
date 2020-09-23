@@ -118,19 +118,41 @@ function onLoad(saved_data)
   createEncoderButtons()
   
   self.clearContextMenu()
-  self.addContextMenuItem('Test Toggle', function(p) 
-    beta = not beta
-    broadcastToAll(p.." toggled test build to ".. beta and "True" or "False")
+  if beta == true then
+    self.addContextMenuItem('Main Branch', function(p) 
+      if Player[p].admin then
+        beta = not beta
+        Player[p].broadcast('Switching back to the stable update branch.')
+        Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
+      else
+        Player[p].broadcast('Please ask the server host or an admin to change versions.')
+      end
+    end
+    )
+  else
+    self.addContextMenuItem('Beta Branch', function(p) 
+      if Player[p].admin then
+        beta = not beta
+        Player[p].broadcast('Switching to the un-stable update branch.')
+        Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
+        Player[p].broadcast("Bugs are to be expected.")
+      else
+        Player[p].broadcast('Please ask the server host or an admin to change versions.')
+      end
+    end
+    )
   end
-  )
   self.addContextMenuItem('Version Check', function(p) 
-    broadcastToAll(p.." is checking for updates.")
-    callVersionCheck()
+    if Player[p].admin then
+      callVersionCheck()
+      broadcastToAll('Preforming an update check.')
+    else
+      Player[p].broadcast('Please ask the server host or an admin to check for updates.')
+    end
   end
   )
   
 	WebRequest.get(URLS['XML'],self,"buildUI")
-  callVersionCheck()
 end
 
 -- Saves core data on save triggers.
@@ -181,8 +203,6 @@ function callVersionCheck()
     else
       WebRequest.get(URLS['ENCODER'],self,"versionCheck")
     end
-  else
-    print("Please wait a bit before checking for an update.")
   end
 end
 function versionCheck(wr)
@@ -190,8 +210,15 @@ function versionCheck(wr)
   ver = string.match(wr,"version = '(.-)'")
   print(ver.." "..version)
   if ''..ver ~= ''..version then
+    if beta == true then
+      broadcastToAll("An update has been found for the beta branch. Reloading encoder.")
+    else
+      broadcastToAll("An update has been found for the main branch. Reloading encoder.")
+    end
     self.script_code = wr
     self.reload()
+  else
+    broadcastToAll("No update found at this time. Carry on.")
   end
 end
 
@@ -322,9 +349,7 @@ end
 function onObjectLeaveContainer(__,obj)
   showCardDetails({obj})
 end
-function onPlayerConnect(__)
-  callVersionCheck()
-end
+
 function onObjectDestroyed(obj)
   if obj == self then
     for i,v in pairs(EncodedObjects) do 
