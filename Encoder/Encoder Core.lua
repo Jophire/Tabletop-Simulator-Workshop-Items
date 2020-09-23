@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '3.13'
+version = '3.14'
 version_string = "Did someone say context menu and auto updates?"
 beta=false
 lastcheck = 0
@@ -144,7 +144,7 @@ function onLoad(saved_data)
   end
   self.addContextMenuItem('Update Check', function(p) 
     if Player[p].admin then
-      callVersionCheck()
+      callVersionCheck(p)
       broadcastToAll('Preforming an update check.')
     else
       Player[p].broadcast('Please ask the server host or an admin to check for updates.')
@@ -195,7 +195,7 @@ function onSave()
   return saved_data
 end
 
-function callVersionCheck()
+function callVersionCheck(p)
   if Time.time-lastcheck > 120 then
     lastcheck = Time.time -- STOP THE SPAM ops.
     if beta then
@@ -203,6 +203,8 @@ function callVersionCheck()
     else
       WebRequest.get(URLS['ENCODER'],self,"versionCheck")
     end
+  else
+    Player[p].broadcast("Please wait "..(lastcheck+120-Time.time).." seconds before preforming another update check.")
   end
 end
 function versionCheck(wr)
