@@ -205,6 +205,7 @@ function callVersionCheck(p)
     end
   else
     Player[p].broadcast("Please wait "..(lastcheck+120-Time.time).." seconds before preforming another update check.")
+  end
 end
 function versionCheck(wr)
   wr = wr.text
