@@ -1,8 +1,8 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '3.14'
-version_string = "Did someone say context menu and auto updates?"
+version = '3.15'
+version_string = "Minor Api bug fixes."
 beta=true
 lastcheck = 0
 
@@ -18,10 +18,11 @@ Object Structure
 EncodedObjects[objID] = {
 	this = Object
 	oName = Original Name
-	encoded = {}
+	encoded = { ....enabled}
   menus = {}
 	editing = nil
   flip = 1
+  disable = false
 ]]
 Properties = {}
 --[[
@@ -726,9 +727,7 @@ function APIpropertyExists(p)
   return Properties[p.propID] ~= nil
 end
 function APItoggleProperty(p)
-  if toggleProperty(p.obj,p.propID) ~= p.enabled then
-    toggleProperty(p.obj,p.propID)
-  end
+  toggleProperty(p.obj,p.propID)
 end
 function APIobjectExist(p)
   return EncodedObjects[p.obj.getGUID()] ~= nil
