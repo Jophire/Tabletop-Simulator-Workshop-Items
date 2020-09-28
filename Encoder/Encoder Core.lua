@@ -759,6 +759,14 @@ function APIsetOAData(p)
     EncodedObjects[p.obj.getGUID()].encoded = p.data
   end
 end
+function APIcheckEnabled(p)
+  if EncodedObjects[p.obj.getGUID()] ~= nil then
+    if EncodedObjects[p.obj.getGUID()].encoded[p.propID] ~= nil then
+      return EncodedObjects[p.obj.getGUID()].encoded[p.propID].enabled
+    end
+  end
+  return false
+end
 function APIdisableEncoding(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     EncodedObjects[p.obj.getGUID()].disable = true
