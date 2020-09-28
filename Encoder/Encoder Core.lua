@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '3.15'
+version = '3.16'
 version_string = "Minor Api bug fixes."
 beta=true
 lastcheck = 0
