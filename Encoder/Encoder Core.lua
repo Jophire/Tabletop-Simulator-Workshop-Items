@@ -684,7 +684,7 @@ function buildPropFunction(p)
       for k,v in pairs(selection) do
         if EncodedObjects[v.getGUID()] ~= nil and v ~= obj then
           enabled = toggleProperty(v,p)
-          if pdat.callOnActivate == true and enabled == true if k == 1 then
+          if pdat.callOnActivate == true and enabled == true and k == 1 then
             --pdat.funcOwner.call(pdat.activateFunc,{object=v,player=ply})
           end
           buildButtons(v)
