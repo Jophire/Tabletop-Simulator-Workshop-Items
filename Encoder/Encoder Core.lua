@@ -1,9 +1,9 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '3.14'
-version_string = "Did someone say context menu and auto updates?"
-beta=false
+version = '3.18'
+version_string = "Minor Api bug fixes."
+beta=true
 lastcheck = 0
 
 URLS={
@@ -18,10 +18,11 @@ Object Structure
 EncodedObjects[objID] = {
 	this = Object
 	oName = Original Name
-	encoded = {}
+	encoded = { ....enabled}
   menus = {}
 	editing = nil
   flip = 1
+  disable = false
 ]]
 Properties = {}
 --[[
@@ -67,7 +68,7 @@ function onLoad(saved_data)
   -- Version Display
   barSize,fsize,offset_x,offset_y = updateSize(''..version,60,6.0,1,0)
   basic_buttons['VersionDisp'] = {click_function='doNothing',function_owner=self,label=''..version,position={0.6+offset_x*0.47,0.12,0.05+offset_y},rotation={0,0,0},width=0,height=0,font_size=fsize,color={0,0,0,1},font_color={1,0,0,1}}
-	basic_buttons['toggleUI'] = {click_function='toggleUI',function_owner=self,label='Toggle UI',position={0+offset_x*0,0.12,0.4+offset_y},rotation={0,0,0},width=300,height=100,font_size=fsize,color={0,0,0,1},font_color={1,0,0,1}}
+	basic_buttons['toggleUI'] = {click_function='minimize',function_owner=self,label='Toggle UI',position={0+offset_x*0,0.12,0.4+offset_y},rotation={0,0,0},width=300,height=100,font_size=fsize,color={0,0,0,1},font_color={1,0,0,1}}
   
 	--Load up the save data.
   if saved_data ~= nil and saved_data ~= "" then
@@ -259,7 +260,6 @@ function updateUI()
 			table.insert(ts,{tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.toolID,onClick=g.."/"..n.toolID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}})
 		end
 	end 
-	
   local index = 0
   for k,v in pairs(tab) do
     if v.attributes ~= nil and v.attributes.id == "Encoder" then
@@ -267,11 +267,10 @@ function updateUI()
       break
     end
   end
-	
 	for k,v in pairs(Player.getColors()) do
 		if k ~= "Grey" then
-			tab[index]["children"][k]["children"][4]["children"][1]["children"][2]["children"][1]["children"][1]["children"] = ps
-			tab[index]["children"][k]["children"][4]["children"][1]["children"][4]["children"][1]["children"][1]["children"] = ts
+			--tab[index]["children"][k]["children"][4]["children"][1]["children"][2]["children"][1]["children"][1]["children"] = ps
+			--tab[index]["children"][k]["children"][4]["children"][1]["children"][4]["children"][1]["children"][1]["children"] = ts
 		end
 	end
 	UI.setXmlTable(tab)	
@@ -685,7 +684,7 @@ function buildPropFunction(p)
       for k,v in pairs(selection) do
         if EncodedObjects[v.getGUID()] ~= nil and v ~= obj then
           enabled = toggleProperty(v,p)
-          if pdat.callOnActivate == true and enabled == true then
+          if pdat.callOnActivate == true and enabled == true if k == 1 then
             --pdat.funcOwner.call(pdat.activateFunc,{object=v,player=ply})
           end
           buildButtons(v)
@@ -699,7 +698,7 @@ function buildPropFunction(p)
     local selection =ply.getSelectedObjects()
     if selection ~= nil then
       for k,v in pairs(selection) do
-        if EncodedObjects[v.getGUID()] ~= nil and v ~= obj then
+        if EncodedObjects[v.getGUID()] ~= nil then
           enabled = toggleProperty(v,p)
           if pdat.callOnActivate == true and enabled == true and k == 1 then
             pdat.funcOwner.call(pdat.activateFunc,{object=v,player=ply})
@@ -726,9 +725,7 @@ function APIpropertyExists(p)
   return Properties[p.propID] ~= nil
 end
 function APItoggleProperty(p)
-  if toggleProperty(p.obj,p.propID) ~= p.enabled then
-    toggleProperty(p.obj,p.propID)
-  end
+  toggleProperty(p.obj,p.propID)
 end
 function APIobjectExist(p)
   return EncodedObjects[p.obj.getGUID()] ~= nil
@@ -759,6 +756,14 @@ function APIsetOAData(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     EncodedObjects[p.obj.getGUID()].encoded = p.data
   end
+end
+function APIcheckEnabled(p)
+  if EncodedObjects[p.obj.getGUID()] ~= nil then
+    if EncodedObjects[p.obj.getGUID()].encoded[p.propID] ~= nil then
+      return EncodedObjects[p.obj.getGUID()].encoded[p.propID].enabled
+    end
+  end
+  return false
 end
 function APIdisableEncoding(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
