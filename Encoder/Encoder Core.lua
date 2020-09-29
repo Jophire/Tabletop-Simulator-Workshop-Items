@@ -3,7 +3,7 @@ mod_name = "Encoder"
 postfix = ''
 version = '3.18'
 version_string = "Minor Api bug fixes."
-beta=true
+beta=false
 lastcheck = 0
 
 URLS={
