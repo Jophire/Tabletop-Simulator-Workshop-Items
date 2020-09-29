@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '3.17'
+version = '3.18'
 version_string = "Minor Api bug fixes."
 beta=true
 lastcheck = 0
@@ -273,7 +273,7 @@ function updateUI()
 			--tab[index]["children"][k]["children"][4]["children"][1]["children"][4]["children"][1]["children"][1]["children"] = ts
 		end
 	end
-	--UI.setXmlTable(tab)	
+	UI.setXmlTable(tab)	
 end
 
 -- Hide the XML UI.
@@ -684,7 +684,7 @@ function buildPropFunction(p)
       for k,v in pairs(selection) do
         if EncodedObjects[v.getGUID()] ~= nil and v ~= obj then
           enabled = toggleProperty(v,p)
-          if pdat.callOnActivate == true and enabled == true then
+          if pdat.callOnActivate == true and enabled == true if k == 1 then
             --pdat.funcOwner.call(pdat.activateFunc,{object=v,player=ply})
           end
           buildButtons(v)
