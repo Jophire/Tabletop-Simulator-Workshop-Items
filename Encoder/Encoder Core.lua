@@ -1,8 +1,8 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '3.18'
-version_string = "Minor Api bug fixes."
+version = '4.0'
+version_string = "Major Overhaul of how properties interact with each other."
 beta=true
 lastcheck = 0
 
@@ -18,6 +18,7 @@ Object Structure
 EncodedObjects[objID] = {
 	this = Object
 	oName = Original Name
+  values = { }
 	encoded = { ....enabled}
   menus = {}
 	editing = nil
@@ -32,6 +33,12 @@ Properties = {}
   funcOwner = obj,
   callOnActivate = true,
   activateFunc ='callEditor'
+]]
+Values = {}
+--[[
+  valueID = internal name, used by Values as key,
+  type = Lua type definition
+  default = 'default_value'
 ]]
 Tools = {}
 --[[
@@ -661,6 +668,7 @@ function buildBaseForm(o)
     tempTable = {}
     tempTable['this'] = o
     tempTable['oName'] = o.getName()
+    tempTable['values'] = {}
     tempTable['encoded'] = {}
     tempTable['menus'] = {props={open=false,pos=0},copy={open=false,pos=0}}
     tempTable['editing'] = nil
@@ -711,28 +719,34 @@ function buildPropFunction(p)
 end
 
 -- API Functions
+--REGISTRATION
+--register a new property.
 function APIregisterProperty(p)
   Properties[p.propID] = deepcopy(p)
   print(Properties[p.propID].propID.." Registered")
   buildPropFunction(p.propID)
 	updateUI()
 end
-function APIremoveProperty(p)
-  Properties[p.propID] = nil
-	updateUI()
+--register a new tool
+function APIregisterTool(p)
+  Tools[p.toolID] = deepcopy(p)
+  print(Tools[p.toolID].toolID.." Registered")
 end
-function APIpropertyExists(p)
-  return Properties[p.propID] ~= nil
-end
-function APItoggleProperty(p)
-  toggleProperty(p.obj,p.propID)
-end
-function APIobjectExist(p)
-  return EncodedObjects[p.obj.getGUID()] ~= nil
-end
+--registers a new object to be encoded.
 function APIaddObject(p)
   encodeObject(p.obj)
 end
+
+--GETTERS/SETTERS
+--checks if a given property exists, returns BOOL
+function APIpropertyExists(p)
+  return Properties[p.propID] ~= nil
+end
+--checks if a given object is encoded, returns BOOL
+function APIobjectExist(p)
+  return EncodedObjects[p.obj.getGUID()] ~= nil
+end
+--
 function APIgetObjectData(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     data = EncodedObjects[p.obj.getGUID()].encoded
@@ -757,23 +771,15 @@ function APIsetOAData(p)
     EncodedObjects[p.obj.getGUID()].encoded = p.data
   end
 end
-function APIcheckEnabled(p)
-  if EncodedObjects[p.obj.getGUID()] ~= nil then
-    if EncodedObjects[p.obj.getGUID()].encoded[p.propID] ~= nil then
-      return EncodedObjects[p.obj.getGUID()].encoded[p.propID].enabled
-    end
-  end
-  return false
-end
-function APIdisableEncoding(p)
-  if EncodedObjects[p.obj.getGUID()] ~= nil then
-    EncodedObjects[p.obj.getGUID()].disable = true
-		buildButtons(p.obj)
-  end
-end
+
+
+--BUTTON UI FUNCTIONS
+--sets current editing state, so that buttons don't overlap. 
+--the p.propID that is called must have a function createButtons({obj=object being edited})
 function APIsetEditing(p)
   EncodedObjects[p.obj.getGUID()].editing = p.propID
 end
+--gets current editing state, so that buttons don't overlap.
 function APIgetEditing(p)
   return EncodedObjects[p.obj.getGUID()].editing
 end
@@ -789,6 +795,35 @@ end
 function APIgetFlip(p)
   return EncodedObjects[p.obj.getGUID()].flip
 end
+
+
+--MISC FUNCTIONS
+function APItoggleProperty(p)
+  toggleProperty(p.obj,p.propID)
+end
+function APIdisableEncoding(p)
+  if EncodedObjects[p.obj.getGUID()] ~= nil then
+    EncodedObjects[p.obj.getGUID()].disable = true
+		buildButtons(p.obj)
+  end
+end
+
+
+--CLEANUP
+function APIremoveProperty(p)
+  Properties[p.propID] = nil
+	updateUI()
+end
+
+
+function APIcheckEnabled(p)
+  if EncodedObjects[p.obj.getGUID()] ~= nil then
+    if EncodedObjects[p.obj.getGUID()].encoded[p.propID] ~= nil then
+      return EncodedObjects[p.obj.getGUID()].encoded[p.propID].enabled
+    end
+  end
+  return false
+end
 function APIgetOName(p)
 	return EncodedObjects[p.obj.getGUID()].oName
 end
@@ -797,13 +832,6 @@ function APIsetOName(p)
 end
 function APIformatButton(p)
   return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
-end
-function APIregisterTool(p)
-  Tools[p.toolID] = deepcopy(p)
-  print(Tools[p.toolID].toolID.." Registered")
-end
-function APIregisterXML(p)
-
 end
 function printPropertyGuide()
     guide = {}
