@@ -719,6 +719,16 @@ function buildPropFunction(p)
 end
 
 -- API Functions
+--[[Almost all function within the api require a table to be passed to them.
+Table keys that are used are as follows.
+obj = the object that is the target of the api call. RW
+propID = the property that is the target of the api call. RW
+value = the value that is the target of the api call. RW
+data = a table of key value pairs related to the cards encoded data RW
+{obj=__,propID='',value='',data={}}
+not all of the values are required for every API function.
+]]
+
 --REGISTRATION
 --register a new property.
 function APIregisterProperty(p)
@@ -746,8 +756,18 @@ end
 function APIobjectExist(p)
   return EncodedObjects[p.obj.getGUID()] ~= nil
 end
---
-function APIgetObjectData(p)
+--Get or Set
+function APIobjGetValData(p)
+end
+function APIobjSetValData(p)
+end
+function APIobjGetAllData(p)
+end
+function APIobjSetAllData(p)
+end
+ 
+--DEPRECIATED USE NEW API Functions
+function APIgetObjectData(p)  --APIobjGetValData
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     data = EncodedObjects[p.obj.getGUID()].encoded
     if data[p.propID] ~= nil then
@@ -760,7 +780,7 @@ function APIsetObjectData(p)
     EncodedObjects[p.obj.getGUID()].encoded[p.propID] = p.data
   end
 end
-function APIgetOAData(p)
+function APIgetOAData(p)      --APIobjGetAllData
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     data = EncodedObjects[p.obj.getGUID()].encoded
     return data
@@ -780,18 +800,23 @@ function APIsetEditing(p)
   EncodedObjects[p.obj.getGUID()].editing = p.propID
 end
 --gets current editing state, so that buttons don't overlap.
+--returns the propID currently be edited.
 function APIgetEditing(p)
   return EncodedObjects[p.obj.getGUID()].editing
 end
+--Clears the editing value to allow other objects to gain control of editing.
 function APIclearEditing(p)
   EncodedObjects[p.obj.getGUID()].editing = nil
 end
+--Builds the card buttons for all enabled properties.
 function APIrebuildButtons(p)
   buildButtons(p.obj)
 end
+--Flips which side of the card the buttons show up on.
 function APIFlip(p)
-  flipMenu(p.obj)
+  flipMenu(p.obj,p.flip)
 end
+--Returns which side the menu is currently on.
 function APIgetFlip(p)
   return EncodedObjects[p.obj.getGUID()].flip
 end
