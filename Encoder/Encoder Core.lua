@@ -18,18 +18,19 @@ Object Structure
 EncodedObjects[objID] = {
 	this = Object
 	oName = Original Name
-  values = { }
-	encoded = { ....enabled}
+  values = {valueID = value }
+	encoded = {propID = boolean}
   menus = {}
 	editing = nil
   flip = 1
-  disable = false
+  disabled = false
 ]]
 Properties = {}
 --[[
   propID = internal name,
   name = external name,
-  dataStruct = {},
+  values = {},  --List of Values this property calls on. DOES NOT GET REGISTERED FROM HERE.
+  dataStruct = {}, --DEPRECIATED
   funcOwner = obj,
   callOnActivate = true,
   activateFunc ='callEditor'
@@ -39,6 +40,7 @@ Values = {}
   valueID = internal name, used by Values as key,
   type = Lua type definition
   default = 'default_value'
+  props = {} list of properties that use this value.
 ]]
 Tools = {}
 --[[
@@ -357,7 +359,6 @@ end
 function onObjectLeaveContainer(__,obj)
   showCardDetails({obj})
 end
-
 function onObjectDestroyed(obj)
   if obj == self then
     for i,v in pairs(EncodedObjects) do 
@@ -742,6 +743,17 @@ function APIregisterTool(p)
   Tools[p.toolID] = deepcopy(p)
   print(Tools[p.toolID].toolID.." Registered")
 end
+--register a new value.
+function APIregisterValue(p)
+  if Values[p.valueID] == nil then
+    Values[p.valueID] = {}
+    Values[p.valueID]['default']= p.default
+    Values[p.valueID]['typeRest']= p.typeRest
+    Values[p.valueID]['props']={}
+    Values[p.valueID]['validate']= _G[p.valueID..'Validate'] = function(val) if type(val) == p.typeRest or p.typeRest == 'nil' then return val else return p.default end end
+  end
+  table.insert(Values[p.valueID]['props'],p.propID)
+end
 --registers a new object to be encoded.
 function APIaddObject(p)
   encodeObject(p.obj)
@@ -756,11 +768,22 @@ end
 function APIobjectExist(p)
   return EncodedObjects[p.obj.getGUID()] ~= nil
 end
---Get or Set
+--Get or Set value data based on propID.
 function APIobjGetValData(p)
+  if EncodedObjects[p.obj.getGUID()] ~= nil then
+    target = p.obj.getGUID()
+    if EncodedObjects[target] ~= nil then
+      data = {}
+      for k,v in pairs(Properties[p.propID].values) do
+        data[v]=EncodedObjects[target].values[v]
+      end
+      return data
+    end
+  end
 end
 function APIobjSetValData(p)
 end
+--Get or Set all value data of a given object.
 function APIobjGetAllData(p)
 end
 function APIobjSetAllData(p)
@@ -851,9 +874,6 @@ function APIcheckEnabled(p)
 end
 function APIgetOName(p)
 	return EncodedObjects[p.obj.getGUID()].oName
-end
-function APIsetOName(p)
-	EncodedObjects[p.obj.getGUID()].oName = p.name
 end
 function APIformatButton(p)
   return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
