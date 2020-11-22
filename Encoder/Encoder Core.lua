@@ -1,8 +1,8 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '3.18'
-version_string = "Minor Api bug fixes."
+version = '4.0'
+version_string = "Major Overhaul of how properties interact with each other."
 beta=true
 lastcheck = 0
 
@@ -18,20 +18,31 @@ Object Structure
 EncodedObjects[objID] = {
 	this = Object
 	oName = Original Name
-	encoded = { ....enabled}
+  values = {valueID = value}
+	encoded = {propID = boolean}
   menus = {}
 	editing = nil
   flip = 1
-  disable = false
+  disabled = false
 ]]
 Properties = {}
 --[[
   propID = internal name,
   name = external name,
-  dataStruct = {},
+  values = {},  --List of Values this property calls on. DOES NOT GET REGISTERED FROM HERE.
+  dataStruct = {}, --DEPRECIATED
   funcOwner = obj,
   callOnActivate = true,
-  activateFunc ='callEditor'
+  activateFunc ='callEditor',
+  
+  xml_index = tableindex
+]]
+Values = {}
+--[[
+  valueID = internal name, used by Values as key,
+  type = Lua type definition
+  default = 'default_value'
+  props = {} list of properties that use this value.
 ]]
 Tools = {}
 --[[
@@ -73,17 +84,6 @@ function onLoad(saved_data)
 	--Load up the save data.
   if saved_data ~= nil and saved_data ~= "" then
     loaded_data = JSON.decode(saved_data)
-    if loaded_data.cards ~= nil then
-      for i,v in pairs(loaded_data.cards) do
-        if i ~= nil and v ~= nil and v ~= "" then
-          EncodedObjects[i] = JSON.decode(v)
-          EncodedObjects[i].this = getObjectFromGUID(i)
-          if EncodedObjects[i].this == nil then
-            EncodedObjects[i] = nil
-          end
-        end
-      end
-    end
     if loaded_data.properties ~= nil then 
       for i,v in pairs(loaded_data.properties) do
         if i ~= nil and v ~= nil and v ~= "" then
@@ -111,9 +111,22 @@ function onLoad(saved_data)
     if loaded_data.zones ~= nil then
       Zones = JSON.decode(loaded_data.zones)
     end
-  end
-  for i,v in pairs(EncodedObjects) do 
-    buildButtons(v.this)
+    if loaded_data.values ~= nil then
+    
+    end
+    if loaded_data.cards ~= nil then
+      for i,v in pairs(loaded_data.cards) do
+        if i ~= nil and v ~= nil and v ~= "" then
+          EncodedObjects[i] = JSON.decode(v)
+          EncodedObjects[i].this = getObjectFromGUID(i)
+          if EncodedObjects[i].this == nil then
+            EncodedObjects[i] = nil
+          else
+            buildButtons(EncodedObjects[i].this)
+          end
+        end
+      end
+    end
   end
   buildZones()
   createEncoderButtons()
@@ -153,7 +166,7 @@ function onLoad(saved_data)
   end
   )
   
-	WebRequest.get(URLS['XML'],self,"buildUI")
+	--WebRequest.get(URLS['XML'],self,"buildUI")
 end
 
 -- Saves core data on save triggers.
@@ -164,6 +177,7 @@ function onSave()
   data_to_save["properties"] = {}
   data_to_save["tools"] = {}
   data_to_save["zones"] = JSON.encode(Zones)
+  data_to_save["values"] = {}
   
   for i,v in pairs(EncodedObjects) do
     --Removing Object reference before encoding.
@@ -192,6 +206,8 @@ function onSave()
       Tools[i].funcOwner = tempThis
     end
   end
+  for i,v in pairs(Values) do
+  end
   saved_data = JSON.encode(data_to_save)
   return saved_data
 end
@@ -210,8 +226,7 @@ function callVersionCheck(p)
 end
 function versionCheck(wr)
   wr = wr.text
-  ver = string.match(wr,"version = '(.-)'")
-  print(ver.." "..version)
+  ver = versionComp(string.match(wr,"version = '(.-)'"),version)
   if ''..ver ~= ''..version then
     if beta == true then
       broadcastToAll("An update has been found for the beta branch. Reloading encoder.")
@@ -224,7 +239,26 @@ function versionCheck(wr)
     broadcastToAll("No update found at this time. Carry on.")
   end
 end
-
+function versionComp(a,b)
+  --First does the pattern only contain ([0-9]+)%.?
+  --Pattern for versioning ##.##.##.##
+  va = {}
+  vb = {}
+  for f in string.gmatch(a,'([0-9]+)%.?') do
+    table.insert(va,tonumber(f))
+  end
+  for f in string.gmatch(b,'([0-9]+)%.?') do
+    table.insert(vb,tonumber(f))
+  end
+  for k = 1, #va >= #vb and #va or #vb do
+    if (va[k] ~= nil and va[k] or 0) > (vb[k] ~= nil and vb[k] or 0) then
+      return a
+    elseif (va[k] ~= nil and va[k] or 0) < (vb[k] ~= nil and vb[k] or 0) then
+      return b
+    end
+  end
+end
+--[[
 function buildUI(wr)
   wr = wr.text
   wr = string.gsub(wr,"VERSION_NUMBER",version)
@@ -286,7 +320,7 @@ function minimize(plr,n,id)
 	else
 		UI.setAttribute(id,"active",true)
 	end
-end
+end]]
 
 -- NEW- Creates scripting zones around each players hands.
 -- This is used to more reliably hide/reveal card buttons as it transitions zones.
@@ -350,7 +384,6 @@ end
 function onObjectLeaveContainer(__,obj)
   showCardDetails({obj})
 end
-
 function onObjectDestroyed(obj)
   if obj == self then
     for i,v in pairs(EncodedObjects) do 
@@ -360,7 +393,7 @@ function onObjectDestroyed(obj)
     end
 		for k,v in pairs(Player.getColors()) do
 			if v ~= "Grey" then
-				UI.setAttribute(k.."MainMenu","active",false)
+				--UI.setAttribute(k.."MainMenu","active",false)
 			end
 		end
   end
@@ -475,7 +508,7 @@ function buildButtons(o)
 							barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,-1,0)
 							o.createButton({
 							label=temp, click_function=v.activateFunc, function_owner=v.funcOwner,
-							position={(1.05+offset_x)*flip*scaler.x,zpos,(-0.75+((count-pos)/4)+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
+							position={(1.05+offset_x)*flip*scaler.x,zpos,(-0.75+((count-pos)/3)+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
 							rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
 							})
 						end
@@ -536,9 +569,9 @@ function buildButtons(o)
       end
       
       for k,v in pairs(EncodedObjects[o.getGUID()].encoded) do
-        if v.enabled == true and Properties[k]~=nil and Properties[k].funcOwner~= nil then
+        if v == true and Properties[k]~=nil and Properties[k].funcOwner~= nil then
 					--print(k)
-          Properties[k].funcOwner.call("createButtons",{object=o})
+          Properties[k].funcOwner.call("createButtons",{obj=o})
         end
       end
     else
@@ -636,19 +669,23 @@ end
 function toggleProperty(o,p)
   if EncodedObjects[o.getGUID()] == nil then
   else
-    propTable = EncodedObjects[o.getGUID()].encoded[p]
-    if propTable == nil then
-      propTable = buildPropData(p)
-      propTable['enabled'] = true
+    local prop = EncodedObjects[o.getGUID()].encoded[p]
+    if prop == nil then
+      EncodedObjects[o.getGUID()].encoded[p] = true
+      for k,v in pairs(Properties[p].values) do
+        if Values[v] ~= nil and EncodedObjects[o.getGUID()].values[v] == nil then
+          EncodedObjects[o.getGUID()].values[v] = Values[v].default
+          --print(EncodedObjects[o.getGUID()].values[v])
+        end
+      end
     else
-      if propTable.enabled ~= true then
-        propTable.enabled = true
+      if prop ~= true then
+        EncodedObjects[o.getGUID()].encoded[p] = true
       else
-        propTable.enabled = false
+        EncodedObjects[o.getGUID()].encoded[p] = false
       end
     end
-    EncodedObjects[o.getGUID()].encoded[p] = propTable
-    return propTable.enabled
+    return EncodedObjects[o.getGUID()].encoded[p]
   end
 end
 function closeEditor(o)
@@ -661,17 +698,15 @@ function buildBaseForm(o)
     tempTable = {}
     tempTable['this'] = o
     tempTable['oName'] = o.getName()
+    tempTable['values'] = {}
     tempTable['encoded'] = {}
     tempTable['menus'] = {props={open=false,pos=0},copy={open=false,pos=0}}
     tempTable['editing'] = nil
     tempTable['flip'] = 1
     tempTable['disable'] = false
-		tempTable['folder_path'] = "Home"
     return tempTable
 end
-function buildPropData(p)
-  return deepcopy(Properties[p].dataStruct)
-end
+
 function buildPropFunction(p)
   local pdat = Properties[p]
   _G[p.."Toggle"] = function(obj,ply) 
@@ -711,29 +746,157 @@ function buildPropFunction(p)
 end
 
 -- API Functions
+--[[Almost all function within the api require a table to be passed to them.
+Table keys that are used are as follows.
+obj = the object that is the target of the api call. RW
+propID = the property that is the target of the api call. RW
+valueID = the value that is the target of the api call. RW
+data = a table of key value pairs related to the cards encoded data RW
+{obj=__,propID='',valueID='',data={valueID=value}}
+not all of the values are required for every API function.
+]]
+
+--REGISTRATION
+--register a new property.
 function APIregisterProperty(p)
   Properties[p.propID] = deepcopy(p)
   print(Properties[p.propID].propID.." Registered")
   buildPropFunction(p.propID)
-	updateUI()
+	--updateUI()
 end
-function APIremoveProperty(p)
-  Properties[p.propID] = nil
-	updateUI()
+function APIlistProps()
+
 end
+--register a new tool
+function APIregisterTool(p)
+  Tools[p.toolID] = deepcopy(p)
+  print(Tools[p.toolID].toolID.." Registered")
+end
+--register a new value.
+function APIregisterValue(p)
+  if Values[p.valueID] == nil then
+    Values[p.valueID] = {}
+    Values[p.valueID]['default']= p.default
+    Values[p.valueID]['validType']= p.validType
+    Values[p.valueID]['props']={}
+    Values[p.valueID]['validate']= function(val,cur) if type(val) == p.validType or p.validType == 'nil' then return val else return cur ~= nil and cur or p.default end end
+    _G[p.valueID..'Validate']= Values[p.valueID]['validate']
+  end
+  table.insert(Values[p.valueID]['props'],p.propID)
+end
+function APIlistValues()
+  data = {}
+  for k,v in pairs(Values) do
+    table.insert(data,k)
+  end
+  return data
+end
+--registers a new object to be encoded.
+function APIencodeObject(p)
+  encodeObject(p.obj)
+end
+
+
+--GETTERS/SETTERS
+--checks if a given property is registered, returns BOOL
 function APIpropertyExists(p)
   return Properties[p.propID] ~= nil
+end
+--checks if a given object is encoded, returns BOOL
+function APIobjectExists(p)
+  return EncodedObjects[p.obj.getGUID()] ~= nil
+end
+--checks if a given value is registered, returns BOOL
+function APIvalueExists(p)
+  return Values[p.valueID] ~= nil
+end
+
+--Get or Set a single value based on valueID. Returns the value.
+function APIobjGetValueData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
+    if EncodedObjects[target].values[p.valueID] == nil then
+      EncodedObjects[target].values[p.valueID] = Values[p.valueID].default
+    end
+    val = EncodedObjects[target].values[p.valueID]
+    data = {}
+    data[p.valueID]=val
+    return data
+  end
+end
+function APIobjSetValueData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
+    EncodedObjects[target].values[p.valueID] = _G[k.."Validate"](p.data.valueID)
+  end
+end
+function APIobjDefaultValue(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil and  Values[p.valueID] ~= nil then
+    EncodedObjects[target].values[p.valueID] = Values[p.valueID].default
+  end
+end
+
+--Get or Set value data based on propID. Returns and accepts an array of Key-Values. Key is a valid valueID.
+function APIobjGetPropData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    data = {}
+    for k,v in pairs(Properties[p.propID].values) do
+      data[v]=EncodedObjects[target].values[v]
+    end
+    return data
+  end
+end
+function APIobjSetPropData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    for k,v in pairs(p.data) do
+      if Values[k] ~= nil and Properties[p.propID].values[k] ~= nil then
+        EncodedObjects[target].values[k] = _G[k.."Validate"](v)
+      else
+        error('Unknown value '..k..' for property '..p.propID..'.')
+      end
+    end
+  end
+end
+function APIobjIsPropEnabled(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    if EncodedObjects[target].encoded[p.propID] ~= nil then
+      return EncodedObjects[target].encoded[p.propID]
+    else
+      return false
+    end
+  end
+  return false
 end
 function APItoggleProperty(p)
   toggleProperty(p.obj,p.propID)
 end
-function APIobjectExist(p)
-  return EncodedObjects[p.obj.getGUID()] ~= nil
+
+--Get or Set all value data of a given object.
+function APIobjGetAllData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+   return EncodedObjects[target].values
+  end
 end
-function APIaddObject(p)
-  encodeObject(p.obj)
+function APIobjSetAllData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    for k,v in pairs(p.data) do
+      if Values[k] ~= nil then
+        EncodedObjects[target].values[k] = _G[k.."Validate"](v)
+      else
+        error('Unknown value '..k..'.')
+      end
+    end
+  end
 end
-function APIgetObjectData(p)
+ 
+--[[DEPRECIATED USE NEW API Functions
+function APIgetObjectData(p)  --APIobjGetPropData
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     data = EncodedObjects[p.obj.getGUID()].encoded
     if data[p.propID] ~= nil then
@@ -746,7 +909,7 @@ function APIsetObjectData(p)
     EncodedObjects[p.obj.getGUID()].encoded[p.propID] = p.data
   end
 end
-function APIgetOAData(p)
+function APIgetOAData(p)      --APIobjGetAllData
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     data = EncodedObjects[p.obj.getGUID()].encoded
     return data
@@ -757,65 +920,57 @@ function APIsetOAData(p)
     EncodedObjects[p.obj.getGUID()].encoded = p.data
   end
 end
-function APIcheckEnabled(p)
-  if EncodedObjects[p.obj.getGUID()] ~= nil then
-    if EncodedObjects[p.obj.getGUID()].encoded[p.propID] ~= nil then
-      return EncodedObjects[p.obj.getGUID()].encoded[p.propID].enabled
-    end
-  end
-  return false
+--]]
+
+--BUTTON UI FUNCTIONS
+--sets current editing state, so that buttons don't overlap. 
+--the p.propID that is called must have a function createButtons({obj=object being edited})
+function APIsetEditing(p)
+  EncodedObjects[p.obj.getGUID()].editing = p.propID
 end
+--gets current editing state, so that buttons don't overlap.
+--returns the propID currently be edited.
+function APIgetEditing(p)
+  return EncodedObjects[p.obj.getGUID()].editing
+end
+--Clears the editing value to allow other objects to gain control of editing.
+function APIclearEditing(p)
+  EncodedObjects[p.obj.getGUID()].editing = nil
+end
+--Builds the card buttons for all enabled properties.
+function APIrebuildButtons(p)
+  buildButtons(p.obj)
+end
+--Flips which side of the card the buttons show up on.
+function APIFlip(p)
+  flipMenu(p.obj,p.flip)
+end
+--Returns which side the menu is currently on.
+function APIgetFlip(p)
+  return EncodedObjects[p.obj.getGUID()].flip
+end
+
+
+--MISC FUNCTIONS
+
 function APIdisableEncoding(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     EncodedObjects[p.obj.getGUID()].disable = true
 		buildButtons(p.obj)
   end
 end
-function APIsetEditing(p)
-  EncodedObjects[p.obj.getGUID()].editing = p.propID
+
+--CLEANUP
+function APIremoveProperty(p)
+  Properties[p.propID] = nil
+	--updateUI()
 end
-function APIgetEditing(p)
-  return EncodedObjects[p.obj.getGUID()].editing
-end
-function APIclearEditing(p)
-  EncodedObjects[p.obj.getGUID()].editing = nil
-end
-function APIrebuildButtons(p)
-  buildButtons(p.obj)
-end
-function APIFlip(p)
-  flipMenu(p.obj)
-end
-function APIgetFlip(p)
-  return EncodedObjects[p.obj.getGUID()].flip
-end
+
 function APIgetOName(p)
 	return EncodedObjects[p.obj.getGUID()].oName
 end
-function APIsetOName(p)
-	EncodedObjects[p.obj.getGUID()].oName = p.name
-end
 function APIformatButton(p)
   return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
-end
-function APIregisterTool(p)
-  Tools[p.toolID] = deepcopy(p)
-  print(Tools[p.toolID].toolID.." Registered")
-end
-function APIregisterXML(p)
-
-end
-function printPropertyGuide()
-    guide = {}
-    guide.title = 'Property Variables and Creation'
-    guide.body = 'propID = internal name\n'..
-	'name = external name\n'..
-	'dataStruct = {}\n'..
-	'clickFunction = function name\n'..
-	'funcOwner = function owner\n'..
-	'callOnActivate = bool\n'..
-    '\n\n---Definitions---\n'
-    addNotebookTab(guide)
 end
 
 -- Tool Functions
