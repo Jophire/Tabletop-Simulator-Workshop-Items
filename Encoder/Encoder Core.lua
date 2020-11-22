@@ -18,7 +18,7 @@ Object Structure
 EncodedObjects[objID] = {
 	this = Object
 	oName = Original Name
-  values = {valueID = value }
+  values = {valueID = value}
 	encoded = {propID = boolean}
   menus = {}
 	editing = nil
@@ -570,7 +570,7 @@ function buildButtons(o)
       
       for k,v in pairs(EncodedObjects[o.getGUID()].encoded) do
         if v == true and Properties[k]~=nil and Properties[k].funcOwner~= nil then
-					print(k)
+					--print(k)
           Properties[k].funcOwner.call("createButtons",{obj=o})
         end
       end
@@ -675,7 +675,7 @@ function toggleProperty(o,p)
       for k,v in pairs(Properties[p].values) do
         if Values[v] ~= nil and EncodedObjects[o.getGUID()].values[v] == nil then
           EncodedObjects[o.getGUID()].values[v] = Values[v].default
-          print(EncodedObjects[o.getGUID()].values[v])
+          --print(EncodedObjects[o.getGUID()].values[v])
         end
       end
     else
@@ -750,9 +750,9 @@ end
 Table keys that are used are as follows.
 obj = the object that is the target of the api call. RW
 propID = the property that is the target of the api call. RW
-value = the value that is the target of the api call. RW
+valueID = the value that is the target of the api call. RW
 data = a table of key value pairs related to the cards encoded data RW
-{obj=__,propID='',value='',data={}}
+{obj=__,propID='',valueID='',data={valueID=value}}
 not all of the values are required for every API function.
 ]]
 
@@ -763,6 +763,9 @@ function APIregisterProperty(p)
   print(Properties[p.propID].propID.." Registered")
   buildPropFunction(p.propID)
 	--updateUI()
+end
+function APIlistProps()
+
 end
 --register a new tool
 function APIregisterTool(p)
@@ -781,10 +784,18 @@ function APIregisterValue(p)
   end
   table.insert(Values[p.valueID]['props'],p.propID)
 end
+function APIlistValues()
+  data = {}
+  for k,v in pairs(Values) do
+    table.insert(data,k)
+  end
+  return data
+end
 --registers a new object to be encoded.
-function APIaddObject(p)
+function APIencodeObject(p)
   encodeObject(p.obj)
 end
+
 
 --GETTERS/SETTERS
 --checks if a given property is registered, returns BOOL
@@ -799,6 +810,33 @@ end
 function APIvalueExists(p)
   return Values[p.valueID] ~= nil
 end
+
+--Get or Set a single value based on valueID. Returns the value.
+function APIobjGetValueData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
+    if EncodedObjects[target].values[p.valueID] == nil then
+      EncodedObjects[target].values[p.valueID] = Values[p.valueID].default
+    end
+    val = EncodedObjects[target].values[p.valueID]
+    data = {}
+    data[p.valueID]=val
+    return data
+  end
+end
+function APIobjSetValueData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
+    EncodedObjects[target].values[p.valueID] = _G[k.."Validate"](p.data.valueID)
+  end
+end
+function APIobjDefaultValue(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil and  Values[p.valueID] ~= nil then
+    EncodedObjects[target].values[p.valueID] = Values[p.valueID].default
+  end
+end
+
 --Get or Set value data based on propID. Returns and accepts an array of Key-Values. Key is a valid valueID.
 function APIobjGetPropData(p)
   local target = p.obj.getGUID()
@@ -822,6 +860,21 @@ function APIobjSetPropData(p)
     end
   end
 end
+function APIobjIsPropEnabled(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    if EncodedObjects[target].encoded[p.propID] ~= nil then
+      return EncodedObjects[target].encoded[p.propID]
+    else
+      return false
+    end
+  end
+  return false
+end
+function APItoggleProperty(p)
+  toggleProperty(p.obj,p.propID)
+end
+
 --Get or Set all value data of a given object.
 function APIobjGetAllData(p)
   local target = p.obj.getGUID()
@@ -899,22 +952,12 @@ end
 
 
 --MISC FUNCTIONS
-function APItoggleProperty(p)
-  toggleProperty(p.obj,p.propID)
-end
+
 function APIdisableEncoding(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     EncodedObjects[p.obj.getGUID()].disable = true
 		buildButtons(p.obj)
   end
-end
-function APIlistValues()
-  for k,v in pairs(Values) do
-  
-  end
-end
-function APIlistProps()
-
 end
 
 --CLEANUP
@@ -923,15 +966,6 @@ function APIremoveProperty(p)
 	--updateUI()
 end
 
-
-function APIcheckEnabled(p)
-  if EncodedObjects[p.obj.getGUID()] ~= nil then
-    if EncodedObjects[p.obj.getGUID()].encoded[p.propID] ~= nil then
-      return EncodedObjects[p.obj.getGUID()].encoded[p.propID].enabled
-    end
-  end
-  return false
-end
 function APIgetOName(p)
 	return EncodedObjects[p.obj.getGUID()].oName
 end
