@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.1.7'
+version = '4.2'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=true
 lastcheck = 0
@@ -894,6 +894,36 @@ function APIobjIsPropEnabled(p)
     end
   end
   return false
+end
+function APIobjGetProps(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    return EncodedObjects[target].encoded
+  end
+end
+function APIobjSetProps(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    EncodedObjects[target].encoded = p.data
+  end
+end
+function APIobjEnableProp(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    local prop = EncodedObjects[p.obj.getGUID()].encoded[p.propID]
+    if prop ~= true then
+      toggleProperty(p.obj,p.propID)
+    end
+  end
+end
+function APIobjDisableProp(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    local prop = EncodedObjects[p.obj.getGUID()].encoded[p.propID]
+    if prop == true then
+      toggleProperty(p.obj,p.propID)
+    end
+  end
 end
 function APItoggleProperty(p)
   toggleProperty(p.obj,p.propID)
