@@ -3,7 +3,8 @@ mod_name = "Encoder"
 postfix = ''
 version = '4.2'
 version_string = "Major Overhaul of how properties interact with each other."
-beta=true
+beta=false
+
 lastcheck = 0
 
 URLS={
