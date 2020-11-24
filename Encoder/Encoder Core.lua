@@ -753,22 +753,18 @@ function buildPropFunction(p)
   end
 end
 function buildValueValidationFunction(p)
-  print(p)
   v=Values[p]
   if string.find('stringnumberboolean',v.validType) then
     vt = v.validType
-    Values[p]['validate']= function(val,cur) print(type(val)..":"..vt) if type(val) == vt then return val else return cur end end
-    print('type validation')
+    Values[p]['validate']= function(val,cur) if type(val) == vt then return val else return cur end end
   elseif string.find(v.validType, 'pattern%b()') then
     _,_,pat = string.find(v.validType,'pattern(%b())')
     if #pat > 2 then
       pat = string.sub(pat,2,-2)
-      print(pat)
-      Values[p]['validate']= function(val,cur) print(val..":"..cur) if string.find(val,pat) then return val else return cur end end
+      Values[p]['validate']= function(val,cur) if string.find(val,pat) then return val else return cur end end
     end
   else
     Values[p]['validate']= function(val,cur) return val end
-    print('no validation')
   end
   _G[p..'Validate']= Values[p]['validate']
 end
@@ -870,7 +866,6 @@ function APIobjGetPropData(p)
   if EncodedObjects[target] ~= nil then
     data = {}
     for k,v in pairs(Properties[p.propID].values) do
-      --print(v)
       if EncodedObjects[target].values[v] == nil and  Values[v] ~= nil then
         EncodedObjects[target].values[v] = Values[v].default
       end
@@ -884,7 +879,6 @@ function APIobjSetPropData(p)
   if EncodedObjects[target] ~= nil then
     for k,v in pairs(Properties[p.propID].values) do
       if Values[v] ~= nil and p.data[v] ~= nil then
-        print(v.."="..p.data[v])
         EncodedObjects[target].values[v] = Values[v]["validate"](p.data[v],EncodedObjects[target].values[v])
       end
     end
