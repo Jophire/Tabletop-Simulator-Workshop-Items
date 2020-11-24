@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.1.6'
+version = '4.1.7'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=true
 lastcheck = 0
