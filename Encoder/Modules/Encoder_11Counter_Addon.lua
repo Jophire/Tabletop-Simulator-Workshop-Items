@@ -27,19 +27,22 @@ function registerModule()
     
     value = {
     valueID = 'oneOneCounter', 
-    validType = 'number',   
+    validType = 'number',
+    desc = 'MTG:+1/+1 and -1/-1 counters.',   
     default = 0       
     }
     enc.call("APIregisterValue",value)
     value = {
     valueID = 'moduleMod', 
-    validType = 'number',   
+    validType = 'number',
+    desc = 'The value used in conjunction by moduleMath to change values by.',   
     default = 1       
     }
     enc.call("APIregisterValue",value)
     value = {
     valueID = 'moduleMath', 
-    validType = 'pattern(^[*+][/-]$)',   
+    validType = 'pattern(^[*+][/-]$)',
+    desc = 'Used by various modules button click functions. Either Add/Subtract or Multiply/Divide.',   
     default = "+-"       
     }
     enc.call("APIregisterValue",value)
@@ -112,7 +115,7 @@ function updateEditDisp(obj)
     data = enc.call("APIobjGetPropData",{obj=obj,propID=pID})
     temp = ((data.oneOneCounter >= 0) and "+" or "")..data.oneOneCounter
     temp = ""..temp..'/'..temp..""
-    barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=400,max_len=90,xJust=1,yJust=0})
+    barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=400,max_len=90,xJust=0,yJust=0})
     obj.editButton({
     index=0,label=temp,width=barSize, font_size=fSize})
     obj.editButton({
