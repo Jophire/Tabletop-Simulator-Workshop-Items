@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.0'
+version = '4.1'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=true
 lastcheck = 0
@@ -43,6 +43,7 @@ Values = {}
   type = Lua type definition
   default = 'default_value'
   props = {} list of properties that use this value.
+  desc = A description for other module creators to understand the values use.
 ]]
 Tools = {}
 --[[
@@ -69,10 +70,9 @@ function onLoad(saved_data)
 	-- Version Display
   broadcastToAll(mod_name.." "..version..postfix,{0.2,0.2,0.2})
 	
-	-- Make sure that the loaded object is at least newer then the previous version on the table.
-  if (Global.getVar('Encoder') == nil or Global.getVar('Encoder').getVar('version') < version) and mod_name == 'Encoder' then
-    Global.setVar('Encoder',self)
-  end
+	-- Set Global Encoder variable to the last spawned encoder.
+  Global.setVar('Encoder',self)
+
 	
 	-- Make the core pretty.
   basic_buttons['Name'] = {click_function='doNothing',function_owner=self,label='Encoder',position={-0,0.12,-0.115},rotation={0,0,0},width=0,height=0,font_size=145,color={0,0,0,1},font_color={1,0,0,1}}
@@ -706,7 +706,6 @@ function buildBaseForm(o)
     tempTable['disable'] = false
     return tempTable
 end
-
 function buildPropFunction(p)
   local pdat = Properties[p]
   _G[p.."Toggle"] = function(obj,ply) 
@@ -744,7 +743,16 @@ function buildPropFunction(p)
     end
   end
 end
-
+function buildValueValidiationFunction(v)
+  if string.find('stringnumberboolean',v.validType) then
+    return function(val,cur) if type(val) == p.validType then return val else return cur end end
+  elseif string.find(v.validType, 'pattern%b()') then
+    _,_,pat = string.find(v.validType,'pattern%b()')
+    print(pat)
+    return function(val,cur) if string.find(val,pat) then return val else return cur end end
+  end
+  return function(val,cur) return val end
+end
 -- API Functions
 --[[Almost all function within the api require a table to be passed to them.
 Table keys that are used are as follows.
@@ -779,6 +787,7 @@ function APIregisterValue(p)
     Values[p.valueID]['default']= p.default
     Values[p.valueID]['validType']= p.validType
     Values[p.valueID]['props']={}
+    Values[p.valueID]['desc']= p.desc ~= nil and p.desc or 'No Description Given'
     Values[p.valueID]['validate']= function(val,cur) if type(val) == p.validType or p.validType == 'nil' then return val else return cur ~= nil and cur or p.default end end
     _G[p.valueID..'Validate']= Values[p.valueID]['validate']
   end
@@ -787,7 +796,7 @@ end
 function APIlistValues()
   data = {}
   for k,v in pairs(Values) do
-    table.insert(data,k)
+    data[k]=v.validType.." --"..v.desc
   end
   return data
 end
@@ -952,12 +961,21 @@ end
 
 
 --MISC FUNCTIONS
-
 function APIdisableEncoding(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     EncodedObjects[p.obj.getGUID()].disable = true
 		buildButtons(p.obj)
   end
+end
+function APIgetOName(p)
+	return EncodedObjects[p.obj.getGUID()].oName
+end
+function APIformatButton(p)
+  return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
+end
+--Compares two version strings '###.##.###.##' which is made up of any number of digits and periods.
+function APIcompVersions(p)
+  return versionCheck(p.va,p.vb)
 end
 
 --CLEANUP
@@ -966,12 +984,6 @@ function APIremoveProperty(p)
 	--updateUI()
 end
 
-function APIgetOName(p)
-	return EncodedObjects[p.obj.getGUID()].oName
-end
-function APIformatButton(p)
-  return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
-end
 
 -- Tool Functions
 function length(t)
