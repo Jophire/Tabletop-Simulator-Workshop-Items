@@ -38,3 +38,10 @@ function onLoad()
   1
   )
 end
+          <Row preferredHeight="30"><Text fontStyle="bold" fontSize="15">Prop List</Text></Row>
+          <Row preferredHeight="670">
+            <VerticalScrollView width="200" height="670" color="white" onValueChanged="changedValue">
+              <VerticalLayout>]]
+              </VerticalLayout>
+            </VerticalScrollView>
+          </Row>

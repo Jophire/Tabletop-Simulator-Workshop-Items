@@ -1,9 +1,10 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.0'
+version = '4.2'
 version_string = "Major Overhaul of how properties interact with each other."
-beta=true
+beta=false
+
 lastcheck = 0
 
 URLS={
@@ -43,6 +44,7 @@ Values = {}
   type = Lua type definition
   default = 'default_value'
   props = {} list of properties that use this value.
+  desc = A description for other module creators to understand the values use.
 ]]
 Tools = {}
 --[[
@@ -69,10 +71,9 @@ function onLoad(saved_data)
 	-- Version Display
   broadcastToAll(mod_name.." "..version..postfix,{0.2,0.2,0.2})
 	
-	-- Make sure that the loaded object is at least newer then the previous version on the table.
-  if (Global.getVar('Encoder') == nil or Global.getVar('Encoder').getVar('version') < version) and mod_name == 'Encoder' then
-    Global.setVar('Encoder',self)
-  end
+	-- Set Global Encoder variable to the last spawned encoder.
+  Global.setVar('Encoder',self)
+
 	
 	-- Make the core pretty.
   basic_buttons['Name'] = {click_function='doNothing',function_owner=self,label='Encoder',position={-0,0.12,-0.115},rotation={0,0,0},width=0,height=0,font_size=145,color={0,0,0,1},font_color={1,0,0,1}}
@@ -112,7 +113,14 @@ function onLoad(saved_data)
       Zones = JSON.decode(loaded_data.zones)
     end
     if loaded_data.values ~= nil then
-    
+      for i,v in pairs(loaded_data.values) do
+        if i ~= nil and v ~= nil and v ~= "" then
+          Values[i] = JSON.decode(v)
+          if Values[i].validate == nil then
+            buildValueValidationFunction(i)
+          end
+        end
+      end
     end
     if loaded_data.cards ~= nil then
       for i,v in pairs(loaded_data.cards) do
@@ -207,6 +215,10 @@ function onSave()
     end
   end
   for i,v in pairs(Values) do
+    local tempThis = Values[i].validate 
+    Values[i].validate = ''
+    data_to_save["values"][i] = JSON.encode(v)
+    Values[i].validate = tempThis
   end
   saved_data = JSON.encode(data_to_save)
   return saved_data
@@ -575,8 +587,10 @@ function buildButtons(o)
         end
       end
     else
-			--print(EncodedObjects[o.getGUID()].editing)
-      Properties[EncodedObjects[o.getGUID()].editing].funcOwner.call("createButtons",{object=o})
+      k = EncodedObjects[o.getGUID()].editing
+			if Properties[k]~=nil and Properties[k].funcOwner~= nil then
+        Properties[k].funcOwner.call("createButtons",{obj=o})
+      end
       temp = " X "
       barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,0,0)
       o.createButton({
@@ -672,17 +686,16 @@ function toggleProperty(o,p)
     local prop = EncodedObjects[o.getGUID()].encoded[p]
     if prop == nil then
       EncodedObjects[o.getGUID()].encoded[p] = true
-      for k,v in pairs(Properties[p].values) do
-        if Values[v] ~= nil and EncodedObjects[o.getGUID()].values[v] == nil then
-          EncodedObjects[o.getGUID()].values[v] = Values[v].default
-          --print(EncodedObjects[o.getGUID()].values[v])
-        end
-      end
     else
       if prop ~= true then
         EncodedObjects[o.getGUID()].encoded[p] = true
       else
         EncodedObjects[o.getGUID()].encoded[p] = false
+      end
+    end
+    for k,v in pairs(Properties[p].values) do
+      if Values[v] ~= nil and EncodedObjects[o.getGUID()].values[v] == nil then
+        EncodedObjects[o.getGUID()].values[v] = Values[v].default
       end
     end
     return EncodedObjects[o.getGUID()].encoded[p]
@@ -706,22 +719,18 @@ function buildBaseForm(o)
     tempTable['disable'] = false
     return tempTable
 end
-
 function buildPropFunction(p)
   local pdat = Properties[p]
   _G[p.."Toggle"] = function(obj,ply) 
     enabled = toggleProperty(obj,p)
     if pdat.callOnActivate == true and enabled == true then
-      pdat.funcOwner.call(pdat.activateFunc,{object=obj,player=ply})
+      pdat.funcOwner.call(pdat.activateFunc,{obj=obj,ply=ply})
     end
     local selection =Player[ply].getSelectedObjects()
     if selection ~= nil then
       for k,v in pairs(selection) do
         if EncodedObjects[v.getGUID()] ~= nil and v ~= obj then
           enabled = toggleProperty(v,p)
-          if pdat.callOnActivate == true and enabled == true and k == 1 then
-            --pdat.funcOwner.call(pdat.activateFunc,{object=v,player=ply})
-          end
           buildButtons(v)
         end
       end
@@ -744,7 +753,22 @@ function buildPropFunction(p)
     end
   end
 end
-
+function buildValueValidationFunction(p)
+  v=Values[p]
+  if string.find('stringnumberboolean',v.validType) then
+    vt = v.validType
+    Values[p]['validate']= function(val,cur) if type(val) == vt then return val else return cur end end
+  elseif string.find(v.validType, 'pattern%b()') then
+    _,_,pat = string.find(v.validType,'pattern(%b())')
+    if #pat > 2 then
+      pat = string.sub(pat,2,-2)
+      Values[p]['validate']= function(val,cur) if string.find(val,pat) then return val else return cur end end
+    end
+  else
+    Values[p]['validate']= function(val,cur) return val end
+  end
+  _G[p..'Validate']= Values[p]['validate']
+end
 -- API Functions
 --[[Almost all function within the api require a table to be passed to them.
 Table keys that are used are as follows.
@@ -774,20 +798,20 @@ function APIregisterTool(p)
 end
 --register a new value.
 function APIregisterValue(p)
-  if Values[p.valueID] == nil then
+  --if Values[p.valueID] == nil then
     Values[p.valueID] = {}
     Values[p.valueID]['default']= p.default
     Values[p.valueID]['validType']= p.validType
     Values[p.valueID]['props']={}
-    Values[p.valueID]['validate']= function(val,cur) if type(val) == p.validType or p.validType == 'nil' then return val else return cur ~= nil and cur or p.default end end
-    _G[p.valueID..'Validate']= Values[p.valueID]['validate']
-  end
-  table.insert(Values[p.valueID]['props'],p.propID)
+    Values[p.valueID]['desc']= p.desc ~= nil and p.desc or 'No Description Given'
+    buildValueValidationFunction(p.valueID)
+  --end
+  --table.insert(Values[p.valueID]['props'],p.propID)
 end
 function APIlistValues()
   data = {}
   for k,v in pairs(Values) do
-    table.insert(data,k)
+    data[k]=v.validType.." --"..v.desc
   end
   return data
 end
@@ -843,6 +867,9 @@ function APIobjGetPropData(p)
   if EncodedObjects[target] ~= nil then
     data = {}
     for k,v in pairs(Properties[p.propID].values) do
+      if EncodedObjects[target].values[v] == nil and  Values[v] ~= nil then
+        EncodedObjects[target].values[v] = Values[v].default
+      end
       data[v]=EncodedObjects[target].values[v]
     end
     return data
@@ -851,11 +878,9 @@ end
 function APIobjSetPropData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
-    for k,v in pairs(p.data) do
-      if Values[k] ~= nil and Properties[p.propID].values[k] ~= nil then
-        EncodedObjects[target].values[k] = _G[k.."Validate"](v)
-      else
-        error('Unknown value '..k..' for property '..p.propID..'.')
+    for k,v in pairs(Properties[p.propID].values) do
+      if Values[v] ~= nil and p.data[v] ~= nil then
+        EncodedObjects[target].values[v] = Values[v]["validate"](p.data[v],EncodedObjects[target].values[v])
       end
     end
   end
@@ -870,6 +895,36 @@ function APIobjIsPropEnabled(p)
     end
   end
   return false
+end
+function APIobjGetProps(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    return EncodedObjects[target].encoded
+  end
+end
+function APIobjSetProps(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    EncodedObjects[target].encoded = p.data
+  end
+end
+function APIobjEnableProp(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    local prop = EncodedObjects[p.obj.getGUID()].encoded[p.propID]
+    if prop ~= true then
+      toggleProperty(p.obj,p.propID)
+    end
+  end
+end
+function APIobjDisableProp(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    local prop = EncodedObjects[p.obj.getGUID()].encoded[p.propID]
+    if prop == true then
+      toggleProperty(p.obj,p.propID)
+    end
+  end
 end
 function APItoggleProperty(p)
   toggleProperty(p.obj,p.propID)
@@ -952,12 +1007,21 @@ end
 
 
 --MISC FUNCTIONS
-
 function APIdisableEncoding(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     EncodedObjects[p.obj.getGUID()].disable = true
 		buildButtons(p.obj)
   end
+end
+function APIgetOName(p)
+	return EncodedObjects[p.obj.getGUID()].oName
+end
+function APIformatButton(p)
+  return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
+end
+--Compares two version strings '###.##.###.##' which is made up of any number of digits and periods.
+function APIcompVersions(p)
+  return versionCheck(p.va,p.vb)
 end
 
 --CLEANUP
@@ -966,12 +1030,6 @@ function APIremoveProperty(p)
 	--updateUI()
 end
 
-function APIgetOName(p)
-	return EncodedObjects[p.obj.getGUID()].oName
-end
-function APIformatButton(p)
-  return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
-end
 
 -- Tool Functions
 function length(t)
