@@ -31,31 +31,51 @@ function registerModule()
     properties = {
     propID = pID,	--The modules unique internal name.
     name = "Example Module", --The visible name located in the api menu.
-    dataStruct = {length=0,location={x=1,y=0.28,z=1}}, --The data structure that will be used by the module with APIgetObjectData and APIsetObjectData.
+    values = {'example1','example2'} --The values you will be sending and requesting with APIobjGetValues APIobjSetValues
     funcOwner = self, --Who owns the triggering function. Generally will be self,
 											--but you could make it target other objects.
-    callOnActivate = true, --Should the activate func call when the player presses the api button?
+    callOnActivate = true, --Should the activated func call when the player presses the api button?
     activateFunc ='callEditor' --The function that should be called in the funcOwner.
     }
 		--Time to register the property. You can register multiple properties from one module.
 		--How you keep up with which one is which later is up to you.
     enc.call("APIregisterProperty",properties)
+    
+    --Building the value tables.
+    value = {
+    valueID = 'example1', --The value id, what it is called.
+    validType = 'number',   --The value's type, if left blank it will accept any type.
+    desc = 'Hello this is an example', --Description of what this value is.
+    default = 0       --The default value when encoding it for the first time.
+    }
+    enc.call("APIregisterValue",value) --Registering the value. If the value already exists nothing happens.
+    
+    value = {
+    valueID = 'example2',
+    validType = 'string',
+    desc = 'Hello this is an example',
+    default = 0
+    }
+    enc.call("APIregisterValue",value)
   end
 end
 
 --REQUIRED: Your module must have a function called createButtons(var)
 --This function is called by the encoder to make sure all objects update at the same time.
---In this function t = {object=objectBeingUpdated}
+--In this function t = {obj=objectBeingUpdated}
 function createButtons(t)
 	--Encoder Check.
   enc = Global.getVar('Encoder')
   if enc ~= nil then
-		--Get the data structure for our encoded object.
-    data = enc.call("APIgetObjectData",{obj=t.object,propID=pID})
+		--Get the data structure for our encoded object. This willreturn a 
+    --table[valueID] = value 
+    --based on what we listed in properties.values
+    data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
 		--Get the flip value of the object. Determines which side the buttons appear on.
-    flip = enc.call("APIgetFlip",{obj=t.object})
-		--Get the currently edited property ID.
-    editing = enc.call("APIgetEditing",{obj=t.object})
+    flip = enc.call("APIgetFlip",{obj=t.obj})
+		--Get the currently edited property ID. This is so that we don't try to create buttons
+    --while another module might be trying to edit a value.
+    editing = enc.call("APIgetEditing",{obj=t.obj})
     if editing == nil then
 			--Useful format for buttons that can be variable in length.
 			temp = ""..data.length..""
@@ -65,7 +85,7 @@ function createButtons(t)
 			--yJust= -1 top, 0, center, 1 bottom.
 			--It returns the width, adjusted font size, and offset values.
       barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=1,yJust=0})
-      t.object.createButton({
+      t.obj.createButton({
       label=temp, click_function='toggleEditor', function_owner=self,
       position={(data.location.x+offset_x)*flip,data.location.y*flip,data.location.z+offset_y}, height=170, width=barSize, font_size=fSize,
       rotation={0,0,90-90*flip}
@@ -75,7 +95,7 @@ function createButtons(t)
 			--The encoder will add one anyways, but its still good to have one if you want to customize it.
 			temp = ""..data.length..""
 			barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=1,yJust=0})
-      t.object.createButton({
+      t.obj.createButton({
       label=temp, click_function='toggleEditClose', function_owner=self,
       position={(data.location.x+offset_x)*flip,data.location.y*flip,data.location.z+offset_y}, height=170, width=barSize, font_size=fSize,
       rotation={0,0,90-90*flip}
@@ -102,7 +122,7 @@ function toggleEditClose(object,ply)
 	--More api calls, check encoder exists.
   enc = Global.getVar('Encoder')
   if enc ~= nil then
-		data = enc.call("APIgetObjectData",{obj=object,propID=pID})
+		data = enc.call("APIobjGetPropData",{obj=object,propID=pID})
 		x = math.random(-1,1)
 		y = 0.28 --Standard Button float height.
 		z = math.random(-1,1)
@@ -110,7 +130,7 @@ function toggleEditClose(object,ply)
 		data.length=math.random(-20012,58601)
 		
 		--Sets the objects data to the new values.
-		enc.call("APIsetObjectData",{obj=object,propID=pID,data=data})
+		enc.call("APIobjSetPropData",{obj=object,propID=pID,data=data})
 		
 		--Clear the editing value. aka: set it to nil
     enc.call("APIclearEditing",{obj=object})
@@ -122,9 +142,9 @@ end
 
 --REQUIRED: This is the function specified up in properties.
 --If you specify a function, you must make sure it has the function.
---The function takes a table t={object=object,player = color}
+--The function takes a table t={obj=object,player = color}
 function callEditor(t)
-  toggleEditor(t.object)
+  toggleEditor(t.obj)
 end
 
 
