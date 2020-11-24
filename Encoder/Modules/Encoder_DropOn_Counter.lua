@@ -14,7 +14,7 @@ function onCollisionEnter(c)
   if enc ~= nil and self.held_by_color == nil then
     encoded = enc.call('APIobjectExists',{obj=obj})
     if encoded == true then
-      d = JSON.decode(self.getGMNotes())
+      d = JSON.decode(self.getDescription())
       cd = enc.call('APIobjGetAllData',{obj=obj})
       for k,v in pairs(d) do
         if enc.call('APIvalueExists',{valueID=k}) then
