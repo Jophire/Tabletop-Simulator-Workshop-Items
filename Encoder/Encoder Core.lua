@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.1'
+version = '4.1.6'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=true
 lastcheck = 0
@@ -112,7 +112,14 @@ function onLoad(saved_data)
       Zones = JSON.decode(loaded_data.zones)
     end
     if loaded_data.values ~= nil then
-    
+      for i,v in pairs(loaded_data.values) do
+        if i ~= nil and v ~= nil and v ~= "" then
+          Values[i] = JSON.decode(v)
+          if Values[i].validate == nil then
+            buildValueValidationFunction(i)
+          end
+        end
+      end
     end
     if loaded_data.cards ~= nil then
       for i,v in pairs(loaded_data.cards) do
@@ -207,6 +214,10 @@ function onSave()
     end
   end
   for i,v in pairs(Values) do
+    local tempThis = Values[i].validate 
+    Values[i].validate = ''
+    data_to_save["values"][i] = JSON.encode(v)
+    Values[i].validate = tempThis
   end
   saved_data = JSON.encode(data_to_save)
   return saved_data
@@ -575,8 +586,10 @@ function buildButtons(o)
         end
       end
     else
-			--print(EncodedObjects[o.getGUID()].editing)
-      Properties[EncodedObjects[o.getGUID()].editing].funcOwner.call("createButtons",{object=o})
+      k = EncodedObjects[o.getGUID()].editing
+			if Properties[k]~=nil and Properties[k].funcOwner~= nil then
+        Properties[k].funcOwner.call("createButtons",{obj=o})
+      end
       temp = " X "
       barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,0,0)
       o.createButton({
@@ -672,17 +685,16 @@ function toggleProperty(o,p)
     local prop = EncodedObjects[o.getGUID()].encoded[p]
     if prop == nil then
       EncodedObjects[o.getGUID()].encoded[p] = true
-      for k,v in pairs(Properties[p].values) do
-        if Values[v] ~= nil and EncodedObjects[o.getGUID()].values[v] == nil then
-          EncodedObjects[o.getGUID()].values[v] = Values[v].default
-          --print(EncodedObjects[o.getGUID()].values[v])
-        end
-      end
     else
       if prop ~= true then
         EncodedObjects[o.getGUID()].encoded[p] = true
       else
         EncodedObjects[o.getGUID()].encoded[p] = false
+      end
+    end
+    for k,v in pairs(Properties[p].values) do
+      if Values[v] ~= nil and EncodedObjects[o.getGUID()].values[v] == nil then
+        EncodedObjects[o.getGUID()].values[v] = Values[v].default
       end
     end
     return EncodedObjects[o.getGUID()].encoded[p]
@@ -711,16 +723,13 @@ function buildPropFunction(p)
   _G[p.."Toggle"] = function(obj,ply) 
     enabled = toggleProperty(obj,p)
     if pdat.callOnActivate == true and enabled == true then
-      pdat.funcOwner.call(pdat.activateFunc,{object=obj,player=ply})
+      pdat.funcOwner.call(pdat.activateFunc,{obj=obj,ply=ply})
     end
     local selection =Player[ply].getSelectedObjects()
     if selection ~= nil then
       for k,v in pairs(selection) do
         if EncodedObjects[v.getGUID()] ~= nil and v ~= obj then
           enabled = toggleProperty(v,p)
-          if pdat.callOnActivate == true and enabled == true and k == 1 then
-            --pdat.funcOwner.call(pdat.activateFunc,{object=v,player=ply})
-          end
           buildButtons(v)
         end
       end
@@ -743,15 +752,25 @@ function buildPropFunction(p)
     end
   end
 end
-function buildValueValidiationFunction(v)
+function buildValueValidationFunction(p)
+  print(p)
+  v=Values[p]
   if string.find('stringnumberboolean',v.validType) then
-    return function(val,cur) if type(val) == p.validType then return val else return cur end end
+    vt = v.validType
+    Values[p]['validate']= function(val,cur) print(type(val)..":"..vt) if type(val) == vt then return val else return cur end end
+    print('type validation')
   elseif string.find(v.validType, 'pattern%b()') then
-    _,_,pat = string.find(v.validType,'pattern%b()')
-    print(pat)
-    return function(val,cur) if string.find(val,pat) then return val else return cur end end
+    _,_,pat = string.find(v.validType,'pattern(%b())')
+    if #pat > 2 then
+      pat = string.sub(pat,2,-2)
+      print(pat)
+      Values[p]['validate']= function(val,cur) print(val..":"..cur) if string.find(val,pat) then return val else return cur end end
+    end
+  else
+    Values[p]['validate']= function(val,cur) return val end
+    print('no validation')
   end
-  return function(val,cur) return val end
+  _G[p..'Validate']= Values[p]['validate']
 end
 -- API Functions
 --[[Almost all function within the api require a table to be passed to them.
@@ -782,16 +801,15 @@ function APIregisterTool(p)
 end
 --register a new value.
 function APIregisterValue(p)
-  if Values[p.valueID] == nil then
+  --if Values[p.valueID] == nil then
     Values[p.valueID] = {}
     Values[p.valueID]['default']= p.default
     Values[p.valueID]['validType']= p.validType
     Values[p.valueID]['props']={}
     Values[p.valueID]['desc']= p.desc ~= nil and p.desc or 'No Description Given'
-    Values[p.valueID]['validate']= function(val,cur) if type(val) == p.validType or p.validType == 'nil' then return val else return cur ~= nil and cur or p.default end end
-    _G[p.valueID..'Validate']= Values[p.valueID]['validate']
-  end
-  table.insert(Values[p.valueID]['props'],p.propID)
+    buildValueValidationFunction(p.valueID)
+  --end
+  --table.insert(Values[p.valueID]['props'],p.propID)
 end
 function APIlistValues()
   data = {}
@@ -852,6 +870,10 @@ function APIobjGetPropData(p)
   if EncodedObjects[target] ~= nil then
     data = {}
     for k,v in pairs(Properties[p.propID].values) do
+      --print(v)
+      if EncodedObjects[target].values[v] == nil and  Values[v] ~= nil then
+        EncodedObjects[target].values[v] = Values[v].default
+      end
       data[v]=EncodedObjects[target].values[v]
     end
     return data
@@ -860,11 +882,10 @@ end
 function APIobjSetPropData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
-    for k,v in pairs(p.data) do
-      if Values[k] ~= nil and Properties[p.propID].values[k] ~= nil then
-        EncodedObjects[target].values[k] = _G[k.."Validate"](v)
-      else
-        error('Unknown value '..k..' for property '..p.propID..'.')
+    for k,v in pairs(Properties[p.propID].values) do
+      if Values[v] ~= nil and p.data[v] ~= nil then
+        print(v.."="..p.data[v])
+        EncodedObjects[target].values[v] = Values[v]["validate"](p.data[v],EncodedObjects[target].values[v])
       end
     end
   end
