@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2'
+version = '4.2.1'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -851,7 +851,7 @@ end
 function APIobjSetValueData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
-    EncodedObjects[target].values[p.valueID] = _G[k.."Validate"](p.data.valueID)
+    EncodedObjects[target].values[p.valueID] = _G[p.valueID.."Validate"](p.data.valueID)
   end
 end
 function APIobjDefaultValue(p)
