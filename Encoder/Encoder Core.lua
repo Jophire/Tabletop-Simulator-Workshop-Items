@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.5'
+version = '4.2.6'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -192,7 +192,7 @@ function onSave()
     if EncodedObjects[i].this ~= nil then
       local tempThis = EncodedObjects[i].this
       EncodedObjects[i].this = ""
-      data_to_save["cards"][i] = JSON.encode(v)
+      data_to_save["cards"][i] = JSON.encode(EncodedObjects[i])
       EncodedObjects[i].this = tempThis
     end
   end
@@ -201,7 +201,7 @@ function onSave()
     if Properties[i].funcOwner ~= nil then
       local tempThis = Properties[i].funcOwner
       Properties[i].funcOwner = Properties[i].funcOwner.getGUID()
-      data_to_save["properties"][i] = JSON.encode(v)
+      data_to_save["properties"][i] = JSON.encode(Properties[i])
       Properties[i].funcOwner = tempThis
     end
   end
@@ -217,7 +217,7 @@ function onSave()
   for i,v in pairs(Values) do
     local tempThis = Values[i].validate 
     Values[i].validate = ''
-    data_to_save["values"][i] = JSON.encode(v)
+    data_to_save["values"][i] = JSON.encode(Values[i])
     Values[i].validate = tempThis
   end
   saved_data = JSON.encode(data_to_save)

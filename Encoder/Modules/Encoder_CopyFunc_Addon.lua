@@ -23,25 +23,7 @@ function registerModule()
     activateFunc ='exactCopy',
     display=true
     }
-    enc.call("APIregisterTool",properties)
-    
-    properties = {
-    toolID = "tokenCopy",
-    name = "Token Copy",
-    funcOwner = self,
-    activateFunc ='tokenCopy',
-    display=true
-    }
-    enc.call("APIregisterTool",properties)
-    
-    value = {
-    valueID = 'isToken', 
-    validType = 'boolean',
-    desc = 'MTG:is this a token? Tokens are non-card permanents.',   
-    default = false       
-    }
-    enc.call("APIregisterValue",value)
-    
+    enc.call("APIregisterTool",properties)   
   end
 end
 
@@ -51,10 +33,6 @@ function exactCopy(obj,ply)
   target = obj
   startLuaCoroutine(self,"createExactCopy")
 end
-function tokenCopy(obj,ply)
-  target = obj
-  startLuaCoroutine(self,"createTokenCopy")
-end
 
 function createExactCopy()
  tar = target
@@ -62,15 +40,6 @@ function createExactCopy()
  enc.call("APIencodeObject",{obj=cop})
  enc.call("APIobjSetProps",{obj=cop,data=enc.call("APIobjGetProps",{obj=tar})})
  enc.call("APIobjSetAllData",{obj=cop,data=enc.call("APIobjGetAllData",{obj=tar})})
- enc.call("APIrebuildButtons",{obj=cop})
- cop.setLock(false)
- return 1
-end
-function createTokenCopy()
- tar = target
- cop = createCopy(tar)
- enc.call("APIencodeObject",{obj=cop})
- enc.call("APIobjSetValueData",{obj=cop,valueID='isToken',data={isToken=true}})
  enc.call("APIrebuildButtons",{obj=cop})
  cop.setLock(false)
  return 1

@@ -22,96 +22,97 @@ function registerModule()
 		properties = {
 		propID = pID,
 		name = "Morph",
-		dataStruct = {},
+		values = {'mtg_morphed'},
 		funcOwner = self,
 		callOnActivate = true,
 		activateFunc ='toggleMorph'
 		}
 		enc.call("APIregisterProperty",properties)
+    value = {
+    valueID = 'mtg_morphed',
+    validType = 'boolean',
+    desc = 'MTG: Morphed permanents are 3/3 creature morphs with Morph:flip this card face up.',
+    default = false
+    }
+    enc.call("APIregisterValue",value)
   end
 end
 
 function createButtons(t)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
-    flip = enc.call("APIgetFlip",{obj=t.object})
-    scaler = {x=1,y=1,z=1}--t.object.getScale()
-    temp = " Morph "
-    barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=120,max_len=90,xJust=0,yJust=0})
-    t.object.createButton({
-    label=temp, click_function='tMorph', function_owner=self,
-    position={(0+offset_x)*flip*scaler.x,0.3*flip*scaler.z,(-1.38+offset_y)*scaler.y}, height=170, width=barSize, font_size=fSize,
-    rotation={0,0,90-90*flip,font_color={1,1,1,1}}
-    })
-		
+    editing = enc.call("APIgetEditing",{obj=t.obj})
+    if editing == nil then
+      flip = enc.call("APIgetFlip",{obj=t.obj})
+      scaler = {x=1,y=1,z=1}--t.obj.getScale()
+      temp = " Morph "
+      barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=120,max_len=90,xJust=0,yJust=0})
+      
+      t.obj.createButton({
+      label=temp, click_function='tMorph', function_owner=self,
+      position={(0+offset_x)*flip*scaler.x,0.3*flip*scaler.z,(-1.38+offset_y)*scaler.y}, height=170, width=barSize, font_size=fSize,
+      rotation={0,0,90-90*flip,font_color={1,1,1,1}}
+      })
+    end
   end
 end
 
 function toggleMorph(t)
-	enc = Global.getVar('Encoder')
-  if enc ~= nil then
-		tMorph(t.object,t.player)
-		local selection =Player[t.player].getSelectedObjects()
-		if selection ~= nil then
-			for k,v in pairs(selection) do
-				if v ~= t.object and enc.call("APIobjectExist",{obj=v}) == true then 
-					tMorph(v,t.player)
-				end
-			end
-		end
-	end
+  tMorph(t.obj,t.ply)
 end
 
-function tMorph(object,ply)
+function tMorph(obj,ply)
 	enc = Global.getVar('Encoder')
   if enc ~= nil then
-    flip = enc.call("APIgetFlip",{obj=object})
-    data = enc.call("APIgetObjectData",{obj=object,propID=pID})
-    if data ~= nil then 
-      if data.enabled ~= true then
-        object.setName(" Morph ")
-        if flip >= 0 then
-          enc.call("APIFlip",{obj=object})
+    flip = enc.call("APIgetFlip",{obj=obj})
+    data = enc.call("APIobjGetPropData",{obj=obj,propID=pID})
+    if data.mtg_morphed ~= true then
+      obj.setName(" Morph ")
+      data.mtg_morphed = true
+      if flip > 0 then
+        enc.call("APIFlip",{obj=obj})
+      end
+      hasDecal = false
+      if obj.getDecals() ~= nil then
+      for k,v in pairs(obj.getDecals()) do
+        if v.name == "Morph" then
+          hasDecal = true
+          break
         end
-        hasDecal = false
-        if object.getDecals() ~= nil then
-        for k,v in pairs(object.getDecals()) do
-          if v.name == "Morph" then
-            hasDecal = true
-            break
-          end
-        end
-        end
-        if hasDecal == false then
-          object.addDecal({name="Morph",url=image_URL,position={0,-0.2,0},rotation={-90,0,0},scale={2.15,3.15,1}})
-        end
-      else
-        data.enabled = false
-        enc.call("APIsetObjectData",{obj=object,propID=pID,data=data})
-        object.setName(enc.call("APIgetOName",{obj=object}))
-        if flip < 0 then
-          enc.call("APIFlip",{obj=object})
-        end
-        local decals = object.getDecals()
-        if decals ~= nil then
-          for k,v in pairs(decals) do
-            if v.name == "Morph" then
-              table.remove(decals,k)
-            end
-          end
-          object.setDecals(decals)
-        end
-        if type(ply) == "string" then
-        local selection =Player[ply].getSelectedObjects()
-        if selection ~= nil then
-          for k,v in pairs(selection) do
-            if v ~= tar and enc.call("APIobjectExist",{obj=v}) == true then 
-              removeMorph(v,0)
-            end
+      end
+      end
+      if hasDecal == false then
+        obj.addDecal({name="Morph",url=image_URL,position={0,-0.28,0},rotation={-90,0,0},scale={2.15,3.15,1}})
+      end
+    else
+      data.mtg_morphed = false
+      obj.setName(enc.call("APIgetOName",{obj=obj}))
+      enc.call("APIobjDisableProp",{obj=obj,propID=pID})
+      if flip < 0 then
+        enc.call("APIFlip",{obj=obj})
+        obj.flip()
+      end
+      local decals = obj.getDecals()
+      obj.setDecals({})
+      if decals ~= nil then
+        for k,v in pairs(decals) do
+          if v.name ~= "Morph" then
+            obj.addDecal(v)
           end
         end
       end
     end
-    enc.call("APIrebuildButtons",{obj=object})
+    if type(ply) == "string" then
+      local selection =Player[ply].getSelectedObjects()
+      if selection ~= nil then
+        for k,v in pairs(selection) do
+          if v ~= tar and enc.call("APIobjExists",{obj=v}) == true then 
+            tMorph(v,0)
+          end
+        end
+      end
+    end
+    enc.call("APIobjSetPropData",{obj=obj,propID=pID,data=data})
+    enc.call("APIrebuildButtons",{obj=obj})
   end
 end

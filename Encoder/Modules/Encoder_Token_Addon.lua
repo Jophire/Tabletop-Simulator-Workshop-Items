@@ -18,29 +18,68 @@ function registerModule()
     properties = {
     propID = pID,
     name = "Is Token",
-    dataStruct = {},
+    values = {'mtg_token'},
     funcOwner = self,
     callOnActivate = false,
-    activateFunc =''
+    activateFunc ='tToken'
     }
     enc.call("APIregisterProperty",properties)
+    value = {
+    valueID = 'mtg_token', 
+    validType = 'boolean',
+    desc = 'MTG:is this a token? Tokens are non-card permanents.',   
+    default = false       
+    }
+    enc.call("APIregisterValue",value)
   end
 end
 
 function createButtons(t)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
-    flip = enc.call("APIgetFlip",{obj=t.object})
-    scaler = {x=1,y=1,z=1}--t.object.getScale()
+    flip = enc.call("APIgetFlip",{obj=t.obj})
+    scaler = {x=1,y=1,z=1}--t.obj.getScale()
     temp = " Token "
     barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=0,yJust=0})
-    t.object.createButton({
-    label=temp, click_function='doNothing', function_owner=self,
+    t.obj.createButton({
+    label=temp, click_function='toggleToken', function_owner=self,
     position={(0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-1.65+offset_y)*scaler.y}, height=170, width=barSize, font_size=fSize,
     rotation={0,0,90-90*flip}
     })
   end
 end
 
-function doNothing()
+function tToken(t)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
+    if data.mtg_token ~= true then
+      data.mtg_token = true
+    else
+      data.mtg_token = false
+    end
+  end
+end
+
+function toggleToken(obj,ply)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    data = enc.call("APIobjGetPropData",{obj=obj,propID=pID})
+    data.mtg_token = false
+    enc.call("APIobjDisableProp",{obj=obj,propID=pID})
+    enc.call("APIobjSetPropData",{obj=obj,propID=pID,data=data})
+    
+    if type(ply) == "string" then
+      local selection =Player[ply].getSelectedObjects()
+      if selection ~= nil then
+        for k,v in pairs(selection) do
+          if v ~= tar and enc.call("APIobjExists",{obj=v}) == true then 
+            toggleToken(v,0)
+          end
+        end
+      end
+    end
+    
+    enc.call("APIrebuildButtons",{obj=obj})
+  end
 end
