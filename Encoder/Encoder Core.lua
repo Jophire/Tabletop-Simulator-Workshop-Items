@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.6'
+version = '4.2.7'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -781,22 +781,37 @@ not all of the values are required for every API function.
 ]]
 
 --REGISTRATION
---register a new property.
+--[[register a new property.
+  Takes a table
+  {propID='internalname',name='Button name',values={list of values},funcOwner=obj,callOnActivate=boolean,activateFunc='function name'}
+]]
 function APIregisterProperty(p)
   Properties[p.propID] = deepcopy(p)
   print(Properties[p.propID].propID.." Registered")
   buildPropFunction(p.propID)
 	--updateUI()
 end
+--Lists currently registered properties.
 function APIlistProps()
-
+  data = {}
+  for k,v in pairs(Properties) do
+    data[k]=v.propID.." : "..v.name.." {"
+    for m,n in pairs(v.values) do
+      data[k]=data[k]..m..","
+    end
+    data[k]=data[k].."}"
+  end
+  return data
 end
 --register a new tool
 function APIregisterTool(p)
   Tools[p.toolID] = deepcopy(p)
   print(Tools[p.toolID].toolID.." Registered")
 end
---register a new value.
+--[[register a new value.
+  Takes a table
+  {valueID='internalname',validType=lua type or pattern(here),desc='What is it used for',default=value}
+]]
 function APIregisterValue(p)
   --if Values[p.valueID] == nil then
     Values[p.valueID] = {}
@@ -808,6 +823,7 @@ function APIregisterValue(p)
   --end
   --table.insert(Values[p.valueID]['props'],p.propID)
 end
+--Lists currently registered values.
 function APIlistValues()
   data = {}
   for k,v in pairs(Values) do
@@ -836,6 +852,7 @@ function APIvalueExists(p)
 end
 
 --Get or Set a single value based on valueID. Returns the value.
+--{obj=obj,valueID=valueID,data={valueID=value}}
 function APIobjGetValueData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
@@ -862,6 +879,7 @@ function APIobjDefaultValue(p)
 end
 
 --Get or Set value data based on propID. Returns and accepts an array of Key-Values. Key is a valid valueID.
+--{obj=obj,propID=propID,data={valueID=value}}
 function APIobjGetPropData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
@@ -885,6 +903,7 @@ function APIobjSetPropData(p)
     end
   end
 end
+--Is a given Property enabled: {obj=obj,propID=propID}
 function APIobjIsPropEnabled(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
@@ -896,18 +915,21 @@ function APIobjIsPropEnabled(p)
   end
   return false
 end
+--Returns a list of props and if they are active or not: {obj=obj}
 function APIobjGetProps(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
     return EncodedObjects[target].encoded
   end
 end
+--Set a prop to active or not: {obj=obj,data={propID=bool}}
 function APIobjSetProps(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
     EncodedObjects[target].encoded = p.data
   end
 end
+--Enable target prop: {obj=obj,propID=propID}
 function APIobjEnableProp(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
@@ -917,6 +939,7 @@ function APIobjEnableProp(p)
     end
   end
 end
+--Disable target prop: {obj=obj,propID=propID}
 function APIobjDisableProp(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
@@ -926,17 +949,20 @@ function APIobjDisableProp(p)
     end
   end
 end
+--Toggles target prop on or off: {obj=obj,propID=propID}
 function APItoggleProperty(p)
   toggleProperty(p.obj,p.propID)
 end
 
 --Get or Set all value data of a given object.
+--{obj=obj}
 function APIobjGetAllData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
    return EncodedObjects[target].values
   end
 end
+--{obj=obj,data={valueID=value}}
 function APIobjSetAllData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
@@ -950,33 +976,6 @@ function APIobjSetAllData(p)
   end
 end
  
---[[DEPRECIATED USE NEW API Functions
-function APIgetObjectData(p)  --APIobjGetPropData
-  if EncodedObjects[p.obj.getGUID()] ~= nil then
-    data = EncodedObjects[p.obj.getGUID()].encoded
-    if data[p.propID] ~= nil then
-      return data[p.propID]
-    end
-  end
-end
-function APIsetObjectData(p)
-  if EncodedObjects[p.obj.getGUID()] ~= nil then
-    EncodedObjects[p.obj.getGUID()].encoded[p.propID] = p.data
-  end
-end
-function APIgetOAData(p)      --APIobjGetAllData
-  if EncodedObjects[p.obj.getGUID()] ~= nil then
-    data = EncodedObjects[p.obj.getGUID()].encoded
-    return data
-  end
-end
-function APIsetOAData(p)
-  if EncodedObjects[p.obj.getGUID()] ~= nil then
-    EncodedObjects[p.obj.getGUID()].encoded = p.data
-  end
-end
---]]
-
 --BUTTON UI FUNCTIONS
 --sets current editing state, so that buttons don't overlap. 
 --the p.propID that is called must have a function createButtons({obj=object being edited})
