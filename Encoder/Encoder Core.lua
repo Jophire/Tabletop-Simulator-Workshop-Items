@@ -789,7 +789,15 @@ function APIregisterProperty(p)
 	--updateUI()
 end
 function APIlistProps()
-
+  data = {}
+  for k,v in pairs(Properties) do
+    data[k]=v.propID.." : "..v.name.." {"
+    for m,n in pairs(v.values) do
+      data[k]=data[k]..m..","
+    end
+    data[k]=data[k].."}"
+  end
+  return data
 end
 --register a new tool
 function APIregisterTool(p)

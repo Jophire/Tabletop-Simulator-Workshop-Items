@@ -7,30 +7,18 @@ function onload()
     })
 
 end
-test=0
 function onCollisionEnter(c)
-  test = 0
-  for k,v in pairs(c) do
-    print(k)
-    print(v)
-  end
   obj = c.collision_object
   enc = Global.getVar('Encoder')
   if enc ~= nil and self.held_by_color == nil then
-    print('Test'..test)
-    test=test+1
     encoded = enc.call('APIobjectExists',{obj=obj})
     if encoded == true then
       d = JSON.decode(self.getDescription())
       cd = enc.call('APIobjGetAllData',{obj=obj})
-      print('Test'..test)
-      test=test+1
       for k,v in pairs(d) do
         if enc.call('APIvalueExists',{valueID=k}) then
           if cd[k] == nil then
             cd[k] = enc.call('APIobjGetValueData',{obj=obj,valueID=k})[k]
-            print('Test'..test)
-            test=test+1
           end
           _,_,m,n = string.find(v,'([%+%-%*%/=])(%d*)')
           n = tonumber(n)
@@ -50,14 +38,23 @@ function onCollisionEnter(c)
           else
             print(m..' is not a recognized operator.')
           end
+        elseif enc.call('APIpropertyExists',{propID=k} then
+          if enc.call('APIobjIsPropEnabled',{obj=obj,propID=k}) ~= v then
+            enc.call('APItoggleProperty',{obj=obj,propID=k})
+          end
+        else
+          local txt = ''
+          for k,v in pairs(enc.call('APIlistProps',{})) do
+            txt = txt..v.."\n"
+          end
+          for k,v in pairs(enc.call('APIlistValues',{})) do
+            txt = txt..v.."\n"
+          end
+          Notes.editNotebookTab({index=0,title="Encoder: List of values and properties",body=txt,color='Grey'})
         end
       end
-      print('Test'..test)
-      test=test+1
       enc.call('APIobjSetAllData',{obj=obj,data=cd})
       enc.call("APIrebuildButtons",{obj=obj})
-      print('Test'..test)
-      test=test+1
       self.destruct()
     end
   end
