@@ -38,19 +38,19 @@ function onCollisionEnter(c)
           else
             print(m..' is not a recognized operator.')
           end
-        elseif enc.call('APIpropertyExists',{propID=k} then
+        elseif enc.call('APIpropertyExists',{propID=k}) then
           if enc.call('APIobjIsPropEnabled',{obj=obj,propID=k}) ~= v then
             enc.call('APItoggleProperty',{obj=obj,propID=k})
           end
         else
           local txt = ''
-          for k,v in pairs(enc.call('APIlistProps',{})) do
+          for k,v in pairs(enc.call('APIlistProps')) do
             txt = txt..v.."\n"
           end
-          for k,v in pairs(enc.call('APIlistValues',{})) do
+          for k,v in pairs(enc.call('APIlistValues')) do
             txt = txt..v.."\n"
           end
-          Notes.editNotebookTab({index=0,title="Encoder: List of values and properties",body=txt,color='Grey'})
+          Notes.addNotebookTab({title="Encoder: List of values and properties",body=txt,color='Grey'})
         end
       end
       enc.call('APIobjSetAllData',{obj=obj,data=cd})
