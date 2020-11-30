@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.7'
+version = '4.2.10'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -756,10 +756,11 @@ end
 function buildValueValidationFunction(p)
   v=Values[p]
   if string.find('stringnumberboolean',v.validType) then
-    vt = v.validType
-    Values[p]['validate']= function(val,cur) if type(val) == vt then return val else return cur end end
+    local vt = v.validType
+    Values[p]['validate']= function(val,cur) 
+      if type(val) == vt then return val else return cur end end
   elseif string.find(v.validType, 'pattern%b()') then
-    _,_,pat = string.find(v.validType,'pattern(%b())')
+    local _,_,pat = string.find(v.validType,'pattern(%b())')
     if #pat > 2 then
       pat = string.sub(pat,2,-2)
       Values[p]['validate']= function(val,cur) if string.find(val,pat) then return val else return cur end end
@@ -795,9 +796,14 @@ end
 function APIlistProps()
   data = {}
   for k,v in pairs(Properties) do
-    data[k]=v.propID.." : "..v.name.." {"
+    if v.funcOwner == nil then
+      data[k]='[Red]MISSING![White]'
+    else
+      data[k]=''
+    end
+    data[k]=data[k]..v.propID.." : "..v.name.." {"
     for m,n in pairs(v.values) do
-      data[k]=data[k]..m..","
+      data[k]=data[k]..n..","
     end
     data[k]=data[k].."}"
   end
