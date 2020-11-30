@@ -23,6 +23,20 @@ function onLoad()
   position={0,-0.1,0}, height=70, width=500, font_size=60,
   rotation={0,0,180},tooltip="Enable/Disable the coroutine.",color={0,0,0,1},font_color={1,1,1,1}
   })
+  
+  --Wait.condition(registerModules,function() if Global.getVar("Encoder") ~= nil then return true else return false end end)
+  
+end
+
+function registerModules()
+  enc = Global.getVar("Encoder")
+  if enc ~= nil then
+    for k,v in pairs(enc.getTable("Properties")) do
+      if v.funcOwner ~= nil then
+        v.funcOwner.call("registerModule")
+      end
+    end
+  end
 end
 
 function courActive()

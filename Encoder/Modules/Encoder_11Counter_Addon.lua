@@ -31,7 +31,7 @@ function registerModule()
     desc = 'MTG:+1/+1 and -1/-1 counters.',   
     default = 0       
     }
-    enc.call("APIregisterValue",value)
+    enc.call("APIregisterValue",value) 
     value = {
     valueID = 'moduleMod', 
     validType = 'number',
@@ -126,7 +126,6 @@ function updateEditDisp(obj)
 end
 function cycleMain(obj,ply,alt)
   enc = Global.getVar('Encoder')
-
   if enc ~= nil then
     data = enc.call("APIobjGetPropData",{obj=obj,propID=pID})
     local mMod = type(ply)=="string" and data.moduleMod or ply['mod']
@@ -141,8 +140,8 @@ function cycleMain(obj,ply,alt)
       if alt == false then
         data.oneOneCounter = data.oneOneCounter*mMod
       else
-        if data.moduleMod == 0 then
-          data.moduleMod = 1
+        if mMod == 0 then
+          mMod = 1
         end
         data.oneOneCounter = data.oneOneCounter/mMod
       end
