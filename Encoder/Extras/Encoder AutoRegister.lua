@@ -24,7 +24,7 @@ function onLoad()
   rotation={0,0,180},tooltip="Enable/Disable the coroutine.",color={0,0,0,1},font_color={1,1,1,1}
   })
   
-  --Wait.condition(registerModules,function() if Global.getVar("Encoder") ~= nil then return true else return false end end)
+  Wait.condition(registerModules,function() if Global.getVar("Encoder") ~= nil then return true else return false end end)
   
 end
 

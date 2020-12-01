@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.10'
+version = '4.2.11'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -238,7 +238,7 @@ function callVersionCheck(p)
 end
 function versionCheck(wr)
   wr = wr.text
-  ver = versionComp(string.match(wr,"version = '(.-)'"),version)
+  local ver = versionComp(string.match(wr,"version = '(.-)'"),version)
   if ''..ver ~= ''..version then
     if beta == true then
       broadcastToAll("An update has been found for the beta branch. Reloading encoder.")
@@ -269,6 +269,7 @@ function versionComp(a,b)
       return b
     end
   end
+  return b
 end
 --[[
 function buildUI(wr)
