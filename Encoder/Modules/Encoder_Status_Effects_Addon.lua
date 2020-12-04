@@ -8,10 +8,10 @@ version = '1.0'
 
 StatusList={
   mtg_exert={name="Exerted", des=":Card does not untap the next Controller's untap step.",val='boolean',def=false},
-  mtg_erozen={name="Frozen", des="Frozen:Card does not untap during the untap step as long as this effect is in effect.",val='boolean',def=false},
-  mtg_detain={name="Detained", des="Detained:Creature can't block, attack, or activate abilities till %Color%'s next turn.",val='color',def=''},
-  mtg_monstrous={name="Monstrous", des="Monstrous:This creature has been made monstrous.",val='boolean',def=false},
-  mtg_goad={name="Goaded", des="Goaded:This creature must attack a player other then 'Color' if able.",val='color',def='',func=function() return Turns.turn_color end}
+  mtg_erozen={name="Frozen", des=":Card does not untap during the untap step as long as this effect is in effect.",val='boolean',def=false},
+  mtg_detain={name="Detained", des=":Creature can't block, attack, or activate abilities till %Color%'s next turn.",val='color',def=''},
+  mtg_monstrous={name="Monstrous", des=":This creature has been made monstrous.",val='boolean',def=false},
+  mtg_goad={name="Goaded", des=":This creature must attack a player other then 'Color' if able.",val='color',def='',func=function() return Turns.turn_color end}
 }
 
 
@@ -54,7 +54,6 @@ function registerModule(obj,ply)
 end
 
 function toggleStatus(obj,ply,alt,val)
-  print('Test'..val)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
     data = enc.call("APIobjGetValueData",{obj=obj,valueID=val})
@@ -71,7 +70,6 @@ function toggleStatus(obj,ply,alt,val)
         data[val] = StatusList[val].func ~= nil and StatusList[val].func() or ply
       end
     end
-    print(data[val])
     enc.call("APIobjSetValueData",{obj=obj,valueID=val,data=data})
     enc.call("APIrebuildButtons",{obj=obj})
   end
@@ -107,7 +105,7 @@ function createButtons(t)
     for k,v in pairs(data) do
       if StatusList[k].val == 'boolean' and v == true then
         tooltip = tooltip..StatusList[k].name..StatusList[k].des..'\n'
-      elseif StatusList[k] == 'color' and v ~= '' then
+      elseif StatusList[k].val == 'color' and v ~= '' then
         tooltip = tooltip..StatusList[k].name..string.gsub(StatusList[k].des,'%%Color%%',v)..'\n'
       end
     end
@@ -130,7 +128,7 @@ function createButtons(t)
       })
       i = 1
       for k,v in pairs(data) do
-        if (StatusList[k].val == 'boolean' and v == true) or StatusList[k] == 'color' and v ~= '' then
+        if (StatusList[k].val == 'boolean' and v == true) or StatusList[k].val == 'color' and v ~= '' then
           temp =StatusList[k].name
           barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=0,yJust=0})
           t.obj.createButton({
