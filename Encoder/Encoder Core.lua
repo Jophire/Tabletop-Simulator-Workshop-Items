@@ -766,6 +766,8 @@ function buildValueValidationFunction(p)
       pat = string.sub(pat,2,-2)
       Values[p]['validate']= function(val,cur) if string.find(val,pat) then return val else return cur end end
     end
+  elseif string.find(v.validType, 'color') then  
+    Values[p]['validate']= function(val,cur) if Player[val] ~= nil then return val else return cur end end
   else
     Values[p]['validate']= function(val,cur) return val end
   end
@@ -817,7 +819,13 @@ function APIregisterTool(p)
 end
 --[[register a new value.
   Takes a table
-  {valueID='internalname',validType=lua type or pattern(here),desc='What is it used for',default=value}
+  {valueID='internalname',validType=#CHECK_VALID_TYPES,desc='What is it used for',default=value}
+  #CHECK_VALID_TYPES:
+    'string'
+    'boolean'
+    'number'
+    'pattern(here)'--example pattern(%%Color%%) the only acceptable value would be a string %Color%
+    'color' --Player colors
 ]]
 function APIregisterValue(p)
   --if Values[p.valueID] == nil then
@@ -1058,15 +1066,6 @@ function deepcopy(orig)
         copy = orig
     end
     return copy
-end
-function addVectors(a,b)
-return {x=a['x']+b['x'],y=a['y']+b['y'],z=a['z']+b['z']}
-end
-function multVectors(a,b)
-  if type(b) ~= "table" then
-    b={x=b,y=b,z=b}
-  end
-  return {x=a['x']*b['x'],y=a['y']*b['y'],z=a['z']*b['z']}
 end
 function waitFrames(num_frames)
     for i=0, num_frames, 1 do
