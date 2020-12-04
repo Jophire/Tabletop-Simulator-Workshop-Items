@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.11'
+version = '4.2.13'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -764,10 +764,12 @@ function buildValueValidationFunction(p)
     local _,_,pat = string.find(v.validType,'pattern(%b())')
     if #pat > 2 then
       pat = string.sub(pat,2,-2)
-      Values[p]['validate']= function(val,cur) if string.find(val,pat) then return val else return cur end end
+      Values[p]['validate']= function(val,cur) 
+      if string.find(val,pat) then return val else return cur end end
     end
   elseif string.find(v.validType, 'color') then  
-    Values[p]['validate']= function(val,cur) if Player[val] ~= nil then return val else return cur end end
+    Values[p]['validate']= function(val,cur)
+    if val == '' or val == nil or Player[val] ~= nil then return val else return cur end end
   else
     Values[p]['validate']= function(val,cur) return val end
   end
@@ -883,7 +885,7 @@ end
 function APIobjSetValueData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
-    EncodedObjects[target].values[p.valueID] = _G[p.valueID.."Validate"](p.data.valueID,EncodedObjects[target].values[p.valueID])
+    EncodedObjects[target].values[p.valueID] = _G[p.valueID.."Validate"](p.data[p.valueID],EncodedObjects[target].values[p.valueID])
   end
 end
 function APIobjDefaultValue(p)
