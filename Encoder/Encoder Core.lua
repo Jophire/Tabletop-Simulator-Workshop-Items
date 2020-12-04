@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.10'
+version = '4.2.13'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -238,7 +238,7 @@ function callVersionCheck(p)
 end
 function versionCheck(wr)
   wr = wr.text
-  ver = versionComp(string.match(wr,"version = '(.-)'"),version)
+  local ver = versionComp(string.match(wr,"version = '(.-)'"),version)
   if ''..ver ~= ''..version then
     if beta == true then
       broadcastToAll("An update has been found for the beta branch. Reloading encoder.")
@@ -269,6 +269,7 @@ function versionComp(a,b)
       return b
     end
   end
+  return b
 end
 --[[
 function buildUI(wr)
@@ -763,8 +764,12 @@ function buildValueValidationFunction(p)
     local _,_,pat = string.find(v.validType,'pattern(%b())')
     if #pat > 2 then
       pat = string.sub(pat,2,-2)
-      Values[p]['validate']= function(val,cur) if string.find(val,pat) then return val else return cur end end
+      Values[p]['validate']= function(val,cur) 
+      if string.find(val,pat) then return val else return cur end end
     end
+  elseif string.find(v.validType, 'color') then  
+    Values[p]['validate']= function(val,cur)
+    if val == '' or val == nil or Player[val] ~= nil then return val else return cur end end
   else
     Values[p]['validate']= function(val,cur) return val end
   end
@@ -816,7 +821,13 @@ function APIregisterTool(p)
 end
 --[[register a new value.
   Takes a table
-  {valueID='internalname',validType=lua type or pattern(here),desc='What is it used for',default=value}
+  {valueID='internalname',validType=#CHECK_VALID_TYPES,desc='What is it used for',default=value}
+  #CHECK_VALID_TYPES:
+    'string'
+    'boolean'
+    'number'
+    'pattern(here)'--example pattern(%%Color%%) the only acceptable value would be a string %Color%
+    'color' --Player colors
 ]]
 function APIregisterValue(p)
   --if Values[p.valueID] == nil then
@@ -874,7 +885,7 @@ end
 function APIobjSetValueData(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
-    EncodedObjects[target].values[p.valueID] = _G[p.valueID.."Validate"](p.data.valueID,EncodedObjects[target].values[p.valueID])
+    EncodedObjects[target].values[p.valueID] = _G[p.valueID.."Validate"](p.data[p.valueID],EncodedObjects[target].values[p.valueID])
   end
 end
 function APIobjDefaultValue(p)
@@ -1057,15 +1068,6 @@ function deepcopy(orig)
         copy = orig
     end
     return copy
-end
-function addVectors(a,b)
-return {x=a['x']+b['x'],y=a['y']+b['y'],z=a['z']+b['z']}
-end
-function multVectors(a,b)
-  if type(b) ~= "table" then
-    b={x=b,y=b,z=b}
-  end
-  return {x=a['x']*b['x'],y=a['y']*b['y'],z=a['z']*b['z']}
 end
 function waitFrames(num_frames)
     for i=0, num_frames, 1 do
