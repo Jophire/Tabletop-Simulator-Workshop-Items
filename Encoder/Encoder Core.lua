@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.13'
+version = '4.2.14'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -348,6 +348,7 @@ function buildZones()
       z = getObjectFromGUID(ZtoG[v..''..i])
       if z == nil then
         h = Player[v].getHandTransform(i)
+        local j = v
         params = {}
         params.type = "scriptingTrigger"
         params.position = h.position
@@ -355,10 +356,10 @@ function buildZones()
         params.scale = h.scale
         params.sound = false
         params.callback_function = function(obj) Zones[obj.guid] = {
-          name = v..''..i,
+          name = j..''..i,
           func_enter = 'hideCardDetails',
           func_leave = 'showCardDetails',
-          color = v
+          color = j
           }
           end
         spawnObject(params)
