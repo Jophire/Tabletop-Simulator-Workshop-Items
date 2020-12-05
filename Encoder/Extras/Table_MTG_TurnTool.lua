@@ -20,6 +20,10 @@ phases = {
   {phase="End",step="Step",delay=delay,func=function(ply,num) end},
   {phase="End",step="Cleanup",delay=delay,func=function(ply,num) end}
 }
+response_stack={}
+--[[
+  ply={responding_to_ply
+]]
 
 XML_ID = 'Phase_Table'
 
@@ -74,7 +78,7 @@ end
 function onPlayerChangeColor(ply)
   if Turns.enable == false then
     for k,v in pairs(Player.getColors()) do
-      if v ~= 'Grey' and v ~= 'Black' then
+      if v ~= 'Grey' and v ~= 'Black' and Turns.turn_color == nil then
         UI.hide(XML_ID..v)
       end
     end
@@ -133,6 +137,9 @@ function countTo(n,a,t,f)
   end
   if f==nil then
     f = 1
+  end
+  if #response_stack > 0 then
+    Wait.
   end
   f(n)
   if n > t then
