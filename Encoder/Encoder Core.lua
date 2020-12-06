@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.14'
+version = '4.2.15'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -431,11 +431,16 @@ end
 
 -- If the encoder is deleted, make sure to cleanup. 
 function encodeObject(o)
+  if o.getVar('noencode') == true then
+    return false
+  end
   if EncodedObjects[o.getGUID()] == nil and o ~= self then
     EncodedObjects[o.getGUID()] = buildBaseForm(o)
     buildButtons(o)
     buildContextMenu(o)
+    return true
   end
+  return false
 end
 
 function updateSize(text,font_size,max_len,x_just,y_just)
