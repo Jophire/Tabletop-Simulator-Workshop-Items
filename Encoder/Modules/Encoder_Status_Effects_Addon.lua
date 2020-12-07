@@ -2,13 +2,13 @@
 by Tipsy Hobbit//STEAM_0:1:13465982
 This module adds only Loyalty Counters.
 ]]
-encVersion = '4.2.10'
-pID = "MTG_Status_Affects"
-version = '1.0'
+encVersion = '4.2.14'
+pID = "MTG_Status_Effects"
+version = '1.1'
 
 StatusList={
   mtg_exert={name="Exerted", des=":Card does not untap the next Controller's untap step.",val='boolean',def=false},
-  mtg_erozen={name="Frozen", des=":Card does not untap during the untap step as long as this effect is in effect.",val='boolean',def=false},
+  mtg_frozen={name="Frozen", des=":Card does not untap during the untap step as long as this effect is in effect.",val='boolean',def=false},
   mtg_detain={name="Detained", des=":Creature can't block, attack, or activate abilities till %Color%'s next turn.",val='color',def=''},
   mtg_monstrous={name="Monstrous", des=":This creature has been made monstrous.",val='boolean',def=false},
   mtg_goad={name="Goaded", des=":This creature must attack a player other then 'Color' if able.",val='color',def='',func=function() return Turns.turn_color end}
@@ -32,7 +32,7 @@ function registerModule(obj,ply)
     end
     properties = {
     propID = pID,
-    name = "Keyword Affects",
+    name = "Status Effects",
     values = values,
     funcOwner = self,
     callOnActivate = true,
@@ -101,7 +101,7 @@ function createButtons(t)
     scaler = {x=1,y=1,z=1}--t.obj.getScale()
     editing = enc.call("APIgetEditing",{obj=t.obj})
     
-    tooltip = ""
+    tooltip = "Status Effects:\n"
     for k,v in pairs(data) do
       if StatusList[k].val == 'boolean' and v == true then
         tooltip = tooltip..StatusList[k].name..StatusList[k].des..'\n'
@@ -116,14 +116,14 @@ function createButtons(t)
       t.obj.createButton({
       label=temp, click_function='toggleEditor', function_owner=self,
       position={(-0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-1.2+offset_y)*scaler.y}, height=170, width=barSize, font_size=fSize,
-      rotation={0,0,90-90*flip}, tooltip=tooltip
+      rotation={0,0,90-90*flip}, tooltip=tooltip,color={r=1,g=1,b=1,a=0.4}
       })
     elseif editing == pID then
       temp = "Status"
       barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=0,yJust=0})
       t.obj.createButton({
       label=temp, click_function='toggleEditClose', function_owner=self,
-      position={(-0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-1.2+offset_y)*scaler.y}, height=170, width=barSize, font_size=fsize,
+      position={(-0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-1.2+offset_y)*scaler.y}, height=160, width=barSize, font_size=fsize,
       rotation={0,0,90-90*flip}, tooltip=tooltip
       })
       i = 1
@@ -133,16 +133,16 @@ function createButtons(t)
           barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=0,yJust=0})
           t.obj.createButton({
           label= temp, click_function='toggleStatus'..k, function_owner=self,
-          position={-0*flip,0.28*flip*scaler.z,(-1.2+offset_y+i*0.2)*scaler.y}, height=170, width=barSize, font_size=fsize,
-          rotation={0,0,90-90*flip}, color={r=0,g=0,b=0}, font_color={r=1,g=0,b=0}
+          position={-0*flip,0.28*flip*scaler.z,(-1.2+offset_y+i*0.25)*scaler.y}, height=160, width=barSize, font_size=fsize,
+          rotation={0,0,90-90*flip}, color={r=0,g=0,b=0}, font_color={r=1,g=0,b=0},tooltip=StatusList[k].des
           })
         else
           temp =StatusList[k].name
           barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=0,yJust=0})
           t.obj.createButton({
           label= temp, click_function='toggleStatus'..k, function_owner=self,
-          position={-0*flip,0.28*flip*scaler.z,(-1.2+offset_y+i*0.2)*scaler.y}, height=170, width=barSize, font_size=fsize,
-          rotation={0,0,90-90*flip}, color={r=0,g=0,b=0}, font_color={r=1,g=1,b=1}
+          position={-0*flip,0.28*flip*scaler.z,(-1.2+offset_y+i*0.25)*scaler.y}, height=160, width=barSize, font_size=fsize,
+          rotation={0,0,90-90*flip}, color={r=0,g=0,b=0}, font_color={r=1,g=1,b=1},tooltip=StatusList[k].des
           })
         end
         i = i+1

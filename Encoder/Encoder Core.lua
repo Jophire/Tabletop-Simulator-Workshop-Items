@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.13'
+version = '4.2.15'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -232,6 +232,12 @@ function callVersionCheck(p)
     else
       WebRequest.get(URLS['ENCODER'],self,"versionCheck")
     end
+    for k,v in pairs(Properties) do
+      u = v.funcOwner.getVar('UPDATE_URL')
+      if u ~= nil then
+        WebRequest.get(u,v.funcOwner,"updateModule") 
+      end
+    end
   else
     Player[p].broadcast("Please wait "..(lastcheck+120-Time.time).." seconds before preforming another update check.")
   end
@@ -348,6 +354,7 @@ function buildZones()
       z = getObjectFromGUID(ZtoG[v..''..i])
       if z == nil then
         h = Player[v].getHandTransform(i)
+        local j = v
         params = {}
         params.type = "scriptingTrigger"
         params.position = h.position
@@ -355,10 +362,10 @@ function buildZones()
         params.scale = h.scale
         params.sound = false
         params.callback_function = function(obj) Zones[obj.guid] = {
-          name = v..''..i,
+          name = j..''..i,
           func_enter = 'hideCardDetails',
           func_leave = 'showCardDetails',
-          color = v
+          color = j
           }
           end
         spawnObject(params)
@@ -430,11 +437,16 @@ end
 
 -- If the encoder is deleted, make sure to cleanup. 
 function encodeObject(o)
+  if o.getVar('noencode') == true then
+    return false
+  end
   if EncodedObjects[o.getGUID()] == nil and o ~= self then
     EncodedObjects[o.getGUID()] = buildBaseForm(o)
     buildButtons(o)
     buildContextMenu(o)
+    return true
   end
+  return false
 end
 
 function updateSize(text,font_size,max_len,x_just,y_just)
@@ -1036,8 +1048,8 @@ function APIformatButton(p)
   return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
 end
 --Compares two version strings '###.##.###.##' which is made up of any number of digits and periods.
-function APIcompVersions(p)
-  return versionCheck(p.va,p.vb)
+function APIversionComp(p)
+  return versionCheck(p.wv,p.cv)
 end
 
 --CLEANUP
