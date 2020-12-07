@@ -4,7 +4,7 @@ This module adds keyword abilities.
 ]]
 pID = "MTG_Keyword_Abilites"
 version = '1.1'
-URL='
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Keyword_Modules.lua'
 
 KeywordList={
   mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},

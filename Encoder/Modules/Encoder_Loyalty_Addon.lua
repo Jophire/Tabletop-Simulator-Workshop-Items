@@ -4,7 +4,7 @@ This module adds only Loyalty Counters.
 ]]
 version = '1.2'
 pID = "MTG_Loyalty"
-URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Loyalty_Addon.lua'
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Loyalty_Addon.lua'
 
 function onload()
   self.createButton({
