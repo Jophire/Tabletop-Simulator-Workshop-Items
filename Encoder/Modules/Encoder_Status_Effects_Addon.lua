@@ -1,10 +1,10 @@
 --[[Status Effects Module
 by Tipsy Hobbit//STEAM_0:1:13465982
-This module adds only Loyalty Counters.
+This module adds only Status Effects.
 ]]
-encVersion = '4.2.14'
 pID = "MTG_Status_Effects"
-version = '1.1'
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Status_Effects_Addon.lua'
+version = '1.2'
 
 StatusList={
   mtg_exert={name="Exerted", des=":Card does not untap the next Controller's untap step.",val='boolean',def=false},
@@ -148,6 +148,24 @@ function createButtons(t)
         i = i+1
       end
     end
+  end
+end
+function updateModule(wr)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    wr = wr.text
+    wrv = string.match(wr,"version = '(.-)'")
+    if wrv == 'DEPRECIATED' then
+      enc.call("APIremoveProperty",{propID=pID})
+      self.destruct()
+    end
+    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
+    if ''..ver ~= ''..version then
+      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
+      self.script_code = wr
+      self.reload()
+    end
+    broadcastToAll("No update found for "..pId..". Carry on.")
   end
 end
 

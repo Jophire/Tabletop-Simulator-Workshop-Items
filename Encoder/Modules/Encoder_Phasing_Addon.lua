@@ -1,8 +1,8 @@
 --Phasing
 --By Tipsy Hobbit
-encVersion = 1.2
 pID = "MTG_Phase"
-version = 1.0
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Phasing_Addon.lua'
+version = '1.7'
 
 function onload()
   self.createButton({
@@ -85,5 +85,23 @@ function unPhased(obj,ply)
 			end
 		end
     enc.call("APIrebuildButtons",{obj=obj})
+  end
+end
+function updateModule(wr)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    wr = wr.text
+    wrv = string.match(wr,"version = '(.-)'")
+    if wrv == 'DEPRECIATED' then
+      enc.call("APIremoveProperty",{propID=pID})
+      self.destruct()
+    end
+    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
+    if ''..ver ~= ''..version then
+      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
+      self.script_code = wr
+      self.reload()
+    end
+    broadcastToAll("No update found for "..pId..". Carry on.")
   end
 end

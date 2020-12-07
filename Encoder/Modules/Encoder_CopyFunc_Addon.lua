@@ -4,6 +4,8 @@
 ]]
 
 pID = "CopyTools"
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_CopyFunc_Addon.lua'
+version = '1.2'
 
 function onload()
   self.createButton({
@@ -76,4 +78,22 @@ function waitFrames(num_frames)
     end
     num_frames = 1
     return 1
+end
+function updateModule(wr)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    wr = wr.text
+    wrv = string.match(wr,"version = '(.-)'")
+    if wrv == 'DEPRECIATED' then
+      enc.call("APIremoveProperty",{propID=pID})
+      self.destruct()
+    end
+    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
+    if ''..ver ~= ''..version then
+      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
+      self.script_code = wr
+      self.reload()
+    end
+    broadcastToAll("No update found for "..pId..". Carry on.")
+  end
 end

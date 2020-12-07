@@ -2,9 +2,9 @@
 by Tipsy Hobbit//STEAM_0:1:13465982
 This module adds color Designators.
 ]]
-encVersion = '4.2.10'
 pID = "MTG_Colors"
-version = '1.0'
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Color_Addon.lua'
+version = '1.2'
 
 colors={
 w={r=1,g=1,b=1},
@@ -111,6 +111,24 @@ function createButtons(t)
         i = i+1
       end
     end
+  end
+end
+function updateModule(wr)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    wr = wr.text
+    wrv = string.match(wr,"version = '(.-)'")
+    if wrv == 'DEPRECIATED' then
+      enc.call("APIremoveProperty",{propID=pID})
+      self.destruct()
+    end
+    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
+    if ''..ver ~= ''..version then
+      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
+      self.script_code = wr
+      self.reload()
+    end
+    broadcastToAll("No update found for "..pId..". Carry on.")
   end
 end
 

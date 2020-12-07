@@ -1,7 +1,8 @@
 --Token Desginator
 --By Tipsy Hobbit
-encVersion = 1.2
 pID = "MTG_Token"
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Token_Addon.lua'
+version = '1.2'
 
 function onload()
   self.createButton({
@@ -81,5 +82,23 @@ function toggleToken(obj,ply)
     end
     
     enc.call("APIrebuildButtons",{obj=obj})
+  end
+end
+function updateModule(wr)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    wr = wr.text
+    wrv = string.match(wr,"version = '(.-)'")
+    if wrv == 'DEPRECIATED' then
+      enc.call("APIremoveProperty",{propID=pID})
+      self.destruct()
+    end
+    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
+    if ''..ver ~= ''..version then
+      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
+      self.script_code = wr
+      self.reload()
+    end
+    broadcastToAll("No update found for "..pId..". Carry on.")
   end
 end
