@@ -2,10 +2,9 @@
 by Tipsy Hobbit//STEAM_0:1:13465982
 This module adds keyword abilities.
 ]]
-encVersion = '4.2.14'
 pID = "MTG_Keyword_Abilites"
 version = '1.1'
-
+URL='
 
 KeywordList={
   mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},

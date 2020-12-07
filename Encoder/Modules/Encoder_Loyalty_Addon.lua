@@ -2,8 +2,9 @@
 by Tipsy Hobbit//STEAM_0:1:13465982
 This module adds only Loyalty Counters.
 ]]
-encVersion = 1
+version = '1.2'
 pID = "MTG_Loyalty"
+URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Loyalty_Addon.lua'
 
 function onload()
   self.createButton({
@@ -71,19 +72,22 @@ function createButtons(t)
       barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=400,max_len=90,xJust=1,yJust=0})
       t.obj.createButton({
       label=temp, click_function='cycleMain', function_owner=self,
-      position={0,0.28*flip*scaler.z,0}, height=400, width=barSize, font_size=fsize,rotation={0,0,90-90*flip}
+      position={0,0.28*flip*scaler.z,-0.8}, height=400, width=barSize, font_size=fsize,rotation={0,0,90-90*flip}, tooltip='Modify Loyalty'
       })
       t.obj.createButton({
       label= data.moduleMath, click_function='cycleMath', function_owner=self,
-      position={-0.4*flip,0.28*flip*scaler.z,-0.8}, height=400, width=400, font_size=240,rotation={0,0,90-90*flip}
+      position={-0.4*flip,0.28*flip*scaler.z,0}, height=400, width=400, font_size=240,rotation={0,0,90-90*flip},
+      tooltip = data.moduleMath == '+-' and 'Add or Subtract '..data.moduleMod or 'Multiply or Divide by '..data.moduleMod
       })
       t.obj.createButton({
       label= data.moduleMod, click_function='cycleMod', function_owner=self,
-      position={0.4*flip,0.28*flip*scaler.z,-0.8}, height=400, width=400, font_size=240,rotation={0,0,90-90*flip}
+      position={0.4*flip,0.28*flip*scaler.z,0}, height=400, width=400, font_size=240,rotation={0,0,90-90*flip},
+      tooltip = data.moduleMath == '+-' and 'Add or Subtract '..data.moduleMod or 'Multiply or Divide by '..data.moduleMod
       })
       t.obj.createButton({
       label= "Reset", click_function='resetValues', function_owner=self,
-      position={0*flip,0.28*flip*scaler.z,1.0}, height=200, width=600, font_size=240,rotation={0,0,90-90*flip}
+      position={0*flip,0.28*flip*scaler.z,1.0}, height=200, width=600, font_size=240,rotation={0,0,90-90*flip},
+      tooltip = 'Left click to reset values, right click to reset editor.'
       })
     end
   end
@@ -118,9 +122,11 @@ function updateEditDisp(obj)
     obj.editButton({
     index=0,label=temp,width=barSize, font_size=fSize})
     obj.editButton({
-    index=1,label=data.moduleMath})
+    index=1,label=data.moduleMath,
+      tooltip = data.moduleMath == '+-' and 'Add or Subtract '..data.moduleMod or 'Multiply or Divide by '..data.moduleMod})
     obj.editButton({
-    index=2,label=data.moduleMod})
+    index=2,label=data.moduleMod,
+      tooltip = data.moduleMath == '+-' and 'Add or Subtract '..data.moduleMod or 'Multiply or Divide by '..data.moduleMod})
   end
 end
 function cycleMain(obj,ply,alt)
@@ -194,9 +200,8 @@ function resetValues(obj,ply,alt)
     if alt == false then
       enc.call("APIobjDefaultValue",{obj=obj,valueID='loyaltyCounter'})
     else
-      for k,v in pairs(data) do
-        enc.call("APIobjDefaultValue",{obj=obj,valueID=k})
-      end
+      enc.call("APIobjDefaultValue",{obj=obj,valueID='moduleMath'})
+      enc.call("APIobjDefaultValue",{obj=obj,valueID='moduleMod'})
     end
     if type(ply) == "string" then
       updateEditDisp(obj)
@@ -212,4 +217,22 @@ function resetValues(obj,ply,alt)
       enc.call("APIrebuildButtons",{obj=obj})
     end
   end 
+end
+function updateModule(wr)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    wr = wr.text
+    wrv = string.match(wr,"version = '(.-)'")
+    if wrv == 'DEPRECIATED' then
+      enc.call("APIremoveProperty",{propID=pID})
+      self.destruct()
+    end
+    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
+    if ''..ver ~= ''..version then
+      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
+      self.script_code = wr
+      self.reload()
+    end
+    broadcastToAll("No update found for "..pId..". Carry on.")
+  end
 end

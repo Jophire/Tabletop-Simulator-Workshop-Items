@@ -232,6 +232,12 @@ function callVersionCheck(p)
     else
       WebRequest.get(URLS['ENCODER'],self,"versionCheck")
     end
+    for k,v in pairs(Properties) do
+      u = v.funcOwner.getVar('UPDATE_URL')
+      if u ~= nil then
+        WebRequest.get(u,v.funcOwner,"updateModule") 
+      end
+    end
   else
     Player[p].broadcast("Please wait "..(lastcheck+120-Time.time).." seconds before preforming another update check.")
   end
@@ -1042,8 +1048,8 @@ function APIformatButton(p)
   return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
 end
 --Compares two version strings '###.##.###.##' which is made up of any number of digits and periods.
-function APIcompVersions(p)
-  return versionCheck(p.va,p.vb)
+function APIversionComp(p)
+  return versionCheck(p.wv,p.cv)
 end
 
 --CLEANUP
