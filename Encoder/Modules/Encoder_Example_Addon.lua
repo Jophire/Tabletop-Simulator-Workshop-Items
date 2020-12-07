@@ -8,6 +8,10 @@ This Example Module uses all the api features for modules.
 --for identifying your module. Without it, it will not be detected by the
 --AutoRegister for modules.
 pID="example_module"
+--URL used for updating the module should you want to include one.
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Example_Addon.lua'
+--Module Version Number
+version = '1.2'
 
 
 --Recommended
@@ -54,7 +58,7 @@ function registerModule()
     valueID = 'example2',
     validType = 'string',
     desc = 'Hello this is an example',
-    default = 0
+    default = 'hello world'
     }
     enc.call("APIregisterValue",value)
   end
@@ -146,7 +150,24 @@ end
 function callEditor(t)
   toggleEditor(t.obj)
 end
-
+function updateModule(wr)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    wr = wr.text
+    wrv = string.match(wr,"version = '(.-)'")
+    if wrv == 'DEPRECIATED' then
+      enc.call("APIremoveProperty",{propID=pID})
+      self.destruct()
+    end
+    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
+    if ''..ver ~= ''..version then
+      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
+      self.script_code = wr
+      self.reload()
+    end
+    broadcastToAll("No update found for "..pId..". Carry on.")
+  end
+end
 
 
 

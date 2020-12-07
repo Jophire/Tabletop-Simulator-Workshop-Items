@@ -3,9 +3,8 @@ by Tipsy Hobbit//STEAM_0:1:13465982
 This module adds keyword abilities.
 ]]
 pID = "MTG_Keyword_Abilites"
-version = '1.1'
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Keyword_Modules.lua'
-
+version = '1.2'
 KeywordList={
   mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},
   mtg_firststrikecounter={name="First Strike",des=":This creature deals combat damage before creatures without first strike.",val='number',def=0},
@@ -170,7 +169,24 @@ function createButtons(t)
     end
   end
 end
-
+function updateModule(wr)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    wr = wr.text
+    wrv = string.match(wr,"version = '(.-)'")
+    if wrv == 'DEPRECIATED' then
+      enc.call("APIremoveProperty",{propID=pID})
+      self.destruct()
+    end
+    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
+    if ''..ver ~= ''..version then
+      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
+      self.script_code = wr
+      self.reload()
+    end
+    broadcastToAll("No update found for "..pId..". Carry on.")
+  end
+end
 
 
 
