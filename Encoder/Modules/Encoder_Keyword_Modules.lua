@@ -4,7 +4,7 @@ This module adds keyword abilities.
 ]]
 pID = "MTG_Keyword_Abilites"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Keyword_Modules.lua'
-version = '1.2'
+version = '1.3'
 KeywordList={
   mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},
   mtg_firststrikecounter={name="First Strike",des=":This creature deals combat damage before creatures without first strike.",val='number',def=0},
@@ -20,6 +20,7 @@ KeywordList={
   mtg_lifelinkcounter={name="Lifelink",des=":Damage dealt by this creature also causes you to gain that much life.",val='number',def=0},
   mtg_indestructiblecounter={name="Indestructible",des=":Effects that say 'destroy' don’t destroy this.",val='number',def=0},
   mtg_defendercounter={name="Defender",des=":This creature can't attack.",val='number',def=0},
+  mtg_hastecounter={name="Haste",des=":This creature does not suffer from summoning sickness.",val='number',def=0}
 }
 
 
