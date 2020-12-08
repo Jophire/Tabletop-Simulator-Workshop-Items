@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Morph"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Moprh_Addon.lua'
-version = '1.6'
+version = '1.7'
 
 function onload()
   self.createButton({
@@ -10,6 +10,7 @@ function onload()
   position={0,0.2,-0.5}, height=100, width=100, font_size=100,
   rotation={0,0,0},tooltip="Version: "..version
   })
+  Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
 end
 
 
@@ -130,7 +131,8 @@ function updateModule(wr)
       broadcastToAll("An update has been found for "..pID..". Reloading Module.")
       self.script_code = wr
       self.reload()
+    else
+      broadcastToAll("No update found for "..pID..". Carry on.")
     end
-    broadcastToAll("No update found for "..pId..". Carry on.")
   end
 end
