@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.16'
+version = '4.2.17'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -1049,7 +1049,7 @@ function APIformatButton(p)
 end
 --Compares two version strings '###.##.###.##' which is made up of any number of digits and periods.
 function APIversionComp(p)
-  return versionCheck(p.wv,p.cv)
+  return versionComp(p.wv,p.cv)
 end
 
 --CLEANUP
