@@ -3,7 +3,7 @@ by Tipsy Hobbit//STEAM_0:1:13465982
 This module adds only 1/1 Counters
 ]]
 pID = "MTG_Power_Toughness"
-version = '1.0'
+version = '1.1'
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_PowerToughness_Addon.lua'
 
 
@@ -13,9 +13,8 @@ function onload()
   position={0,0.2,-0.5}, height=100, width=100, font_size=100,
   rotation={0,0,0},tooltip=pID
   })
+  Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
 end
-
-
 function registerModule()
   enc = Global.getVar('Encoder')
   if enc ~= nil then
@@ -303,7 +302,8 @@ function updateModule(wr)
       broadcastToAll("An update has been found for "..pID..". Reloading Module.")
       self.script_code = wr
       self.reload()
+    else
+      broadcastToAll("No update found for "..pID..". Carry on.")
     end
-    broadcastToAll("No update found for "..pId..". Carry on.")
   end
 end

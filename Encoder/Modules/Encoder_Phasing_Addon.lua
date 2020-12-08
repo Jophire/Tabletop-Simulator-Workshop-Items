@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Phase"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Phasing_Addon.lua'
-version = '1.7'
+version = '1.8'
 
 function onload()
   self.createButton({
@@ -10,9 +10,8 @@ function onload()
   position={0,0.2,-0.5}, height=100, width=100, font_size=100,
   rotation={0,0,0},tooltip="Version: "..version
   })
+  Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
 end
-
-
 function registerModule()
   enc = Global.getVar('Encoder')
   if enc ~= nil then
@@ -34,7 +33,6 @@ function registerModule()
     enc.call("APIregisterValue",value)
   end
 end
-
 function createButtons(t)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
@@ -49,7 +47,6 @@ function createButtons(t)
     })
   end
 end
-
 function phaseOut(t)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
@@ -62,7 +59,6 @@ function phaseOut(t)
     enc.call("APIobjSetPropData",{obj=t.obj,propID=pID,data=data})
   end
 end
-
 function unPhased(obj,ply)
   enc = Global.getVar('Encoder')
   if enc ~= nil and enc.call("APIobjectExists",{obj=obj}) then
@@ -101,7 +97,8 @@ function updateModule(wr)
       broadcastToAll("An update has been found for "..pID..". Reloading Module.")
       self.script_code = wr
       self.reload()
+    else
+      broadcastToAll("No update found for "..pID..". Carry on.")
     end
-    broadcastToAll("No update found for "..pId..". Carry on.")
   end
 end
