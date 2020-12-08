@@ -4,7 +4,7 @@ This module adds keyword abilities.
 ]]
 pID = "MTG_Keyword_Abilites"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Keyword_Modules.lua'
-version = '1.3'
+version = '1.4'
 KeywordList={
   mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},
   mtg_firststrikecounter={name="First Strike",des=":This creature deals combat damage before creatures without first strike.",val='number',def=0},
@@ -183,9 +183,11 @@ function updateModule(wr)
     if ''..ver ~= ''..version then
       broadcastToAll("An update has been found for "..pID..". Reloading Module.")
       self.script_code = wr
+      Wait.frames('registerModule',1)
       self.reload()
+    else
+      broadcastToAll("No update found for "..pID..". Carry on.")
     end
-    broadcastToAll("No update found for "..pId..". Carry on.")
   end
 end
 
