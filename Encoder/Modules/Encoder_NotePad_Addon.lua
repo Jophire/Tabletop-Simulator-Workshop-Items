@@ -2,7 +2,7 @@
 --by Tipsy Hobbit//STEAM_0:1:13465982
 pID = "notepad"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_NotePad_Addon.lua'
-version = '1.3'
+version = '1.4'
 
 function onload()
   self.createButton({
@@ -59,7 +59,7 @@ function createButtons(t)
 			t.obj.createInput({
 			label="NotePad", input_function='editText', function_owner=self,
 			position={(0.0)*flip*scaler.x,0.28*flip*scaler.z,(0.0)*scaler.y}, height=1200, width=700, font_size=70,
-			rotation={0,0,90-90*flip},tooltip='',alignment=2,value=data.notes,validation=1,tab=3
+			rotation={0,0,90-90*flip},tooltip='',alignment=2,value=data.notes.text,validation=1,tab=3
 			})
 			temp = ' V '
 			barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=60,max_len=90,xJust=0,yJust=0})
