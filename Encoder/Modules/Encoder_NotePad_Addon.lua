@@ -1,8 +1,8 @@
 --Notepad
 --by Tipsy Hobbit//STEAM_0:1:13465982
 pID = "notepad"
-UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Notepad_Module.lua'
-version = '1.0'
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Notepad_Addon.lua'
+version = '1.1'
 
 function onload()
   self.createButton({
@@ -56,7 +56,6 @@ function createButtons(t)
 			rotation={0,0,90-90*flip},tooltip=tooltip
 			})
 		elseif editing == pID then
-			
 			t.object.createInput({
 			label="NotePad", input_function='editText', function_owner=self,
 			position={(0.0)*flip*scaler.x,0.28*flip*scaler.z,(0.0)*scaler.y}, height=1200, width=700, font_size=70,
