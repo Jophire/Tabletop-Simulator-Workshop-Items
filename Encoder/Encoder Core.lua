@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.17'
+version = '4.2.20'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -768,20 +768,22 @@ function buildPropFunction(p)
 end
 function buildValueValidationFunction(p)
   v=Values[p]
-  if string.find('stringnumberboolean',v.validType) then
-    local vt = v.validType
-    Values[p]['validate']= function(val,cur) 
-      if type(val) == vt then return val else return cur end end
-  elseif string.find(v.validType, 'pattern%b()') then
-    local _,_,pat = string.find(v.validType,'pattern(%b())')
-    if #pat > 2 then
-      pat = string.sub(pat,2,-2)
+  if v.validType ~= nil and v.validType ~= 'nil' then
+    if string.find('stringnumberboolean',v.validType) then
+      local vt = v.validType
       Values[p]['validate']= function(val,cur) 
-      if string.find(val,pat) then return val else return cur end end
+        if type(val) == vt then return val else return cur end end
+    elseif string.find(v.validType, 'pattern%b()') then
+      local _,_,pat = string.find(v.validType,'pattern(%b())')
+      if #pat > 2 then
+        pat = string.sub(pat,2,-2)
+        Values[p]['validate']= function(val,cur) 
+        if string.find(val,pat) then return val else return cur end end
+      end
+    elseif string.find(v.validType, 'color') then  
+      Values[p]['validate']= function(val,cur)
+      if val == '' or val == nil or Player[val] ~= nil then return val else return cur end end
     end
-  elseif string.find(v.validType, 'color') then  
-    Values[p]['validate']= function(val,cur)
-    if val == '' or val == nil or Player[val] ~= nil then return val else return cur end end
   else
     Values[p]['validate']= function(val,cur) return val end
   end
