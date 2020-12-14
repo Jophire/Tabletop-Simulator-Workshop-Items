@@ -2,7 +2,7 @@
 --by Tipsy Hobbit//STEAM_0:1:13465982
 pID = "notepad"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_NotePad_Addon.lua'
-version = '1.2'
+version = '1.3'
 
 function onload()
   self.createButton({
@@ -39,31 +39,31 @@ end
 function createButtons(t)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
-    flip = enc.call("APIgetFlip",{obj=t.object})
-		data = enc.call("APIobjGetPropData",{obj=t.object,propID=pID})
+    flip = enc.call("APIgetFlip",{obj=t.obj})
+		data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
 		scaler = {x=1,y=1,z=1}
 		tooltip = ""
 		if data.notes.tooltip == true then
 			tooltip = data.notes.text
 		end
-		editing = enc.call("APIgetEditing",{obj=t.object})
+		editing = enc.call("APIgetEditing",{obj=t.obj})
     if editing == nil then
 			temp = "[=]"
 			barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=60,max_len=90,xJust=0,yJust=0})
-			t.object.createButton({
+			t.obj.createButton({
 			label=temp, click_function='toggleEditor', function_owner=self,
 			position={(0.780+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(0.235+offset_y)*scaler.y}, height=110, width=barSize, font_size=fSize,
 			rotation={0,0,90-90*flip},tooltip=tooltip
 			})
 		elseif editing == pID then
-			t.object.createInput({
+			t.obj.createInput({
 			label="NotePad", input_function='editText', function_owner=self,
 			position={(0.0)*flip*scaler.x,0.28*flip*scaler.z,(0.0)*scaler.y}, height=1200, width=700, font_size=70,
 			rotation={0,0,90-90*flip},tooltip='',alignment=2,value=data.notes,validation=1,tab=3
 			})
 			temp = ' V '
 			barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=60,max_len=90,xJust=0,yJust=0})
-			t.object.createButton({
+			t.obj.createButton({
 			label=temp, click_function='toggleToolTip', function_owner=self,
 			position={(-1.1+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(0+offset_y)*scaler.y}, height=110, width=barSize, font_size=fSize,
 			rotation={0,0,90-90*flip},tooltip=data.notes.tooltip==true and 'Visible' or 'Hidden'
