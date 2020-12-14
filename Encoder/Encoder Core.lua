@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.20'
+version = '4.2.21'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -140,30 +140,29 @@ function onLoad(saved_data)
   createEncoderButtons()
   
   self.clearContextMenu()
-  if beta == true then
-    self.addContextMenuItem('Main Branch', function(p) 
-      if Player[p].admin then
-        beta = not beta
-        Player[p].broadcast('Switching back to the stable update branch.')
-        Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
-      else
-        Player[p].broadcast('Please ask the server host or an admin to change versions.')
-      end
+  self.addContextMenuItem('Main Branch', function(p) 
+    if Player[p].admin then
+      lastcheck = 0
+      beta = false
+      Player[p].broadcast('Switching back to the stable update branch.')
+      Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
+    else
+      Player[p].broadcast('Please ask the server host or an admin to change versions.')
     end
-    )
-  else
-    self.addContextMenuItem('Beta Branch', function(p) 
-      if Player[p].admin then
-        beta = not beta
-        Player[p].broadcast('Switching to the un-stable update branch.')
-        Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
-        Player[p].broadcast("Bugs are to be expected.")
-      else
-        Player[p].broadcast('Please ask the server host or an admin to change versions.')
-      end
-    end
-    )
   end
+  )
+  self.addContextMenuItem('Beta Branch', function(p) 
+    if Player[p].admin then
+      lastcheck = 0
+      beta = true
+      Player[p].broadcast('Switching to the un-stable update branch.')
+      Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
+      Player[p].broadcast("Bugs are to be expected.")
+    else
+      Player[p].broadcast('Please ask the server host or an admin to change versions.')
+    end
+  end
+  )
   self.addContextMenuItem('Update Check', function(p) 
     if Player[p].admin then
       callVersionCheck(p)
