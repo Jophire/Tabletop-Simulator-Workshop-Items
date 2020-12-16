@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.21'
+version = '4.2.24'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -31,7 +31,6 @@ Properties = {}
   propID = internal name,
   name = external name,
   values = {},  --List of Values this property calls on. DOES NOT GET REGISTERED FROM HERE.
-  dataStruct = {}, --DEPRECIATED
   funcOwner = obj,
   callOnActivate = true,
   activateFunc ='callEditor',
@@ -354,6 +353,7 @@ function buildZones()
       if z == nil then
         h = Player[v].getHandTransform(i)
         local j = v
+        local ind = i
         params = {}
         params.type = "scriptingTrigger"
         params.position = h.position
@@ -361,7 +361,7 @@ function buildZones()
         params.scale = h.scale
         params.sound = false
         params.callback_function = function(obj) Zones[obj.guid] = {
-          name = j..''..i,
+          name = j..''..ind,
           func_enter = 'hideCardDetails',
           func_leave = 'showCardDetails',
           color = j
@@ -401,7 +401,14 @@ function onObjectLeaveScriptingZone(zone, obj)
   end
 end
 function onObjectLeaveContainer(__,obj)
-  showCardDetails({obj})
+  if obj.use_hands == true and EncodedObjects[obj.getGUID() ~= nil then
+    Wait.condition( function() 
+    Wait.condition(
+      function() handCheck(obj) end,
+      function() return obj == nil or obj.resting end
+    ) end,
+    function() return not obj.resting end)
+  end
 end
 function onObjectDestroyed(obj)
   if obj == self then
@@ -418,11 +425,41 @@ function onObjectDestroyed(obj)
   end
 end
 function onObjectDropped(c,obj)
-	--print(obj)
-  if (Global.getVar('Encoder') == nil or Global.getVar('Encoder').getVar('version') < version) and mod_name == 'Encoder' then
+  local ver = versionComp(Global.getVar('Encoder').getVar('version'),version)
+  if ver == version and mod_name == 'Encoder' or Global.getVar('Encoder') == nil then
     Global.setVar('Encoder',self)
   end
   
+  if EncodedObjects[obj.getGUID()] ~= nil and obj.use_hands == true then
+    Wait.condition(
+      function() handCheck(obj) end,
+      function() return obj == nil or obj.resting end
+    )
+  end
+end
+--Use a raycast to check if an object is resting in a hand or not.
+function handCheck(obj)
+  if obj ~= nil and obj.getLock() == false and obj.held_by_color == nil then
+    params = {
+      origin = obj.getPosition(),
+      direction = Vector(0,-1,0),
+      type=1,
+      debug=false
+    }
+    c = Physics.cast(params)
+    dist = 0
+    for k,v in pairs(c) do
+      if v.hit_object.tag == 'Surface' then
+        dist = v.distance
+      end
+    end
+    if dist == 0 or dist > 2.0 and dist < 3.2 then 
+      hideCardDetails({obj})
+    else
+      showCardDetails({obj})
+    end
+  else
+  end
 end
 
 function doNothing()
