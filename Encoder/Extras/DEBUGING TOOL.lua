@@ -39,8 +39,10 @@ function onObjectHover(ply,obj)
     if obj.getVar("pID") ~= nil then
       data = enc.getTable("Properties")
       data = data[obj.getVar("pID")]
-      UI.setAttribute(MPID..ply.."Text","text",printOutData(data))
-      UI.show(MPID..ply.."Display")
+      if data ~= nil then
+        UI.setAttribute(MPID..ply.."Text","text",printOutData(data))
+        UI.show(MPID..ply.."Display")
+      end
     end
   else
     UI.hide(MPID..ply.."Display")
