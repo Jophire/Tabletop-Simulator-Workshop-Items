@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.26'
+version = '4.2.27'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -440,11 +440,11 @@ function handCheck(obj)
     c = Physics.cast(params)
     dist = 0
     for k,v in pairs(c) do
-      if v.hit_object.tag == 'Surface' then
+      if v.hit_object.tag == 'Surface' or v.hit_object.interactable == false  then
         dist = v.distance
       end
     end
-    if dist == 0 or dist > 2.0 and dist < 3.2 then 
+    if dist > 2.0 and dist < 3.2 or c[1] == nil then 
       hideCardDetails({obj})
     else
       showCardDetails({obj})
