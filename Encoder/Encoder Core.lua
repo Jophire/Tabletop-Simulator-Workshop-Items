@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.25'
+version = '4.2.26'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -392,7 +392,7 @@ function onObjectLeaveScriptingZone(zone, obj)
   end
 end
 function onObjectLeaveContainer(__,obj)
-  if obj.use_hands == true and EncodedObjects[obj.getGUID() ~= nil then
+  if obj.use_hands == true and EncodedObjects[obj.getGUID()] ~= nil then
     Wait.condition( function() 
     Wait.condition(
       function() handCheck(obj) end,
