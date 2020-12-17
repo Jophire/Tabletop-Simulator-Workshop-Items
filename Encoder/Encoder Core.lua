@@ -1,11 +1,9 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.24'
+version = '4.2.25'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
-
-lastcheck = 0
 
 URLS={
   ENCODER='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Encoder%20Core.lua',
@@ -141,7 +139,6 @@ function onLoad(saved_data)
   self.clearContextMenu()
   self.addContextMenuItem('Main Branch', function(p) 
     if Player[p].admin then
-      lastcheck = 0
       beta = false
       Player[p].broadcast('Switching back to the stable update branch.')
       Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
@@ -152,7 +149,6 @@ function onLoad(saved_data)
   )
   self.addContextMenuItem('Beta Branch', function(p) 
     if Player[p].admin then
-      lastcheck = 0
       beta = true
       Player[p].broadcast('Switching to the un-stable update branch.')
       Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
@@ -223,21 +219,16 @@ function onSave()
 end
 
 function callVersionCheck(p)
-  if Time.time-lastcheck > 120 then
-    lastcheck = Time.time -- STOP THE SPAM ops.
-    if beta then
-      WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
-    else
-      WebRequest.get(URLS['ENCODER'],self,"versionCheck")
-    end
-    for k,v in pairs(Properties) do
-      u = v.funcOwner.getVar('UPDATE_URL')
-      if u ~= nil then
-        WebRequest.get(u,v.funcOwner,"updateModule") 
-      end
-    end
+  if beta then
+    WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
   else
-    Player[p].broadcast("Please wait "..(lastcheck+120-Time.time).." seconds before preforming another update check.")
+    WebRequest.get(URLS['ENCODER'],self,"versionCheck")
+  end
+  for k,v in pairs(Properties) do
+    u = v.funcOwner.getVar('UPDATE_URL')
+    if u ~= nil then
+      WebRequest.get(u,v.funcOwner,"updateModule") 
+    end
   end
 end
 function versionCheck(wr)
