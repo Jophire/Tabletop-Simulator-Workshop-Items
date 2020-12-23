@@ -349,7 +349,7 @@ function buildZones()
         params.type = "scriptingTrigger"
         params.position = h.position
         params.rotation = h.rotation
-        params.scale = h.scale
+        params.scale = h.scale*4/3
         params.sound = false
         params.callback_function = function(obj) Zones[obj.guid] = {
           name = j..''..ind,
