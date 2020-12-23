@@ -71,7 +71,6 @@ function unTap()
 							untaps = false
 							data["mtg_exert"] = false
 							enc.call("APIobjSetAllData",{obj=v,data=data})
-              enc.call("APIobjDisableProp",{obj=v,propID='mtg_exert'})
 							enc.call("APIrebuildButtons",{obj=v})
 						end
 					end
