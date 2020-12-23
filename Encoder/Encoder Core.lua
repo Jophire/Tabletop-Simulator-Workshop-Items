@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.27'
+version = '4.2.28'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -32,7 +32,7 @@ Properties = {}
   funcOwner = obj,
   callOnActivate = true,
   activateFunc ='callEditor',
-  
+  visible = true, --Should this property show up in the menu.
   xml_index = tableindex
 ]]
 Values = {}
@@ -444,7 +444,9 @@ function handCheck(obj)
         dist = v.distance
       end
     end
-    if dist > 2.0 and dist < 3.2 or c[1] == nil then 
+    --If the card is above 2 and resting, its in a hand. 
+    --Or if its resting, but there is nothing below it, its in a hand.
+    if dist > 2.0 or c[1] == nil then 
       hideCardDetails({obj})
     else
       showCardDetails({obj})
@@ -605,13 +607,13 @@ function buildButtons(o)
         local count = 0
         local pos = EncodedObjects[o.getGUID()].menus.props.pos
         for k,v in pairsByKeys(Properties) do
-					if v.funcOwner ~= nil then
+					if v.funcOwner ~= nil and v.visible ~= false then
 						if pos <= count and count < pos+7 then
 							temp = v.name
 							barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,1,0)
 							o.createButton({
 							label=temp, click_function=v.propID..'Toggle', function_owner=self,
-							position={(-1.05+offset_x)*flip*scaler.x,zpos,(-0.75+((count-pos)/4)+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
+							position={(-1.05+offset_x)*flip*scaler.x,zpos,(-0.75+((count-pos)/3.9)+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
 							rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
 							})
 						end
