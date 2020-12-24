@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.31'
+version = '4.2.33'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -439,7 +439,7 @@ function handCheck(obj)
       debug=false
     }
     c = Physics.cast(params)
-    dist = 0
+    dist = 10000
     for k,v in pairs(c) do
       if v.hit_object.tag == 'Surface' or v.hit_object.interactable == false  then
         dist = v.distance < dist and v.distance or dist
