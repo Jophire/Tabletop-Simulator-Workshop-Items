@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.28'
+version = '4.2.29'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -441,7 +441,7 @@ function handCheck(obj)
     dist = 0
     for k,v in pairs(c) do
       if v.hit_object.tag == 'Surface' or v.hit_object.interactable == false  then
-        dist = v.distance
+        dist = v.distance < dist and v.distance or dist
       end
     end
     --If the card is above 2 and resting, its in a hand. 
