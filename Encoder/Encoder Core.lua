@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.30'
+version = '4.2.31'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -350,7 +350,7 @@ function buildZones()
         params.position = h.position
         params.rotation = h.rotation
         hs = Vector(h.scale.x,h.scale.y,h.scale.z)
-        params.scale = hs*4/3
+        params.scale = hs*(4/3)
         params.sound = false
         params.callback_function = function(obj) Zones[obj.guid] = {
           name = j..''..ind,
