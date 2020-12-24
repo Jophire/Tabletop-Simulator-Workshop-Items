@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.33'
+version = '4.2.34'
 version_string = "Major Overhaul of how properties interact with each other."
 beta=false
 
@@ -158,15 +158,21 @@ function onLoad(saved_data)
     end
   end
   )
-  self.addContextMenuItem('Update Check', function(p) 
+  self.addContextMenuItem('Update', function(p) 
     if Player[p].admin then
       callVersionCheck(p)
-      broadcastToAll('Preforming an update check.')
+      broadcastToAll('Preforming an update.')
     else
       Player[p].broadcast('Please ask the server host or an admin to check for updates.')
     end
   end
   )
+  
+  if beta then
+    WebRequest.get(URLS['ENCODER_BETA'],self,"updateCheck")
+  else
+    WebRequest.get(URLS['ENCODER'],self,"updateCheck")
+  end
   
 	--WebRequest.get(URLS['XML'],self,"buildUI")
 end
@@ -229,6 +235,16 @@ function callVersionCheck(p)
     if u ~= nil then
       WebRequest.get(u,v.funcOwner,"updateModule") 
     end
+  end
+end
+
+function updateCheck(wr)
+  wr = wr.text
+  local ver = versionComp(string.match(wr,"version = '(.-)'"),version)
+  if ''..ver ~= ''..version then
+    broadcastToAll("An update has been found. Please right click the encoder and select update.")
+  else
+    broadcastToAll("No update found at this time. Carry on.")
   end
 end
 function versionCheck(wr)
