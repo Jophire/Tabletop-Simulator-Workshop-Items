@@ -20,23 +20,42 @@ function onCollisionEnter(c)
           if cd[k] == nil then
             cd[k] = enc.call('APIobjGetValueData',{obj=obj,valueID=k})[k]
           end
-          _,_,m,n = string.find(v,'([%+%-%*%/=])(%d*)')
-          n = tonumber(n)
-          --print(m.."  "..n)
-          if m == '+' then
-            cd[k] = cd[k]+n
-          elseif m == '-' then
-            cd[k] = cd[k]-n
-          elseif m == '*' then
-            cd[k] = cd[k]*n
-          elseif m == '/' then
-            if n ~= 0 then
-              cd[k] = cd[k]/n
+          _,_,action,value = string.find(v,'([%+%-%*%/=])(.*)')
+          _,_,typ,value = string.find(value,'([snbcv]):(.*)')
+          if typ == 'n' then
+            value = tonumber(value)
+            if action == '+' then
+              cd[k] = cd[k]+value
+            elseif action == '-' then
+              cd[k] = cd[k]-value
+            elseif action == '*' then
+              cd[k] = cd[k]*value
+            elseif action == '/' then
+              if value ~= 0 then
+                cd[k] = cd[k]/value
+              end
+            elseif action == '=' then
+              cd[k] = value
+            else
+              print(action..' is not a recognized operator.')
             end
-          elseif m == '=' then
-            cd[k] = n
-          else
-            print(m..' is not a recognized operator.')
+          elseif typ == 'b' then 
+            cd[k] = value == 'true' and true or false
+          elseif typ == 's' then
+            if action == '+' then
+              cd[k] = cd[k]..value
+            elseif action == '=' then
+              cd[k] = value
+            else
+              print(action..' is not a recognized operator.')
+            end
+          elseif typ == 'c' then
+            if action == '=' then
+              cd[k] = value
+            else
+              print(action..' is not a recognized operator.')
+            end
+          elseif typ == 'v' then
           end
         end
         if enc.call('APIpropertyExists',{propID=k}) then
