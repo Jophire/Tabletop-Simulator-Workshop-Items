@@ -1,8 +1,8 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.00'
-version_string = "Apperently I am not needed. GLHF"
+version = '4.4.01'
+version_string = "Player,Menu and Style update."
 beta=false
 
 URLS={
@@ -588,7 +588,7 @@ end
 
 function buildButtons(o)
   for k,v in pairs(Menus)
-    v.funcOwner.call("createMenu",o)
+    v.funcOwner.call("createMenu",{obj=o,ply=p})
   end
 end
 
