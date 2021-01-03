@@ -59,7 +59,7 @@ function onObjectDropped(c,object)
         object.setLock(true)
 				
 				start = 0
-				modules = tableMerge(enc.getTable("Properties"),enc.getTable("Tools"))
+				modules = tableMerge(enc.getTable("Properties"),enc.getTable("Menus"))
 				count = 0
 				
 				startPos = addVectors(self.getPosition(),multVectors(self.getTransformUp(),1))
@@ -97,7 +97,7 @@ function Float()
   start = 0
   while self ~= nil and cour == true do
     if enc ~= nil then
-      modules = tableMerge(enc.getTable("Properties"),enc.getTable("Tools"))
+      modules = tableMerge(enc.getTable("Properties"),enc.getTable("Menus"))
       count = 0
 			
 			startPos = addVectors(self.getPosition(),multVectors(self.getTransformUp(),1))

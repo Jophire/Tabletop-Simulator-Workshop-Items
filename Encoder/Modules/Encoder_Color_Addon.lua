@@ -4,7 +4,7 @@ This module adds color Designators.
 ]]
 pID = "MTG_Colors"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Color_Addon.lua'
-version = '1.3'
+version = '1.4'
 
 colors={
 w={r=1,g=1,b=1},
@@ -32,7 +32,7 @@ function registerModule(obj,ply)
     name = "MTG Colors",
     values = {'mtg_colors'},
     funcOwner = self,
-    callOnActivate = true,
+    tags='basic,face_prop',
     activateFunc ='callEditor'
     }
     enc.call("APIregisterProperty",properties)
@@ -74,7 +74,10 @@ function toggleEditor(obj,ply)
   end
 end
 function callEditor(t)
-  toggleEditor(t.obj,nil)
+  enc.call("APItoggleProperty",{obj=t.obj,propID=pID})
+  if enc.call("APIobjIsPropEnabled",{obj=t.obj,propID=pID}) then
+    toggleEditor(t.obj,nil)
+  end
 end
 function toggleEditClose(obj,ply)
   enc = Global.getVar('Encoder')

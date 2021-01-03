@@ -4,7 +4,7 @@ This module adds only Loyalty Counters.
 ]]
 pID = "MTG_Loyalty"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Loyalty_Addon.lua'
-version = '1.3'
+version = '1.5'
 
 
 function onload()
@@ -25,7 +25,7 @@ function registerModule()
     name = "Loyalty",
     values = {'loyaltyCounter','moduleMod','moduleMath'},
     funcOwner = self,
-    callOnActivate = true,
+    tags="basic,counter",
     activateFunc ='callEditor'
     }
     enc.call("APIregisterProperty",properties)
@@ -104,7 +104,10 @@ function toggleEditor(obj,ply)
 end
 
 function callEditor(t)
-  toggleEditor(t.obj,nil)
+  enc.call("APItoggleProperty",{obj=t.obj,propID=pID})
+  if enc.call("APIobjIsPropEnabled",{obj=t.obj,propID=pID}) then
+    toggleEditor(t.obj,nil)
+  end
 end
 
 function toggleEditClose(obj,ply)

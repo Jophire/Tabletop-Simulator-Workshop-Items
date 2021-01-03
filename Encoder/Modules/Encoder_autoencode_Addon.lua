@@ -5,7 +5,7 @@
 
 pID = "AutoEncoder"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_autoencode_Addon.lua'
-version = '1.3'
+version = '1.4'
 
 function onload()
   self.createButton({
@@ -20,13 +20,15 @@ function registerModule()
   enc = Global.getVar('Encoder')
   if enc ~= nil then
     properties = {
-    toolID = pID,
+    propID = pID,
     name = "Auto Encoder",
+    values={},
     funcOwner = self,
     activateFunc ='',
-    display=false
+    tags="tool",
+    visible=false
     }
-    enc.call("APIregisterTool",properties)
+    enc.call("APIregisterProperty",properties)
   end
 end
 

@@ -64,7 +64,7 @@ function onCollisionEnter(c)
             end
           elseif typ == 'v' then
             if Player[guid] ~= nil then
-              value = enc.call('APIplyGetValueData',{color=guid,valueID=value})
+              value = enc.call('APIplyGetValueData',{ply=guid,valueID=value})
             else
               value = enc.call('APIobjGetValueData',{obj=getObjectFromGUID(guid),valueID=value})
             end
@@ -96,7 +96,7 @@ function onCollisionEnter(c)
           error(value..' is not a recognized value.')
         end
         if enc.call('APIpropertyExists',{propID=k}) then
-          if enc.call('APIobjIsPropEnabled',{obj=obj,propID=k}) ~= value then
+          if enc.call('APIobjIsPropEnabled',{obj=obj,propID=k}) ~= v then
             enc.call('APItoggleProperty',{obj=obj,propID=k})
           end
         end

@@ -2,7 +2,7 @@
 --by Tipsy Hobbit//STEAM_0:1:13465982
 pID = "notepad"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_NotePad_Addon.lua'
-version = '1.4'
+version = '1.5'
 
 function onload()
   self.createButton({
@@ -22,8 +22,8 @@ function registerModule()
 		name = "Notepad",
 		values = {'notes'},
 		funcOwner = self,
-		callOnActivate = false,
-		activateFunc =''
+		tags='tool',
+		activateFunc ='toggleProp'
 		}
 		enc.call("APIregisterProperty",properties)
     value = {
@@ -34,6 +34,10 @@ function registerModule()
     }
     enc.call("APIregisterValue",value)
   end
+end
+
+function toggleProp(t)
+  enc.call("APItoggleProperty",{obj=t.obj,propID=pID})
 end
 
 function createButtons(t)
