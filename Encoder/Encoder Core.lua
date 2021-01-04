@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.05'
+version = '4.4.06'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -242,6 +242,11 @@ function onLoad(saved_data)
     WebRequest.get(URLS['ENCODER_BETA'],self,"updateCheck")
   else
     WebRequest.get(URLS['ENCODER'],self,"updateCheck")
+  end
+  
+  if CORE_VALUE.menu_count == 0 then
+    broadcastToAll("The card menu has been split into its own module. Please load it off the workshop page.")
+    Wait.time(function()broadcastToAll("The card menu has been split into its own module. Please load it off the workshop page.")end,5)
   end
   
 	--WebRequest.get(URLS['XML'],self,"buildUI")
