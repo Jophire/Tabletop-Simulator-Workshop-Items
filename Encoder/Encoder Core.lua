@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.03'
+version = '4.4.05'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -654,7 +654,7 @@ function buildButtons(o)
           if EncodedObjects[o.getGUID()].menus[k] == nil then
             EncodedObjects[o.getGUID()].menus[k] = {open=false,pos=0}
           end
-          v.funcOwner.call(v.activateFunc,{obj=o,style=Styles[CORE_VALUE.style].styleTable})
+          v.funcOwner.call(v.activateFunc,{obj=o})
           count = count+1
         else
           --log(v.funcOwner,"Missing module for menu "..k,'missing_module')
@@ -673,11 +673,12 @@ function buildButtons(o)
       if Properties[k]~=nil and Properties[k].funcOwner~= nil then
         Properties[k].funcOwner.call("createButtons",{obj=o})
       end
+      flip = EncodedObjects[o.getGUID()].flip
       temp = " X "
       barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,0,0)
       o.createButton({
       label=temp, click_function='closeEditor', function_owner=self,
-      position={(-1.1+offset_x)*flip,zpos,(1.4+offset_y)}, height=100, width=barSize, font_size=fsize,
+      position={(-1.1+offset_x)*flip,0.28*flip,(1.4+offset_y)}, height=100, width=barSize, font_size=fsize,
       rotation={0,0,90-90*flip}
       })
     end

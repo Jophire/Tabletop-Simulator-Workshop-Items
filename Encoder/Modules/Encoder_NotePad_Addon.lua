@@ -36,8 +36,8 @@ function registerModule()
   end
 end
 
-function toggleProp(t)
-  enc.call("APItoggleProperty",{obj=t.obj,propID=pID})
+function toggleProp(obj,ply)
+  enc.call("APItoggleProperty",{obj=obj,propID=pID})
 end
 
 function createButtons(t)

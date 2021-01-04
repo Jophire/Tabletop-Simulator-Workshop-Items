@@ -58,9 +58,9 @@ function createButtons(t)
   end
 end
 
-function toggleMorph(t)
-  enc.call("APItoggleProperty",{obj=t.obj,propID=pID})
-  tMorph(t.obj,t.ply)
+function toggleMorph(obj,ply)
+  enc.call("APItoggleProperty",{obj=obj,propID=pID})
+  tMorph(obj,ply)
 end
 
 function tMorph(obj,ply)

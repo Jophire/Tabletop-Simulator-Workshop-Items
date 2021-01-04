@@ -147,11 +147,10 @@ end
 
 --REQUIRED: This is the function specified up in properties.
 --If you specify a function, you must make sure it has the function.
---The function takes a table t={obj=object,player = color}
-function callEditor(t)
-  enc.call("APItoggleProperty",{obj=t.obj,propID=pID}) --Toggle prop if this is not a one time use thing.
-  if enc.call("APIobjIsPropEnabled",{obj=t.obj,propID=pID}) then --So it does not call the editor on disabling the prop.
-    toggleEditor(t.obj)
+function callEditor(obj,ply)
+  enc.call("APItoggleProperty",{obj=obj,propID=pID}) --Toggle prop if this is not a one time use thing.
+  if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then --So it does not call the editor on disabling the prop.
+    toggleEditor(obj)
   end
 end
 function updateModule(wr)

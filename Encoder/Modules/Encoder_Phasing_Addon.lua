@@ -47,17 +47,17 @@ function createButtons(t)
     })
   end
 end
-function phaseOut(t)
+function phaseOut(obj,ply)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
-    enc.call("APItoggleProperty",{obj=t.obj,propID=pID})
-    data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
+    enc.call("APItoggleProperty",{obj=obj,propID=pID})
+    data = enc.call("APIobjGetPropData",{obj=obj,propID=pID})
 		if data.mtg_phased ~= true then
 			data.mtg_phased = true
     else
       data.mtg_phased = false
     end
-    enc.call("APIobjSetPropData",{obj=t.obj,propID=pID,data=data})
+    enc.call("APIobjSetPropData",{obj=obj,propID=pID,data=data})
   end
 end
 function unPhased(obj,ply)

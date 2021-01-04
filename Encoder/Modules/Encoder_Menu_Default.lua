@@ -5,7 +5,7 @@ If no menu has been registered, then the encoder will spawn this from the github
 ]]
 pID="Default_Menu"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
-version = '1.1'
+version = '1.2'
 Style = {}
 function onload()
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
@@ -156,7 +156,7 @@ function createPropMenu(t)
             temp = v.name
             barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=1,yJust=0})
             o.createButton(Style.new{
-            label=temp, click_function=v.propID..'Toggle', function_owner=self,
+            label=temp, click_function=v.activateFunc, function_owner=v.funcOwner,
             position={(-1.05+offset_x)*flip*scaler.x,zpos,(-0.75+((count-md.pos)/3.9)+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
             rotation={0,0,90-90*flip}
             })

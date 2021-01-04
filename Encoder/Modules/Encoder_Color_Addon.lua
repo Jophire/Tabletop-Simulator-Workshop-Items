@@ -73,10 +73,10 @@ function toggleEditor(obj,ply)
     enc.call("APIrebuildButtons",{obj=obj})
   end
 end
-function callEditor(t)
-  enc.call("APItoggleProperty",{obj=t.obj,propID=pID})
-  if enc.call("APIobjIsPropEnabled",{obj=t.obj,propID=pID}) then
-    toggleEditor(t.obj,nil)
+function callEditor(obj,ply)
+  enc.call("APItoggleProperty",{obj=obj,propID=pID})
+  if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
+    toggleEditor(obj,nil)
   end
 end
 function toggleEditClose(obj,ply)
