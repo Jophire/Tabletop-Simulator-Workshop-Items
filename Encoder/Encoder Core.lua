@@ -1,15 +1,36 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.2.34'
-version_string = "Major Overhaul of how properties interact with each other."
-beta=false
+version = '4.4.08'
+version_string = "Player,Menu and Style update."
 
 URLS={
   ENCODER='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Encoder%20Core.lua',
   ENCODER_BETA='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/Encoder%20Core.lua',
-  XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json'
+  XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json',
+  BASIC_MENU='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
   }
+CORE_VALUE = {
+  menu_count = 0,
+  style_count = 0,
+  beta = false,
+  style = "Basic_Style"
+}
+basicstyleTableDefault = {
+  label='',
+  position={0,0.28,0},
+  rotation={0,0,0},
+  scale={1,1,1},
+  width=60,
+  height=60,
+  font_size=10,
+  color= {0,0,0,1},
+  font_color= {1,1,1,1},
+  hover_color= {0.3,0.3,0.3,1},
+  press_color= {0.6,0.6,0.6,1},
+  tooltip=""
+}
+
 
 EncodedObjects = {}
 --[[
@@ -24,16 +45,28 @@ EncodedObjects[objID] = {
   flip = 1
   disabled = false
 ]]
+Players = {}
+--[[
+  For attaching values to player colors instead of objects.
+  {ply=color} is how color is referenced in data for the api.
+  Players[color] = {
+    this = color
+    values = {valueID = value}
+    encoded = {propID = boolean}
+    editing = nil
+  }
+]]
 Properties = {}
 --[[
   propID = internal name,
   name = external name,
   values = {},  --List of Values this property calls on. DOES NOT GET REGISTERED FROM HERE.
   funcOwner = obj,
-  callOnActivate = true,
   activateFunc ='callEditor',
   visible = true, --Should this property show up in the menu.
+  tags = '{json list}',--A json list of tags. 'tool,property,hidden'
   xml_index = tableindex
+  }
 ]]
 Values = {}
 --[[
@@ -43,28 +76,34 @@ Values = {}
   props = {} list of properties that use this value.
   desc = A description for other module creators to understand the values use.
 ]]
-Tools = {}
---[[
-  toolID = internal name
-  name = external name
-  funcOwner = function owner
-  activateFunc = string
-  display = bool
-]]
 Zones = {}
 --[[
   name=Zone name
   activateFunc = function to call
 ]]
+Styles = {}
+Styles["Basic_Style"] = {name="Basic Style",desc="Comes with the encoder.",styleTable=basicstyleTableDefault}
+--[[
+  styleID = internal name,
+  name = '',
+  desc = '',
+  styleTable = buttonTable
+]]
+Menus = {}
+--[[
+  menuID = internal name,
+  funcOwner = obj,
+  activateFunc = func name --Encoder calls this to create the menus. 
+]]
 
 
-basic_buttons = {}
 
 -- Preps the core code for module integration as well
 --   as load in any save_data
 -----------------------------------------------------
 -- @param save_data Game data from autosaves. 
 function onLoad(saved_data)
+  basic_buttons = {}
 	-- Version Display
   broadcastToAll(mod_name.." "..version..postfix,{0.2,0.2,0.2})
 	
@@ -90,24 +129,18 @@ function onLoad(saved_data)
           if Properties[i].funcOwner == nil then
             Properties[i] = nil
           else
-            buildPropFunction(i)
-          end
-        end
-      end
-    end
-    if loaded_data.tools ~= nil then
-      for i,v in pairs(loaded_data.tools) do
-        if i ~= nil and v ~= nil and v ~= "" then
-          Tools[i] = JSON.decode(v)
-          Tools[i].funcOwner = getObjectFromGUID(Tools[i].funcOwner)
-          if Tools[i].funcOwner == nil then
-            Tools[i] = nil
+            --buildPropFunction(i)
           end
         end
       end
     end
     if loaded_data.zones ~= nil then
       Zones = JSON.decode(loaded_data.zones)
+      for k,v in pairs(Zones) do
+        if getObjectFromGUID(k) == nil then
+          Zones[k] = nil
+        end
+      end
     end
     if loaded_data.values ~= nil then
       for i,v in pairs(loaded_data.values) do
@@ -118,6 +151,9 @@ function onLoad(saved_data)
           end
         end
       end
+    end
+    if loaded_data.players ~= nil then
+      Players = JSON.decode(loaded_data.players)
     end
     if loaded_data.cards ~= nil then
       for i,v in pairs(loaded_data.cards) do
@@ -132,14 +168,44 @@ function onLoad(saved_data)
         end
       end
     end
+    if loaded_data.menus ~= nil then
+      CORE_VALUE.menu_count = 0
+      for i,v in pairs(loaded_data.menus) do
+        if i ~= nil and v ~= nil and v ~= "" then
+          Menus[i] = JSON.decode(v)
+          Menus[i].funcOwner = getObjectFromGUID(Menus[i].funcOwner)
+          if Menus[i].funcOwner == nil then
+            Menus[i] = nil
+          else
+            CORE_VALUE.menu_count = CORE_VALUE.menu_count + 1
+          end
+        end
+      end
+      if CORE_VALUE.menu_count == 0 then
+        --log(CORE_VALUE.menu_count,"No menus currently exist.","missing_module")
+      end
+    end
+    if loaded_data.styles ~= nil then
+      Styles = JSON.decode(loaded_data.styles)
+      CORE_VALUE.style_count = 0
+      for i,v in pairs(Styles) do
+        CORE_VALUE.style_count = CORE_VALUE.style_count + 1
+      end
+      --log(CORE_VALUE.style_count,"No styles currently exist, will not be able to render buttons in a unified manner.","missing_module")
+    end
   end
+  
   buildZones()
+  
+  for k,v in pairs(Player.getColors()) do
+    encodePlayer(v)
+  end
   createEncoderButtons()
   
   self.clearContextMenu()
   self.addContextMenuItem('Main Branch', function(p) 
     if Player[p].admin then
-      beta = false
+      CORE_VALUE.beta = false
       Player[p].broadcast('Switching back to the stable update branch.')
       Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
     else
@@ -149,7 +215,7 @@ function onLoad(saved_data)
   )
   self.addContextMenuItem('Beta Branch', function(p) 
     if Player[p].admin then
-      beta = true
+      CORE_VALUE.beta = true
       Player[p].broadcast('Switching to the un-stable update branch.')
       Player[p].broadcast("Please don't forget to preform a version check to force the swith to occur.")
       Player[p].broadcast("Bugs are to be expected.")
@@ -167,11 +233,21 @@ function onLoad(saved_data)
     end
   end
   )
-  
-  if beta then
+  self.addContextMenuItem('Refresh Style', function(p)
+    for k,v in pairs(Menus) do
+      v.funcOwner.call('refreshStyle',_)
+    end
+  end
+  )
+  if CORE_VALUE.beta then
     WebRequest.get(URLS['ENCODER_BETA'],self,"updateCheck")
   else
     WebRequest.get(URLS['ENCODER'],self,"updateCheck")
+  end
+  
+  if CORE_VALUE.menu_count == 0 then
+    broadcastToAll("No menu module located. Spawning the default menu module.")
+    WebRequest.get(URLS['BASIC_MENU'],self,"getMenuModule")
   end
   
 	--WebRequest.get(URLS['XML'],self,"buildUI")
@@ -183,9 +259,11 @@ function onSave()
   local data_to_save = {}
   data_to_save["cards"] = {}
   data_to_save["properties"] = {}
-  data_to_save["tools"] = {}
   data_to_save["zones"] = JSON.encode(Zones)
   data_to_save["values"] = {}
+  data_to_save["players"] = JSON.encode(Players)
+  data_to_save["menus"] = {}
+  data_to_save["styles"] = JSON.encode(Styles)
   
   for i,v in pairs(EncodedObjects) do
     --Removing Object reference before encoding.
@@ -205,32 +283,43 @@ function onSave()
       Properties[i].funcOwner = tempThis
     end
   end
-  for i,v in pairs(Tools) do
-    --Removing Object reference before encoding.
-    if Tools[i].funcOwner ~= nil then
-      local tempThis = Tools[i].funcOwner
-      Tools[i].funcOwner = Tools[i].funcOwner.getGUID()
-      data_to_save["tools"][i] = JSON.encode(v)
-      Tools[i].funcOwner = tempThis
-    end
-  end
   for i,v in pairs(Values) do
     local tempThis = Values[i].validate 
     Values[i].validate = ''
     data_to_save["values"][i] = JSON.encode(Values[i])
     Values[i].validate = tempThis
   end
+  for i,v in pairs(Menus) do
+    if Menus[i].funcOwner ~= nil then
+      local tempThis = Menus[i].funcOwner
+      Menus[i].funcOwner = Menus[i].funcOwner.getGUID()
+      data_to_save["menus"][i] = JSON.encode(Menus[i])
+      Menus[i].funcOwner = tempThis
+    end
+  end
   saved_data = JSON.encode(data_to_save)
   return saved_data
 end
 
 function callVersionCheck(p)
-  if beta then
+  if CORE_VALUE.beta then
     WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
   else
     WebRequest.get(URLS['ENCODER'],self,"versionCheck")
   end
   for k,v in pairs(Properties) do
+    u = v.funcOwner.getVar('UPDATE_URL')
+    if u ~= nil then
+      WebRequest.get(u,v.funcOwner,"updateModule") 
+    end
+  end
+  for k,v in pairs(Menus) do
+    u = v.funcOwner.getVar('UPDATE_URL')
+    if u ~= nil then
+      WebRequest.get(u,v.funcOwner,"updateModule") 
+    end
+  end
+  for k,v in pairs(Styles) do
     u = v.funcOwner.getVar('UPDATE_URL')
     if u ~= nil then
       WebRequest.get(u,v.funcOwner,"updateModule") 
@@ -251,7 +340,7 @@ function versionCheck(wr)
   wr = wr.text
   local ver = versionComp(string.match(wr,"version = '(.-)'"),version)
   if ''..ver ~= ''..version then
-    if beta == true then
+    if CORE_VALUE.beta == true then
       broadcastToAll("An update has been found for the beta branch. Reloading encoder.")
     else
       broadcastToAll("An update has been found for the main branch. Reloading encoder.")
@@ -282,69 +371,6 @@ function versionComp(a,b)
   end
   return b
 end
---[[
-function buildUI(wr)
-  wr = wr.text
-  wr = string.gsub(wr,"VERSION_NUMBER",version)
-  wr = string.gsub(wr,"GUID_HERE",self.getGUID())
-	local xml = UI.getXmlTable()
-  local found = 0
-  for k,v in pairs(xml) do
-    if v.attributes.id ~= nil and v.attributes.id == "Encoder" then
-      found = k
-      break
-    end
-  end
-  if found == 0 then
-    table.insert(xml,JSON.decode(wr)[1])
-  else
-    xml[found] = JSON.decode(wr)[1]
-  end
-end
-
--- Update the XML UI to show new modules as they are registered.
-function updateUI()
-	local g = self.getGUID()
-	local tab = UI.getXmlTable()
-	local ps = {}
-	for m,n in pairsByKeys(Properties) do
-		if n.funcOwner ~= nil then
-			table.insert(ps,{tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.propID,onClick=g.."/"..n.propID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}})
-		end
-	end 
-	local ts = {}
-	for m,n in pairsByKeys(Tools) do
-		if n.funcOwner ~= nil then
-			table.insert(ts,{tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.toolID,onClick=g.."/"..n.toolID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}})
-		end
-	end 
-  local index = 0
-  for k,v in pairs(tab) do
-    if v.attributes ~= nil and v.attributes.id == "Encoder" then
-      index = k
-      break
-    end
-  end
-	for k,v in pairs(Player.getColors()) do
-		if k ~= "Grey" then
-			--tab[index]["children"][k]["children"][4]["children"][1]["children"][2]["children"][1]["children"][1]["children"] = ps
-			--tab[index]["children"][k]["children"][4]["children"][1]["children"][4]["children"][1]["children"][1]["children"] = ts
-		end
-	end
-	UI.setXmlTable(tab)	
-end
-
--- Hide the XML UI.
-function minimize(plr,n,id)
-	id = string.sub(id,0,-4)
-	log(id)
-	local temp = UI.getAttribute(id,"active")
-	if temp == "True" or temp == nil then
-		UI.setAttribute(id,"active",false)
-	else
-		UI.setAttribute(id,"active",true)
-	end
-end]]
 
 -- NEW- Creates scripting zones around each players hands.
 -- This is used to more reliably hide/reveal card buttons as it transitions zones.
@@ -356,8 +382,9 @@ function buildZones()
   for k,v in pairs(Player.getColors()) do
     if v ~= "Grey" then
     for i=1,Player[v].getHandCount() do
-      z = getObjectFromGUID(ZtoG[v..''..i])
+      z = getObjectFromGUID(ZtoG[v..'_Hand_'..i])
       if z == nil then
+        --error('Missing hand zone for '..v..''..i)
         h = Player[v].getHandTransform(i)
         local j = v
         local ind = i
@@ -369,7 +396,7 @@ function buildZones()
         params.scale = hs*(4/3)
         params.sound = false
         params.callback_function = function(obj) Zones[obj.guid] = {
-          name = j..''..ind,
+          name = j..'_Hand_'..ind,
           func_enter = 'hideCardDetails',
           func_leave = 'showCardDetails',
           color = j
@@ -381,6 +408,24 @@ function buildZones()
     end
   end
 end
+function getMenuModule(wr)
+  local wr = wr.text
+  params = {}
+  params.type = "PiecePack_Crowns"
+  params.position = self.getPosition()+Vector(0,1,0)
+  params.rotation = self.getRotation()
+  params.scale = Vector(1,1,1)*(2/3)
+  params.sound = false
+  params.callback_function = function(obj)
+      obj.setName('Menu Module')
+      obj.script_code = wr
+      obj.reload()
+      Wait.condition(function() obj.call("registerModule",nil) end,function() return obj.spawning end)
+    end
+  spawnObject(params)
+end
+
+
 
 -- Functions to hide or show card details as it transitions from hand to table and back.
 function hideCardDetails(tar)
@@ -430,6 +475,12 @@ function onObjectDestroyed(obj)
 				--UI.setAttribute(k.."MainMenu","active",false)
 			end
 		end
+    for k,v in pairs(Zones) do
+      o = getObjectFromGUID(k)
+      if o ~= nil then
+        o.destruct()
+      end
+    end
   end
 end
 function onObjectDropped(c,obj)
@@ -487,9 +538,33 @@ function encodeObject(o)
     return false
   end
   if EncodedObjects[o.getGUID()] == nil and o ~= self then
-    EncodedObjects[o.getGUID()] = buildBaseForm(o)
+    EncodedObjects[o.getGUID()] = {
+    this = o,
+    oName = o.getName(),
+    values = {},
+    encoded = {},
+    menus = {},
+    editing = nil,
+    flip = 1,
+    disable = false
+    }
     buildButtons(o)
     buildContextMenu(o)
+    return true
+  end
+  return false
+end
+function encodePlayer(c)
+  if Players[c] == nil then
+    Players[c] = {
+      this = c,
+      values = {},
+      encoded = {},
+      editing = nil,
+      style = "basic",
+      menus = {}
+    }
+    --updateXML(c)
     return true
   end
   return false
@@ -531,157 +606,50 @@ end
 
 function buildButtons(o)
   o.clearButtons()
-	o.clearInputs()
+  o.clearInputs()
   if EncodedObjects[o.getGUID()].disable ~= true then
-    local flip = EncodedObjects[o.getGUID()].flip
-    local scaler = {x=1,y=1,z=1}--o.getScale()
-    zpos = 0.28*flip*scaler.z
     if EncodedObjects[o.getGUID()].editing == nil then
-      if EncodedObjects[o.getGUID()].menus.copy.open == false then
-        o.createButton({
-        label=">\n>\n>", click_function='toggleCopyMenu', function_owner=self,
-        position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1},tooltip="Tool Menu"
-        })
-      else
-        o.createButton({
-        label="<\n<\n<", click_function='toggleCopyMenu', function_owner=self,
-        position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1},tooltip="Tool Menu"
-        })
-        temp = "Disable Encoding"
-        barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,-1,0)
-        o.createButton({
-        label=temp, click_function='disableEncoding', function_owner=self,
-        position={(1.05+offset_x)*flip*scaler.x,zpos,(1.5+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,0,0,1}
-        })
-        temp = "↿     ↾"
-        barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,-1,0)
-        o.createButton({
-        label=temp, click_function='CMscrollUp', function_owner=self,
-        position={(1.05+offset_x)*flip*scaler.x,zpos,(-1+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
-        })
-        temp = "⇃     ⇂"
-        barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,-1,0)
-        o.createButton({
-        label=temp, click_function='CMscrollDown', function_owner=self,
-        position={(1.05+offset_x)*flip*scaler.x,zpos,1*scaler.y}, height=100, width=barSize, font_size=fsize,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
-        })
-        local count = 0
-        local pos = EncodedObjects[o.getGUID()].menus.copy.pos
-        for k,v in pairsByKeys(Tools) do
-					if v.display==true and v.funcOwner ~= nil then
-						if pos <= count and count < pos+7 then
-							temp = v.name
-							barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,-1,0)
-							o.createButton({
-							label=temp, click_function=v.activateFunc, function_owner=v.funcOwner,
-							position={(1.05+offset_x)*flip*scaler.x,zpos,(-0.75+((count-pos)/3)+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-							rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
-							})
-						end
-						count = count+1
-					end
+      count = 0
+      for k,v in pairs(Menus) do
+        if v.funcOwner ~= nil then
+          if EncodedObjects[o.getGUID()].menus[k] == nil then
+            EncodedObjects[o.getGUID()].menus[k] = {open=false,pos=0}
+          end
+          v.funcOwner.call(v.activateFunc,{obj=o})
+          count = count+1
+        else
+          --log(v.funcOwner,"Missing module for menu "..k,'missing_module')
         end
       end
-      if EncodedObjects[o.getGUID()].menus.props.open == false then
-        o.createButton({
-        label="<\n<\n<", click_function='togglePropMenu', function_owner=self,
-        position={-1.0*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1},tooltip="Module Menu"
-        })
-      else
-        o.createButton({
-        label=">\n>\n>", click_function='togglePropMenu', function_owner=self,
-        position={-1.0*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1},tooltip="Module Menu"
-        })
-        temp = " Flip "
-        barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,1,0)
-        o.createButton({
-        label=temp, click_function='flipMenu', function_owner=self,
-        position={(-1.05+offset_x)*flip*scaler.x,zpos,(1.25+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
-        })
-        temp = "↿     ↾"
-        barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,1,0)
-        o.createButton({
-        label=temp, click_function='PMscrollUp', function_owner=self,
-        position={(-1.05+offset_x)*flip*scaler.x,zpos,(-1+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
-        })
-        temp = "⇃     ⇂"
-        barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,1,0)
-        o.createButton({
-        label=temp, click_function='PMscrollDown', function_owner=self,
-        position={(-1.05+offset_x)*flip*scaler.x,zpos,(1+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-        rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
-        })
-        
-        local count = 0
-        local pos = EncodedObjects[o.getGUID()].menus.props.pos
-        for k,v in pairsByKeys(Properties) do
-					if v.funcOwner ~= nil and v.visible ~= false then
-						if pos <= count and count < pos+7 then
-							temp = v.name
-							barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,1,0)
-							o.createButton({
-							label=temp, click_function=v.propID..'Toggle', function_owner=self,
-							position={(-1.05+offset_x)*flip*scaler.x,zpos,(-0.75+((count-pos)/3.9)+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-							rotation={0,0,90-90*flip},color={0,0,0,1},font_color={1,1,1,1}
-							})
-						end
-						count = count+1
-					end
-        end
+      if count == 0 then
+        --log(count,"No menus exist, cannot render to cards.",'missing_module')
       end
-      
       for k,v in pairs(EncodedObjects[o.getGUID()].encoded) do
         if v == true and Properties[k]~=nil and Properties[k].funcOwner~= nil then
-					--print(k)
           Properties[k].funcOwner.call("createButtons",{obj=o})
         end
       end
     else
       k = EncodedObjects[o.getGUID()].editing
-			if Properties[k]~=nil and Properties[k].funcOwner~= nil then
+      if Properties[k]~=nil and Properties[k].funcOwner~= nil then
         Properties[k].funcOwner.call("createButtons",{obj=o})
       end
+      flip = EncodedObjects[o.getGUID()].flip
       temp = " X "
       barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,0,0)
       o.createButton({
       label=temp, click_function='closeEditor', function_owner=self,
-      position={(-1.1+offset_x)*flip,zpos,(1.4+offset_y)}, height=100, width=barSize, font_size=fsize,
+      position={(-1.1+offset_x)*flip,0.28*flip,(1.4+offset_y)}, height=100, width=barSize, font_size=fsize,
       rotation={0,0,90-90*flip}
       })
     end
   end
 end
-
-function CMscrollDown(o,p)
-  if EncodedObjects[o.getGUID()].menus.copy.pos < length(Properties) then
-    EncodedObjects[o.getGUID()].menus.copy.pos = EncodedObjects[o.getGUID()].menus.copy.pos+1
-  end
-  buildButtons(o)
-end
-function CMscrollUp(o,p)
-  if EncodedObjects[o.getGUID()].menus.copy.pos > 0 then
-    EncodedObjects[o.getGUID()].menus.copy.pos = EncodedObjects[o.getGUID()].menus.copy.pos-1
-  end
-  buildButtons(o)
-end
-function PMscrollDown(o,p)
-  if EncodedObjects[o.getGUID()].menus.props.pos < length(Properties) then
-    EncodedObjects[o.getGUID()].menus.props.pos = EncodedObjects[o.getGUID()].menus.props.pos+1
-  end
-  buildButtons(o)
-end
-function PMscrollUp(o,p)
-  if EncodedObjects[o.getGUID()].menus.props.pos > 0 then
-    EncodedObjects[o.getGUID()].menus.props.pos = EncodedObjects[o.getGUID()].menus.props.pos-1
+function closeEditor(o)
+  if type(o) == 'String' then
+    Players[o].editing = nil
+  else
+    EncodedObjects[o.getGUID()].editing = nil
   end
   buildButtons(o)
 end
@@ -700,8 +668,6 @@ function disableEncoding(o,p)
   end
   buildButtons(o)
 end
-
-
 function flipMenu(o,p)
   local flip = EncodedObjects[o.getGUID()].flip
   if flip ~= 1 then
@@ -723,25 +689,8 @@ function flipMenu(o,p)
   end
   buildButtons(o)
 end
-function toggleCopyMenu(o)
-  if EncodedObjects[o.getGUID()].menus.copy.open ~= true then
-    EncodedObjects[o.getGUID()].menus.copy.open = true
-  else
-    EncodedObjects[o.getGUID()].menus.copy.open = false
-  end
-  buildButtons(o)
-end
-function togglePropMenu(o)
-  if EncodedObjects[o.getGUID()].menus.props.open ~= true then
-    EncodedObjects[o.getGUID()].menus.props.open = true
-  else
-    EncodedObjects[o.getGUID()].menus.props.open = false
-  end
-  buildButtons(o)
-end
 function toggleProperty(o,p)
-  if EncodedObjects[o.getGUID()] == nil then
-  else
+  if EncodedObjects[o.getGUID()] ~= nil then
     local prop = EncodedObjects[o.getGUID()].encoded[p]
     if prop == nil then
       EncodedObjects[o.getGUID()].encoded[p] = true
@@ -758,60 +707,28 @@ function toggleProperty(o,p)
       end
     end
     return EncodedObjects[o.getGUID()].encoded[p]
+  elseif type(o) == 'String' and Players[o] ~= nil then
+    local prop = Players[o].encoded[p]
+    if prop == nil then
+      Players[o].encoded[p] = true
+    else
+      if prop ~= true then
+        Players[o].encoded[p] = true
+      else
+        Players[o].encoded[p] = false
+      end
+    end
+    for k,v in pairs(Properties[p].values) do
+      if Values[v] ~= nil and Players[o].values[v] == nil then
+        Players[o].values[v] = Values[v].default
+      end
+    end
+    return Players[o].encoded[p]
   end
-end
-function closeEditor(o)
-  EncodedObjects[o.getGUID()].editing = nil
-  buildButtons(o)
 end
 
+
 -- Factories
-function buildBaseForm(o)
-    tempTable = {}
-    tempTable['this'] = o
-    tempTable['oName'] = o.getName()
-    tempTable['values'] = {}
-    tempTable['encoded'] = {}
-    tempTable['menus'] = {props={open=false,pos=0},copy={open=false,pos=0}}
-    tempTable['editing'] = nil
-    tempTable['flip'] = 1
-    tempTable['disable'] = false
-    return tempTable
-end
-function buildPropFunction(p)
-  local pdat = Properties[p]
-  _G[p.."Toggle"] = function(obj,ply) 
-    enabled = toggleProperty(obj,p)
-    if pdat.callOnActivate == true and enabled == true then
-      pdat.funcOwner.call(pdat.activateFunc,{obj=obj,ply=ply})
-    end
-    local selection =Player[ply].getSelectedObjects()
-    if selection ~= nil then
-      for k,v in pairs(selection) do
-        if EncodedObjects[v.getGUID()] ~= nil and v ~= obj then
-          enabled = toggleProperty(v,p)
-          buildButtons(v)
-        end
-      end
-    end
-    buildButtons(obj)
-  end
-	
-	 _G[p.."UIToggle"] = function(ply,n,id) 
-    local selection =ply.getSelectedObjects()
-    if selection ~= nil then
-      for k,v in pairs(selection) do
-        if EncodedObjects[v.getGUID()] ~= nil then
-          enabled = toggleProperty(v,p)
-          if pdat.callOnActivate == true and enabled == true and k == 1 then
-            pdat.funcOwner.call(pdat.activateFunc,{object=v,player=ply})
-          end
-          buildButtons(v)
-        end
-      end
-    end
-  end
-end
 function buildValueValidationFunction(p)
   v=Values[p]
   if v.validType ~= nil and v.validType ~= 'nil' then
@@ -833,52 +750,109 @@ function buildValueValidationFunction(p)
   else
     Values[p]['validate']= function(val,cur) return val end
   end
-  _G[p..'Validate']= Values[p]['validate']
+  _G[p..'validate']= Values[p]['validate']
 end
--- API Functions
+
+
+--##########################
+--#API Functions
 --[[Almost all function within the api require a table to be passed to them.
 Table keys that are used are as follows.
 obj = the object that is the target of the api call. RW
+ply = the player color that is the target of the api call. RW
 propID = the property that is the target of the api call. RW
 valueID = the value that is the target of the api call. RW
 data = a table of key value pairs related to the cards encoded data RW
-{obj=__,propID='',valueID='',data={valueID=value}}
+{obj=__,ply='',propID='',valueID='',data={valueID=value}}
 not all of the values are required for every API function.
 ]]
 
 --REGISTRATION
+
+--##########################
+--#PROPERTY FUNCTIONS
 --[[register a new property.
   Takes a table
   {propID='internalname',name='Button name',values={list of values},funcOwner=obj,callOnActivate=boolean,activateFunc='function name'}
 ]]
 function APIregisterProperty(p)
+--[[propID = internal name,
+  name = external name,
+  values = {},  --List of Values this property calls on. DOES NOT GET REGISTERED FROM HERE.
+  funcOwner = obj,
+  callOnActivate = true,
+  activateFunc ='callEditor',
+  visible = true, --Should this property show up in the menu.
+  tags = {list},--A list of tags. 'tool,property,hidden'
+  xml_index = tableindex
+  }]]
   Properties[p.propID] = deepcopy(p)
   print(Properties[p.propID].propID.." Registered")
-  buildPropFunction(p.propID)
+  --buildPropFunction(p.propID)
 	--updateUI()
 end
 --Lists currently registered properties.
-function APIlistProps()
+function APIgetPropsList(p)
+  tags = {}
+  if p ~= nil and p.tags ~= nil then
+    for k,v in pairs(p.tags) do
+      tags[k] = v
+    end
+  end
   data = {}
   for k,v in pairs(Properties) do
-    if v.funcOwner == nil then
-      data[k]='[Red]MISSING![White]'
+    if #tags ~= 0 then
+      if v.tags == nil or v.tags == '' then
+        Properties[k].tags = 'untagged'
+      end
+      for i=1, #tags do
+        if string.find(v.tags,tags[i]) then
+          if v.funcOwner == nil then
+            data[k]='[Red]MISSING![White]'
+          else
+            data[k]=''
+          end
+          data[k]=data[k]..v.propID.." : "..v.name.." {"
+          for m,n in pairs(v.values) do
+            data[k]=data[k]..n..","
+          end
+          data[k]=data[k].."}"
+          break;
+        end
+      end
     else
-      data[k]=''
+      if v.funcOwner == nil then
+        data[k]='[Red]MISSING![White]'
+      else
+        data[k]=''
+      end
+      data[k]=data[k]..v.propID.." : "..v.name.." {"
+      for m,n in pairs(v.values) do
+        data[k]=data[k]..n..","
+      end
+      data[k]=data[k].."}"
     end
-    data[k]=data[k]..v.propID.." : "..v.name.." {"
-    for m,n in pairs(v.values) do
-      data[k]=data[k]..n..","
-    end
-    data[k]=data[k].."}"
   end
   return data
 end
---register a new tool
-function APIregisterTool(p)
-  Tools[p.toolID] = deepcopy(p)
-  print(Tools[p.toolID].toolID.." Registered")
+--checks if a given property is registered, returns BOOL
+function APIpropertyExists(p)
+  return Properties[p.propID] ~= nil
 end
+--returns a list of values the property ues.
+function APIgetPropValues(p)
+  if Properties[p.propID] ~= nil then
+    return Properties[p.propID].values
+  end
+  return {}
+end
+--Returns the Property Table
+function APIgetProp(p)
+  return Properties[p.propID]
+end
+
+--##########################
+--#VALUE FUNCTIONS
 --[[register a new value.
   Takes a table
   {valueID='internalname',validType=#CHECK_VALID_TYPES,desc='What is it used for',default=value}
@@ -894,7 +868,6 @@ function APIregisterValue(p)
     Values[p.valueID] = {}
     Values[p.valueID]['default']= p.default
     Values[p.valueID]['validType']= p.validType
-    Values[p.valueID]['props']={}
     Values[p.valueID]['desc']= p.desc ~= nil and p.desc or 'No Description Given'
     buildValueValidationFunction(p.valueID)
   --end
@@ -908,77 +881,124 @@ function APIlistValues()
   end
   return data
 end
---registers a new object to be encoded.
-function APIencodeObject(p)
-  encodeObject(p.obj)
-end
-
-
---GETTERS/SETTERS
---checks if a given property is registered, returns BOOL
-function APIpropertyExists(p)
-  return Properties[p.propID] ~= nil
-end
---checks if a given object is encoded, returns BOOL
-function APIobjectExists(p)
-  return EncodedObjects[p.obj.getGUID()] ~= nil
-end
 --checks if a given value is registered, returns BOOL
 function APIvalueExists(p)
   return Values[p.valueID] ~= nil
 end
 
---Get or Set a single value based on valueID. Returns the value.
---{obj=obj,valueID=valueID,data={valueID=value}}
-function APIobjGetValueData(p)
+--##########################
+--#MENU FUNCTIONS
+--[[Register a new menu. ]]
+function APIregisterMenu(p)
+  Menus[p.menuID] = {
+    menuID = p.menuID,
+    funcOwner = p.funcOwner,
+    activateFunc = p.activateFunc
+   }
+end
+function APIlistMenus()
+  data = {}
+  for k,v in pairs(Menus) do
+    table.insert(data,k)
+  end
+  return data
+end
+--Get or Set menu data of a given object.
+--{obj=obj,menuID=menu ID,data=data}
+function APIobjGetMenuData(p)
   local target = p.obj.getGUID()
-  if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
-    if EncodedObjects[target].values[p.valueID] == nil then
-      EncodedObjects[target].values[p.valueID] = Values[p.valueID].default
+  if EncodedObjects[target] ~= nil then
+    data = EncodedObjects[target].menus[p.menuID]
+    if data == nil then
+      data = {open=false,pos=0}
     end
-    val = EncodedObjects[target].values[p.valueID]
-    data = {}
-    data[p.valueID]=val
     return data
   end
 end
-function APIobjSetValueData(p)
+function APIobjSetMenuData(p)
   local target = p.obj.getGUID()
-  if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
-    EncodedObjects[target].values[p.valueID] = _G[p.valueID.."Validate"](p.data[p.valueID],EncodedObjects[target].values[p.valueID])
+  if EncodedObjects[target] ~= nil then
+    if EncodedObjects[target].menus[p.menuID] == nil then
+      EncodedObjects[target].menus[p.menuID] = {open=false,pos=0}
+    end
+    for k,v in pairs(p.data) do
+      EncodedObjects[target].menus[p.menuID][k] = v
+    end
   end
 end
-function APIobjDefaultValue(p)
+function APIobjToggleMenu(p)
   local target = p.obj.getGUID()
-  if EncodedObjects[target] ~= nil and  Values[p.valueID] ~= nil then
-    EncodedObjects[target].values[p.valueID] = Values[p.valueID].default
+  if EncodedObjects[target] ~= nil then
+    if EncodedObjects[target].menus[p.menuID] == nil then
+      EncodedObjects[target].menus[p.menuID] = {open=false,pos=0}
+    end
+    if EncodedObjects[target].menus[p.menuID].open ~= true then
+      EncodedObjects[target].menus[p.menuID].open = true
+    else
+      EncodedObjects[target].menus[p.menuID].open = false
+    end
   end
 end
 
---Get or Set value data based on propID. Returns and accepts an array of Key-Values. Key is a valid valueID.
---{obj=obj,propID=propID,data={valueID=value}}
-function APIobjGetPropData(p)
-  local target = p.obj.getGUID()
-  if EncodedObjects[target] ~= nil then
-    data = {}
-    for k,v in pairs(Properties[p.propID].values) do
-      if EncodedObjects[target].values[v] == nil and  Values[v] ~= nil then
-        EncodedObjects[target].values[v] = Values[v].default
-      end
-      data[v]=EncodedObjects[target].values[v]
-    end
-    return data
+--##########################
+--#STYLE FUNCTIONS
+function APIregisterStyle(p)
+  Styles[p.styleID] = {
+    styleID = p.styleID,
+    name = p.name,
+    desc = p.desc,
+    styleTable = p.styleTable
+  }
+end
+function APIlistStyles()
+  data = {}
+  for k,v in pairs(Styles) do
+    data[k] = v.styleID.." = "..v.name..":"..v.desc
+  end
+  return data
+end
+function APIsetGlobalStyle(p)
+  if Styles[p.styleID] ~= nil then
+    CORE_VALUE.style = p.styleID
   end
 end
-function APIobjSetPropData(p)
+function APIgetGlobalStyle()
+  return CORE_VALUE.style
+end
+function APIgetStyleTable()
+  return Styles[CORE_VALUE.style].styleTable
+end
+
+--##########################
+--#GETTERS/SETTERS
+
+--OBJECT/PLAYER FUNCTIONS
+--Toggles target prop on or off: {obj=obj,propID=propID}
+function APItoggleProperty(p)
+  if p.obj ~= nil then
+    toggleProperty(p.obj,p.propID)
+  end
+  if p.ply ~= nil then
+    toggleProperty(p.ply,p.propID)
+  end
+end
+
+--OBJECT FUNCTIONS
+--registers a new object to be encoded.
+function APIencodeObject(p)
+  encodeObject(p.obj)
+end
+--checks if a given object is encoded, returns BOOL
+function APIobjectExists(p)
+  return EncodedObjects[p.obj.getGUID()] ~= nil
+end
+--Returns if the object is disabled or not.
+function APIobjDisabled(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
-    for k,v in pairs(Properties[p.propID].values) do
-      if Values[v] ~= nil and p.data[v] ~= nil then
-        EncodedObjects[target].values[v] = Values[v]["validate"](p.data[v],EncodedObjects[target].values[v])
-      end
-    end
+    return EncodedObjects[target].disable
   end
+  return false
 end
 --Is a given Property enabled: {obj=obj,propID=propID}
 function APIobjIsPropEnabled(p)
@@ -1021,16 +1041,62 @@ function APIobjDisableProp(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
     local prop = EncodedObjects[p.obj.getGUID()].encoded[p.propID]
-    if prop == true then
+    if prop ~= false then
       toggleProperty(p.obj,p.propID)
     end
   end
 end
---Toggles target prop on or off: {obj=obj,propID=propID}
-function APItoggleProperty(p)
-  toggleProperty(p.obj,p.propID)
+--Get or Set a single value based on valueID. Returns the value.
+--{obj=obj,valueID=valueID,data={valueID=value}}
+function APIobjGetValueData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
+    if EncodedObjects[target].values[p.valueID] == nil then
+      EncodedObjects[target].values[p.valueID] = Values[p.valueID].default
+    end
+    val = EncodedObjects[target].values[p.valueID]
+    data = {}
+    data[p.valueID]=val
+    return data
+  end
 end
-
+function APIobjSetValueData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil and Values[p.valueID] ~= nil then
+    EncodedObjects[target].values[p.valueID] = _G[p.valueID.."Validate"](p.data[p.valueID],EncodedObjects[target].values[p.valueID])
+  end
+end
+function APIobjDefaultValue(p)
+  local target = p.obj.getGUID()    
+  if EncodedObjects[target] ~= nil and  Values[p.valueID] ~= nil then
+    EncodedObjects[target].values[p.valueID] = Values[p.valueID].default
+  end
+end
+--Get or Set value data based on propID. Returns and accepts an array of Key-Values. Key is a valid valueID.
+--{obj=obj,propID=propID,data={valueID=value}}
+function APIobjGetPropData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    data = {}
+    for k,v in pairs(Properties[p.propID].values) do
+      if EncodedObjects[target].values[v] == nil and  Values[v] ~= nil then
+        EncodedObjects[target].values[v] = Values[v].default
+      end
+      data[v]=EncodedObjects[target].values[v]
+    end
+    return data
+  end
+end
+function APIobjSetPropData(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    for k,v in pairs(Properties[p.propID].values) do
+      if Values[v] ~= nil and p.data[v] ~= nil then
+        EncodedObjects[target].values[v] = Values[v]["validate"](p.data[v],EncodedObjects[target].values[v])
+      end
+    end
+  end
+end
 --Get or Set all value data of a given object.
 --{obj=obj}
 function APIobjGetAllData(p)
@@ -1047,30 +1113,178 @@ function APIobjSetAllData(p)
       if Values[k] ~= nil then
         EncodedObjects[target].values[k] = _G[k.."Validate"](v,EncodedObjects[target].values[k])
       else
-        error('Unknown value '..k..'.')
+        --log(k,'Unknown value '..k..'.','value')
       end
     end
   end
 end
+
+--PLAYER FUNCTIONS
+--registers a new Player color to be encoded.
+function APIencodePlayer(p)
+  encodePlayer(p.ply)
+end
+--checks if a given player color is registered, returns BOOL
+function APIplayerExists(p)
+  return Players[p.ply] ~= nil
+end
+--Is a given Property enabled: {ply=color,propID=propID}
+function APIplyIsPropEnabled(p)
+  local target = p.ply
+  if EncodedObjects[target] ~= nil then
+    if Players[target].encoded[p.propID] ~= nil then
+      return Players[target].encoded[p.propID]
+    else
+      return false
+    end
+  end
+  return false
+end
+--Returns a list of props and if they are active or not: {ply=color}
+function APIplyGetProps(p)
+  local target = p.ply
+  if Players[target] ~= nil then
+    return Players[target].encoded
+  end
+end
+--Set a prop to active or not: {ply=color,data={propID=bool}}
+function APIplySetProps(p)
+  local target = p.ply
+  if Players[target] ~= nil then
+    Players[target].encoded = p.data
+  end
+end
+--Enable target prop: {ply=color,propID=propID}
+function APIplyEnableProp(p)
+  local target = p.ply
+  if Players[target] ~= nil then
+    local prop = Players[p.obj.getGUID()].encoded[p.propID]
+    if prop ~= true then
+      Players(p.obj,p.propID)
+    end
+  end
+end
+--Disable target prop: {ply=color,propID=propID}
+function APIplyDisableProp(p)
+  local target = p.ply
+  if Players[target] ~= nil then
+    local prop = Players[p.obj.getGUID()].encoded[p.propID]
+    if prop ~= false then
+      Players(p.obj,p.propID)
+    end
+  end
+end
+--{ply=color,valueID=valueID,data={valueID=value}}
+function APIplyGetValueData(p)
+  local target = p.ply
+  if Players[target] ~= nil and Values[p.valueID] ~= nil then
+    if Players[target].values[p.valueID] == nil then
+      Players[target].values[p.valueID] = Values[p.valueID].default
+    end
+    val = Players[target].values[p.valueID]
+    data = {}
+    data[p.valueID]=val
+    return data
+  end
+end
+function APIplySetValueData(p)
+  local target = p.ply
+  if Players[target] ~= nil and Values[p.valueID] ~= nil then
+    Players[target].values[p.valueID] = _G[p.valueID.."Validate"](p.data[p.valueID],Players[target].values[p.valueID])
+  end
+end
+function APIplyDefaultValue(p)
+  local target = p.ply    
+  if Players[target] ~= nil and  Values[p.valueID] ~= nil then
+    Players[target].values[p.valueID] = Values[p.valueID].default
+  end
+end
+--Get or Set value data based on propID. Returns and accepts an array of Key-Values. Key is a valid valueID.
+--{ply=ply,propID=propID,data={valueID=value}}
+function APIplyGetPropData(p)
+  local target = p.ply
+  if Players[target] ~= nil then
+    data = {}
+    for k,v in pairs(Properties[p.propID].values) do
+      if Players[target].values[v] == nil and  Values[v] ~= nil then
+        Players[target].values[v] = Values[v].default
+      end
+      data[v]=Players[target].values[v]
+    end
+    return data
+  end
+end
+function APIplySetPropData(p)
+  local target = p.ply
+  if Players[target] ~= nil then
+    for k,v in pairs(Properties[p.propID].values) do
+      if Values[v] ~= nil and p.data[v] ~= nil then
+        Players[target].values[v] = Values[v]["validate"](p.data[v],Players[target].values[v])
+      end
+    end
+  end
+end
+--{ply=color}
+function APIplyGetAllData(p)
+  local target = p.ply
+  if Players[target] ~= nil then
+   return Players[target].values
+  end
+end
+--{ply=color,data={valueID=value}}
+function APIplySetAllData(p)
+  local target = p.ply
+  if Players[target] ~= nil then
+    for k,v in pairs(p.data) do
+      if Values[k] ~= nil then
+        Players[target].values[k] = _G[k.."Validate"](v,Players[target].values[k])
+      else
+        --log(k,'Unknown value '..k..'.','value')
+      end
+    end
+  end
+end
+
+
+
  
 --BUTTON UI FUNCTIONS
 --sets current editing state, so that buttons don't overlap. 
 --the p.propID that is called must have a function createButtons({obj=object being edited})
 function APIsetEditing(p)
-  EncodedObjects[p.obj.getGUID()].editing = p.propID
+  if p.obj ~= nil then
+    EncodedObjects[p.obj.getGUID()].editing = p.propID
+  else
+    Players[p.ply].editing = p.propID
+  end
 end
 --gets current editing state, so that buttons don't overlap.
 --returns the propID currently be edited.
 function APIgetEditing(p)
-  return EncodedObjects[p.obj.getGUID()].editing
+  if p.obj ~= nil then
+    return EncodedObjects[p.obj.getGUID()].editing
+  else
+    return Players[p.ply].editing
+  end
 end
 --Clears the editing value to allow other objects to gain control of editing.
 function APIclearEditing(p)
-  EncodedObjects[p.obj.getGUID()].editing = nil
+  if p.obj ~= nil then
+    EncodedObjects[p.obj.getGUID()].editing = nil
+  else
+    Players[p.ply].editing = nil
+  end
 end
 --Builds the card buttons for all enabled properties.
 function APIrebuildButtons(p)
-  buildButtons(p.obj)
+  if p.obj ~= nil then
+    buildButtons(p.obj)
+  else
+    updateXML(p.ply)
+  end
+end
+function APIformatButton(p)
+  return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
 end
 --Flips which side of the card the buttons show up on.
 function APIFlip(p)
@@ -1092,9 +1306,6 @@ end
 function APIgetOName(p)
 	return EncodedObjects[p.obj.getGUID()].oName
 end
-function APIformatButton(p)
-  return updateSize(p.str,p.font_size,p.max_len,p.xJust,p.yJust)
-end
 --Compares two version strings '###.##.###.##' which is made up of any number of digits and periods.
 function APIversionComp(p)
   return versionComp(p.wv,p.cv)
@@ -1108,13 +1319,6 @@ end
 
 
 -- Tool Functions
-function length(t)
-  local count = 0
-  for k,v in pairs(t) do
-    count = count+1
-  end
-  return count
-end
 function deepcopy(orig)
     local orig_type = type(orig)
     local copy
@@ -1129,23 +1333,4 @@ function deepcopy(orig)
     end
     return copy
 end
-function waitFrames(num_frames)
-    for i=0, num_frames, 1 do
-        coroutine.yield(0)
-    end
-    num_frames = 1
-    return 1
-end
-function pairsByKeys (t, f)
-	local a = {}
-	for n in pairs(t) do table.insert(a, n) end
-	table.sort(a, f)
-	local i = 0      -- iterator variable
-	local iter = function ()   -- iterator function
-		i = i + 1
-		if a[i] == nil then return nil
-		else return a[i], t[a[i]]
-		end
-	end
-	return iter
-end
+

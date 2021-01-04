@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Phase"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Phasing_Addon.lua'
-version = '1.8'
+version = '1.9'
 
 function onload()
   self.createButton({
@@ -20,7 +20,7 @@ function registerModule()
 		name = "Phase Out",
 		values = {'mtg_phased'},
 		funcOwner = self,
-		callOnActivate = true,
+		tags='tool,face_prop',
 		activateFunc ='phaseOut'
 		}
 		enc.call("APIregisterProperty",properties)
@@ -47,16 +47,17 @@ function createButtons(t)
     })
   end
 end
-function phaseOut(t)
+function phaseOut(obj,ply)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
-    data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
+    enc.call("APItoggleProperty",{obj=obj,propID=pID})
+    data = enc.call("APIobjGetPropData",{obj=obj,propID=pID})
 		if data.mtg_phased ~= true then
 			data.mtg_phased = true
     else
       data.mtg_phased = false
     end
-    enc.call("APIobjSetPropData",{obj=t.obj,propID=pID,data=data})
+    enc.call("APIobjSetPropData",{obj=obj,propID=pID,data=data})
   end
 end
 function unPhased(obj,ply)

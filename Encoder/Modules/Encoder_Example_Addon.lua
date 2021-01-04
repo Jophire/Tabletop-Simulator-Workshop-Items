@@ -11,7 +11,7 @@ pID="example_module"
 --URL used for updating the module should you want to include one.
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Example_Addon.lua'
 --Module Version Number
-version = '1.3'
+version = '1.4'
 
 
 --Recommended
@@ -39,7 +39,7 @@ function registerModule()
     values = {'example1','example2'} --The values you will be sending and requesting with APIobjGetValues APIobjSetValues
     funcOwner = self, --Who owns the triggering function. Generally will be self,
 											--but you could make it target other objects.
-    callOnActivate = true, --Should the activated func call when the player presses the api button?
+    tags="list,of,tags", --Used by menus to decide if this belongs in it.
     activateFunc ='callEditor' --The function that should be called in the funcOwner.
     }
 		--Time to register the property. You can register multiple properties from one module.
@@ -147,9 +147,11 @@ end
 
 --REQUIRED: This is the function specified up in properties.
 --If you specify a function, you must make sure it has the function.
---The function takes a table t={obj=object,player = color}
-function callEditor(t)
-  toggleEditor(t.obj)
+function callEditor(obj,ply)
+  enc.call("APItoggleProperty",{obj=obj,propID=pID}) --Toggle prop if this is not a one time use thing.
+  if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then --So it does not call the editor on disabling the prop.
+    toggleEditor(obj)
+  end
 end
 function updateModule(wr)
   enc = Global.getVar('Encoder')

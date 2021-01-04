@@ -5,7 +5,7 @@
 
 pID = "CopyTools"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_CopyFunc_Addon.lua'
-version = '1.3'
+version = '1.4'
 
 function onload()
   self.createButton({
@@ -20,13 +20,15 @@ function registerModule()
   enc = Global.getVar('Encoder')
   if enc ~= nil then
     properties = {
-    toolID = "exactCopy",
+    propID = "exactCopy",
     name = "Exact Copy",
+    values={},
     funcOwner = self,
     activateFunc ='exactCopy',
-    display=true
+    tags="tool",
+    visible=true
     }
-    enc.call("APIregisterTool",properties)   
+    enc.call("APIregisterProperty",properties)   
   end
 end
 

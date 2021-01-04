@@ -4,7 +4,7 @@ This module adds only 1/1 Counters
 ]]
 pID = "MTG_11_Counters"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_11Counter_Addon.lua'
-version = '1.3'
+version = '1.5'
 
 function onload()
   self.createButton({
@@ -23,8 +23,9 @@ function registerModule()
     name = "+1/+1 Counters",
     values = {'oneOneCounter','moduleMod','moduleMath'},
     funcOwner = self,
-    callOnActivate = true,
-    activateFunc ='callEditor'
+    tags='basic,counter',
+    activateFunc ='callEditor',
+    visible=true
     }
     enc.call("APIregisterProperty",properties)
     
@@ -104,8 +105,11 @@ function toggleEditor(obj,ply)
   end
 end
 
-function callEditor(t)
-  toggleEditor(t.obj,nil)
+function callEditor(obj,ply)
+  enc.call("APItoggleProperty",{obj=obj,propID=pID})
+  if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
+    toggleEditor(obj,nil)
+  end
 end
 
 function toggleEditClose(obj,ply)

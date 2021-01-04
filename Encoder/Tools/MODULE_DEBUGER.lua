@@ -35,14 +35,19 @@ function onObjectHover(ply,obj)
   if enc ~= nil and obj~=nil then
     if enc.call("APIobjectExists",{obj=obj}) then
       data = enc.call("APIobjGetAllData",{obj=obj})
+      for k,v in pairs(enc.call('APIlistMenus')) do
+        table.insert(data,enc.call("APIobjGetMenuData",{obj=obj,menuID=v}))
+      end
       UI.setAttribute(MPID..ply.."Text","text",printOutData(data))
       UI.show(MPID..ply.."Display")
     end
     if obj.getVar("pID") ~= nil then
       data = enc.getTable("Properties")
-      data = data[obj.getVar("pID")]
-      UI.setAttribute(MPID..ply.."Text","text",printOutData(data))
-      UI.show(MPID..ply.."Display")
+      if data[obj.getVar("pID")] ~= nil then
+        data = data[obj.getVar("pID")]
+        UI.setAttribute(MPID..ply.."Text","text",printOutData(data))
+        UI.show(MPID..ply.."Display")
+      end
     end
   else
     UI.hide(MPID..ply.."Display")

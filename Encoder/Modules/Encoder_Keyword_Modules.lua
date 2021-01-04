@@ -4,7 +4,7 @@ This module adds keyword abilities.
 ]]
 pID = "MTG_Keyword_Abilites"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Keyword_Modules.lua'
-version = '1.6'
+version = '1.7'
 KeywordList={
   mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},
   mtg_firststrikecounter={name="First Strike",des=":This creature deals combat damage before creatures without first strike.",val='number',def=0},
@@ -45,7 +45,7 @@ function registerModule(obj,ply)
     name = "Keyword Abilities",
     values = values,
     funcOwner = self,
-    callOnActivate = true,
+    tags="basic,counter",
     activateFunc ='callEditor'
     }
     enc.call("APIregisterProperty",properties)
@@ -101,8 +101,11 @@ function toggleEditor(obj,ply)
     enc.call("APIrebuildButtons",{obj=obj})
   end
 end
-function callEditor(t)
-  toggleEditor(t.obj,nil)
+function callEditor(obj,ply)
+  enc.call("APItoggleProperty",{obj=obj,propID=pID})
+  if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
+    toggleEditor(obj,nil)
+  end
 end
 function toggleEditClose(obj,ply)
   enc = Global.getVar('Encoder')
