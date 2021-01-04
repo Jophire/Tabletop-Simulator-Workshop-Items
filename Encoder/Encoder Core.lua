@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.08'
+version = '4.4.09'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -750,7 +750,7 @@ function buildValueValidationFunction(p)
   else
     Values[p]['validate']= function(val,cur) return val end
   end
-  _G[p..'validate']= Values[p]['validate']
+  _G[p..'Validate']= Values[p]['validate']
 end
 
 

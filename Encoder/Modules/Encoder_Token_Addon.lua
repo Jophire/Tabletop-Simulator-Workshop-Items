@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Token"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Token_Addon.lua'
-version = '1.4'
+version = '1.5'
 
 function onload()
   self.createButton({
@@ -52,8 +52,8 @@ end
 function tToken(obj,ply)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
-    enc.call("APItoggleProperty",{obj=t.obj,propID=pID})
-    data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
+    enc.call("APItoggleProperty",{obj=obj,propID=pID})
+    data = enc.call("APIobjGetPropData",{obj=obj,propID=pID})
     if data.mtg_token ~= true then
       data.mtg_token = true
     else
