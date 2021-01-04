@@ -1,13 +1,14 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.06'
+version = '4.4.08'
 version_string = "Player,Menu and Style update."
 
 URLS={
   ENCODER='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Encoder%20Core.lua',
   ENCODER_BETA='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/Encoder%20Core.lua',
-  XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json'
+  XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json',
+  BASIC_MENU='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
   }
 CORE_VALUE = {
   menu_count = 0,
@@ -245,8 +246,8 @@ function onLoad(saved_data)
   end
   
   if CORE_VALUE.menu_count == 0 then
-    broadcastToAll("The card menu has been split into its own module. Please load it off the workshop page.")
-    Wait.time(function()broadcastToAll("The card menu has been split into its own module. Please load it off the workshop page.")end,5)
+    broadcastToAll("No menu module located. Spawning the default menu module.")
+    WebRequest.get(URLS['BASIC_MENU'],self,"getMenuModule")
   end
   
 	--WebRequest.get(URLS['XML'],self,"buildUI")
@@ -370,69 +371,6 @@ function versionComp(a,b)
   end
   return b
 end
---[[
-function buildUI(wr)
-  wr = wr.text
-  wr = string.gsub(wr,"VERSION_NUMBER",version)
-  wr = string.gsub(wr,"GUID_HERE",self.getGUID())
-	local xml = UI.getXmlTable()
-  local found = 0
-  for k,v in pairs(xml) do
-    if v.attributes.id ~= nil and v.attributes.id == "Encoder" then
-      found = k
-      break
-    end
-  end
-  if found == 0 then
-    table.insert(xml,JSON.decode(wr)[1])
-  else
-    xml[found] = JSON.decode(wr)[1]
-  end
-end
-
--- Update the XML UI to show new modules as they are registered.
-function updateUI()
-	local g = self.getGUID()
-	local tab = UI.getXmlTable()
-	local ps = {}
-	for m,n in pairsByKeys(Properties) do
-		if n.funcOwner ~= nil then
-			table.insert(ps,{tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.propID,onClick=g.."/"..n.propID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}})
-		end
-	end 
-	local ts = {}
-	for m,n in pairsByKeys(Tools) do
-		if n.funcOwner ~= nil then
-			table.insert(ts,{tag="Row",attributes={preferredHeight=30},children={tag="Cell",children={tag="Button",attributes={id=n.toolID,onClick=g.."/"..n.toolID.."UIToggle",fontStyle="Bold",fontSize=10,text=n.name},value=n.name}}})
-		end
-	end 
-  local index = 0
-  for k,v in pairs(tab) do
-    if v.attributes ~= nil and v.attributes.id == "Encoder" then
-      index = k
-      break
-    end
-  end
-	for k,v in pairs(Player.getColors()) do
-		if k ~= "Grey" then
-			--tab[index]["children"][k]["children"][4]["children"][1]["children"][2]["children"][1]["children"][1]["children"] = ps
-			--tab[index]["children"][k]["children"][4]["children"][1]["children"][4]["children"][1]["children"][1]["children"] = ts
-		end
-	end
-	UI.setXmlTable(tab)	
-end
-
--- Hide the XML UI.
-function minimize(plr,n,id)
-	id = string.sub(id,0,-4)
-	log(id)
-	local temp = UI.getAttribute(id,"active")
-	if temp == "True" or temp == nil then
-		UI.setAttribute(id,"active",false)
-	else
-		UI.setAttribute(id,"active",true)
-	end
-end]]
 
 -- NEW- Creates scripting zones around each players hands.
 -- This is used to more reliably hide/reveal card buttons as it transitions zones.
@@ -470,6 +408,24 @@ function buildZones()
     end
   end
 end
+function getMenuModule(wr)
+  local wr = wr.text
+  params = {}
+  params.type = "PiecePack_Crowns"
+  params.position = self.getPosition()+Vector(0,1,0)
+  params.rotation = self.getRotation()
+  params.scale = Vector(1,1,1)*(2/3)
+  params.sound = false
+  params.callback_function = function(obj)
+      obj.setName('Menu Module')
+      obj.script_code = wr
+      obj.reload()
+      Wait.condition(function() obj.call("registerModule",nil) end,function() return obj.spawning end)
+    end
+  spawnObject(params)
+end
+
+
 
 -- Functions to hide or show card details as it transitions from hand to table and back.
 function hideCardDetails(tar)
@@ -773,41 +729,6 @@ end
 
 
 -- Factories
---[[function buildPropFunction(p)
-  local pdat = Properties[p]
-  _G[p.."Toggle"] = function(obj,ply) 
-    enabled = toggleProperty(obj,p)
-    if pdat.callOnActivate == true and enabled == true then
-      pdat.funcOwner.call(pdat.activateFunc,{obj=obj,ply=ply})
-    end
-    local selection =Player[ply].getSelectedObjects()
-    if selection ~= nil then
-      for k,v in pairs(selection) do
-        if EncodedObjects[v.getGUID()] ~= nil and v ~= obj then
-          enabled = toggleProperty(v,p)
-          buildButtons(v)
-        end
-      end
-    end
-    buildButtons(obj)
-  end
-	
-	 _G[p.."UIToggle"] = function(ply,n,id) 
-    local selection =ply.getSelectedObjects()
-    if selection ~= nil then
-      for k,v in pairs(selection) do
-        if EncodedObjects[v.getGUID()] ~= nil then
-          enabled = toggleProperty(v,p)
-          if pdat.callOnActivate == true and enabled == true and k == 1 then
-            pdat.funcOwner.call(pdat.activateFunc,{object=v,player=ply})
-          end
-          buildButtons(v)
-        end
-      end
-    end
-  end
-end
-]]
 function buildValueValidationFunction(p)
   v=Values[p]
   if v.validType ~= nil and v.validType ~= 'nil' then
