@@ -57,7 +57,7 @@ function createButtons(t)
     barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=0,yJust=0})
     t.obj.createButton(Style.new{
     label=temp, click_function='toggleToken', function_owner=self,
-    position={(0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-1.65+offset_y)*scaler.y}, height=170, width=barSize, font_size=fSize,
+    position={(0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-1.65+offset_y)*scaler.y}, height=170, width=barSize, font_size=fsize,
     rotation={0,0,90-90*flip}
     })
   end

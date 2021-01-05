@@ -7,14 +7,21 @@ UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Worksho
 version = '1.5.1'
 Style = {}
 colors={
-w={r=1,g=1,b=1},
-u={r=0,g=0,b=1},
-b={r=0,g=0,b=0},
-r={r=1,g=0,b=0},
-g={r=0,g=1,b=0}
+w=Color(0.988,0.988,0.757),
+u=Color(0.404,0.757,0.961),
+b=Color(0.518,0.518,0.518),
+r=Color(0.973,0.333,0.333),
+g=Color(0.149,0.710,0.412)
 }
 
 function onload()
+  Color.Add("mtg_white",colors[w])
+  Color.Add("mtg_blue",colors[u])
+  Color.Add("mtg_black",colors[b])
+  Color.Add("mtg_red",colors[r])
+  Color.Add("mtg_green",colors[g])
+  Color.Add("mtg_Colorless",Color(0.7,0.7,0.7))
+  
   self.addContextMenuItem('Register Module', function(p) 
     registerModule()
   end)
@@ -116,23 +123,25 @@ function createButtons(t)
           t.obj.createButton({
           label=temp, click_function='toggleEditor', function_owner=self,
           position={1.0*flip*scaler.x,0.28*flip*scaler.z,(-1.4+i*0.1)*scaler.y}, height=50, width=75, font_size=0,
-          rotation={0,0,90-90*flip}, color=a
+          rotation={0,0,90-90*flip}, color=a:tohex(), tooltip='Color Identity: '
           })
           i = i+1
         end
-        t.obj.createButton(Style.new{
-          label=temp, click_function='toggleEditor', function_owner=self,
-          position={1.0*flip*scaler.x,0.27*flip*scaler.z,(-1.4+(2.5-i)*0.1)*scaler.y}, height=43*(i+1), width=77, font_size=0,
-          rotation={0,0,90-90*flip}
-          })
       elseif editing == pID then
         t.obj.createButton({
         label='', click_function='toggle'..c, function_owner=self,
         position={-0*flip,0.28*flip*scaler.z,(-1.2+i*0.4)*scaler.y}, height=100, width=300, font_size=0,
-        rotation={0,0,90-90*flip}, color=a
+        rotation={0,0,90-90*flip}, color=a:tohex(), tooltip='Color Identity: '
         })
         i = i+1
       end
+    end
+    if editing == nil and i == 0 then
+      t.obj.createButton(Style.new{
+      label=temp, click_function='toggleEditor', function_owner=self,
+      position={1.0*flip*scaler.x,0.25*flip*scaler.z,(-1.4+3*0.1)*scaler.y}, height=150, width=77, font_size=0,
+      rotation={0,0,90-90*flip}, color='Grey', tooltip='Color Identity: Colorless'
+      })
     end
   end
 end
