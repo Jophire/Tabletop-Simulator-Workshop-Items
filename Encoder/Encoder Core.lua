@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.12'
+version = '4.4.13'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -171,7 +171,7 @@ function onLoad(saved_data)
             EncodedObjects[i] = nil
           else
             local o = EncodedObjects[i].this
-            Wait.frames(buildButtons(o),2)
+            Wait.frames(function() buildButtons(o) end,2)
           end
         end
       end
