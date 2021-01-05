@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.12'
+version = '4.4.13'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -69,17 +69,19 @@ Properties = {}
   }
 ]]
 Values = {}
+Values["obj_owner"] = {valueID="obj_owner",type='color',default='Grey',desc='Who owns this object.'}
 --[[
   valueID = internal name, used by Values as key,
   type = Lua type definition
   default = 'default_value'
-  props = {} list of properties that use this value.
   desc = A description for other module creators to understand the values use.
 ]]
 Zones = {}
 --[[
   name=Zone name
-  activateFunc = function to call
+  func_enter = function to call on enter
+  func_leave = function to call on exit,
+  color = --Player color this zone belongs to.
 ]]
 Styles = {}
 Styles["Basic_Style"] = {name="Basic Style",desc="Comes with the encoder.",styleTable=basicstyleTableDefault}
@@ -140,9 +142,11 @@ function onLoad(saved_data)
     if loaded_data.zones ~= nil then
       Zones = JSON.decode(loaded_data.zones)
       for k,v in pairs(Zones) do
-        if getObjectFromGUID(k) == nil then
-          Zones[k] = nil
-        end
+        Wait.condition(
+        function() end,
+        function() return getObjectFromGUID(k) ~= nil end,
+        0.1,
+        function() Zones[k] = nil end)
       end
     end
     if loaded_data.values ~= nil then
@@ -167,7 +171,7 @@ function onLoad(saved_data)
             EncodedObjects[i] = nil
           else
             local o = EncodedObjects[i].this
-            Wait.frames(buildButtons(o),2)
+            Wait.frames(function() buildButtons(o) end,2)
           end
         end
       end
@@ -185,7 +189,7 @@ function onLoad(saved_data)
           CORE_VALUE.menu_count = CORE_VALUE.menu_count + 1
           end,
           function() return Menus[k].funcOwner ~= nil end,
-          1, --second?
+          0.1, --second?
           function() Menus[k] = nil end
           )
         end
@@ -198,9 +202,7 @@ function onLoad(saved_data)
       Styles = JSON.decode(loaded_data.styles)
     end
   end
-  
-  buildZones()
-  
+    
   for k,v in pairs(Player.getColors()) do
     encodePlayer(v)
   end
@@ -249,10 +251,16 @@ function onLoad(saved_data)
     WebRequest.get(URLS['ENCODER'],self,"updateCheck")
   end
   
-  if CORE_VALUE.menu_count == 0 then
-    broadcastToAll("No menu module located. Spawning the default menu module.")
-    WebRequest.get(URLS['BASIC_MENU'],self,"getMenuModule")
+  Wait.frames(function()
+    buildZones()
+    if CORE_VALUE.menu_count == 0 then
+      broadcastToAll("No menu module located. Spawning the default menu module.")
+      WebRequest.get(URLS['BASIC_MENU'],self,"getMenuModule")
+    end
   end
+  ,
+  2
+  )
   
 	--WebRequest.get(URLS['XML'],self,"buildUI")
 end
