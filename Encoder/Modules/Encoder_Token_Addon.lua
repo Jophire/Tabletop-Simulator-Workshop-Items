@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Token"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Token_Addon.lua'
-version = '1.5'
+version = '1.6'
 
 function onload()
   self.createButton({
@@ -59,6 +59,7 @@ function tToken(obj,ply)
     else
       data.mtg_token = false
     end
+    enc.call("APIrebuildButtons",{obj=obj})
   end
 end
 
