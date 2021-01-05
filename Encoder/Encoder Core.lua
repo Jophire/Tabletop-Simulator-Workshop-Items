@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.14'
+version = '4.4.15'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -968,7 +968,7 @@ end
 function APIlistStyles()
   data = {}
   for k,v in pairs(Styles) do
-    data[k] = v.styleID.." = "..v.name..":"..v.desc
+    data[k] = k.." = "..v.name..":"..v.desc
   end
   return data
 end
