@@ -202,9 +202,7 @@ function onLoad(saved_data)
       Styles = JSON.decode(loaded_data.styles)
     end
   end
-  
-  buildZones()
-  
+    
   for k,v in pairs(Player.getColors()) do
     encodePlayer(v)
   end
@@ -254,6 +252,7 @@ function onLoad(saved_data)
   end
   
   Wait.frames(function()
+    buildZones()
     if CORE_VALUE.menu_count == 0 then
       broadcastToAll("No menu module located. Spawning the default menu module.")
       WebRequest.get(URLS['BASIC_MENU'],self,"getMenuModule")
