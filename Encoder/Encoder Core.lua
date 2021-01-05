@@ -130,7 +130,7 @@ function onLoad(saved_data)
           Wait.condition(
           function() Properties[k].funcOwner.call('registerModule',nil) end,
           function() return Properties[k].funcOwner ~= nil end,
-          1, --second?
+          0.1, --second?
           function() Properties[k] = nil end
           )
             --buildPropFunction(i)
