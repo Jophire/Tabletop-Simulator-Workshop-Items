@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.15'
+version = '4.4.16'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -329,14 +329,6 @@ function callVersionCheck(p)
     u = v.funcOwner.getVar('UPDATE_URL')
     if u ~= nil then
       WebRequest.get(u,v.funcOwner,"updateModule") 
-    end
-  end
-  for k,v in pairs(Styles) do
-    if k ~= 'Basic_Style' then
-      u = v.funcOwner.getVar('UPDATE_URL')
-      if u ~= nil then
-        WebRequest.get(u,v.funcOwner,"updateModule") 
-      end
     end
   end
 end
