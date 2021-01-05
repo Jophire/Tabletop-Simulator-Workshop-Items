@@ -75,7 +75,6 @@ function createButtons(t)
       temp = ((data.oneOneCounter >= 0) and "+" or "")..data.oneOneCounter
       temp = ""..temp..'/'..temp..""
       barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=1,yJust=0})
-      log(f
       t.obj.createButton(Style.new{
       label=temp, click_function='toggleEditor', function_owner=self,
       position={(1.1+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(1.1+offset_y)*scaler.y}, height=170, width=barSize, font_size=fsize,

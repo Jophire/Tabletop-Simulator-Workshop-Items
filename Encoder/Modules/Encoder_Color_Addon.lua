@@ -123,7 +123,7 @@ function createButtons(t)
           t.obj.createButton({
           label=temp, click_function='toggleEditor', function_owner=self,
           position={1.0*flip*scaler.x,0.28*flip*scaler.z,(-1.4+i*0.1)*scaler.y}, height=50, width=75, font_size=0,
-          rotation={0,0,90-90*flip}, color=a:tohex(), tooltip='Color Identity: '
+          rotation={0,0,90-90*flip}, color=tohex(a), tooltip='Color Identity: '
           })
           i = i+1
         end
@@ -131,7 +131,7 @@ function createButtons(t)
         t.obj.createButton({
         label='', click_function='toggle'..c, function_owner=self,
         position={-0*flip,0.28*flip*scaler.z,(-1.2+i*0.4)*scaler.y}, height=100, width=300, font_size=0,
-        rotation={0,0,90-90*flip}, color=a:tohex(), tooltip='Color Identity: '
+        rotation={0,0,90-90*flip}, color=tohex(a), tooltip='Color Identity: '
         })
         i = i+1
       end
