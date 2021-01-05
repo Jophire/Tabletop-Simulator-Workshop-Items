@@ -166,7 +166,8 @@ function onLoad(saved_data)
           if EncodedObjects[i].this == nil then
             EncodedObjects[i] = nil
           else
-            buildButtons(EncodedObjects[i].this)
+            local o = EncodedObjects[i].this
+            Wait.frames(buildButtons(o),2)
           end
         end
       end
