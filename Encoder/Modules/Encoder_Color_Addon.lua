@@ -122,7 +122,7 @@ function createButtons(t)
         end
         t.obj.createButton(Style.new{
           label=temp, click_function='toggleEditor', function_owner=self,
-          position={1.0*flip*scaler.x,0.27*flip*scaler.z,(-1.4+((2.5-i)*0.1)*scaler.y}, height=43*(i+1), width=77, font_size=0,
+          position={1.0*flip*scaler.x,0.27*flip*scaler.z,(-1.4+(2.5-i)*0.1)*scaler.y}, height=43*(i+1), width=77, font_size=0,
           rotation={0,0,90-90*flip}
           })
       elseif editing == pID then
