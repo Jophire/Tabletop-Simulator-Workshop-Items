@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.11'
+version = '4.4.12'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -126,9 +126,13 @@ function onLoad(saved_data)
         if i ~= nil and v ~= nil and v ~= "" then
           Properties[i] = JSON.decode(v)
           Properties[i].funcOwner = getObjectFromGUID(Properties[i].funcOwner)
-          if Properties[i].funcOwner == nil then
-            Properties[i] = nil
-          else
+          local k = i
+          Wait.condition(
+          function() Properties[k].funcOwner.call('registerModule',nil) end,
+          function() return Properties[k].funcOwner ~= nil end,
+          1, --second?
+          function() Properties[k] = nil end
+          )
             --buildPropFunction(i)
           end
         end
@@ -174,11 +178,16 @@ function onLoad(saved_data)
         if i ~= nil and v ~= nil and v ~= "" then
           Menus[i] = JSON.decode(v)
           Menus[i].funcOwner = getObjectFromGUID(Menus[i].funcOwner)
-          if Menus[i].funcOwner == nil then
-            Menus[i] = nil
-          else
-            CORE_VALUE.menu_count = CORE_VALUE.menu_count + 1
-          end
+          local k = i
+          Wait.condition(
+          function() 
+          Menus[k].funcOwner.call('registerModule',nil) 
+          CORE_VALUE.menu_count = CORE_VALUE.menu_count + 1
+          end,
+          function() return Menus[k].funcOwner ~= nil end,
+          1, --second?
+          function() Menus[k] = nil end
+          )
         end
       end
       if CORE_VALUE.menu_count == 0 then
@@ -187,11 +196,6 @@ function onLoad(saved_data)
     end
     if loaded_data.styles ~= nil then
       Styles = JSON.decode(loaded_data.styles)
-      CORE_VALUE.style_count = 0
-      for i,v in pairs(Styles) do
-        CORE_VALUE.style_count = CORE_VALUE.style_count + 1
-      end
-      --log(CORE_VALUE.style_count,"No styles currently exist, will not be able to render buttons in a unified manner.","missing_module")
     end
   end
   
@@ -514,6 +518,7 @@ function handCheck(obj)
         dist = v.distance < dist and v.distance or dist
       end
     end
+    log(dist,'Card Distance above surface.')
     --If the card is above 2 and resting, its in a hand. 
     --Or if its resting, but there is nothing below it, its in a hand.
     if dist > 2.0 or c[1] == nil then 
