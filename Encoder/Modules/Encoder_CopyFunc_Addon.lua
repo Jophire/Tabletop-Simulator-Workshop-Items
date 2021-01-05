@@ -15,7 +15,7 @@ function registerModule()
   enc = Global.getVar('Encoder')
   if enc ~= nil then
     properties = {
-    propID = "exactCopy",
+    propID = pID,
     name = "Exact Copy",
     values={},
     funcOwner = self,
