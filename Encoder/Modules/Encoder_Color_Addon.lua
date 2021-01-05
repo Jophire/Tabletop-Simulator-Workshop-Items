@@ -4,23 +4,23 @@ This module adds color Designators.
 ]]
 pID = "MTG_Colors"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Color_Addon.lua'
-version = '1.5.1'
+version = '1.5.3'
 Style = {}
 colors={
-w=Color(0.988,0.988,0.757),
-u=Color(0.404,0.757,0.961),
-b=Color(0.518,0.518,0.518),
-r=Color(0.973,0.333,0.333),
-g=Color(0.149,0.710,0.412)
+w={c=Color(0.988,0.988,0.757),n="White"},
+u={c=Color(0.404,0.757,0.961),n="Blue"},
+b={c=Color(0.518,0.518,0.518),n="Black"},
+r={c=Color(0.973,0.333,0.333),n="Red"},
+g={c=Color(0.149,0.710,0.412),n="Green"}
 }
 
 function onload()
-  Color.Add("mtg_white",colors[w])
-  Color.Add("mtg_blue",colors[u])
-  Color.Add("mtg_black",colors[b])
-  Color.Add("mtg_red",colors[r])
-  Color.Add("mtg_green",colors[g])
-  Color.Add("mtg_Colorless",Color(0.7,0.7,0.7))
+  Color.Add("mtg_white",colors.w.c)
+  Color.Add("mtg_blue",colors.u.c)
+  Color.Add("mtg_black",colors.b.c)
+  Color.Add("mtg_red",colors.r.c)
+  Color.Add("mtg_green",colors.g.c)
+  Color.Add("mtg_colorless",Color(0.7,0.7,0.7))
   
   self.addContextMenuItem('Register Module', function(p) 
     registerModule()
@@ -123,7 +123,7 @@ function createButtons(t)
           t.obj.createButton({
           label=temp, click_function='toggleEditor', function_owner=self,
           position={1.0*flip*scaler.x,0.28*flip*scaler.z,(-1.4+i*0.1)*scaler.y}, height=50, width=75, font_size=0,
-          rotation={0,0,90-90*flip}, color=tohex(a), tooltip='Color Identity: '
+          rotation={0,0,90-90*flip}, color=a.c, tooltip='Color Identity: '..a.n
           })
           i = i+1
         end
@@ -131,7 +131,7 @@ function createButtons(t)
         t.obj.createButton({
         label='', click_function='toggle'..c, function_owner=self,
         position={-0*flip,0.28*flip*scaler.z,(-1.2+i*0.4)*scaler.y}, height=100, width=300, font_size=0,
-        rotation={0,0,90-90*flip}, color=tohex(a), tooltip='Color Identity: '
+        rotation={0,0,90-90*flip}, color=a.c, tooltip='Color Identity: '..a.n
         })
         i = i+1
       end
@@ -140,7 +140,7 @@ function createButtons(t)
       t.obj.createButton(Style.new{
       label=temp, click_function='toggleEditor', function_owner=self,
       position={1.0*flip*scaler.x,0.25*flip*scaler.z,(-1.4+3*0.1)*scaler.y}, height=150, width=77, font_size=0,
-      rotation={0,0,90-90*flip}, color='Grey', tooltip='Color Identity: Colorless'
+      rotation={0,0,90-90*flip}, color='mtg_colorless', tooltip='Color Identity: Colorless'
       })
     end
   end
