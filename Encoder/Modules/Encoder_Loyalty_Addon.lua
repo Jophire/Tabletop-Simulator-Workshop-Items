@@ -4,7 +4,7 @@ This module adds only Loyalty Counters.
 ]]
 pID = "MTG_Loyalty"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Loyalty_Addon.lua'
-version = '1.5.1'
+version = '1.5.2'
 Style={}
 
 function onload()
@@ -77,7 +77,7 @@ function createButtons(t)
       barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
       t.obj.createButton(Style.new{
       label=temp, click_function='toggleEditor', function_owner=self,
-      position={(-1.1+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(1.4+offset_y)*scaler.y}, height=170, width=barSize, font_size=fsize,
+      position={(-1.1+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(1.4+offset_y)*scaler.y}, height=170, width=barSize > 150 and barSize or 150, font_size=fsize,
       rotation={0,0,90-90*flip}
       })
     elseif editing == pID then
