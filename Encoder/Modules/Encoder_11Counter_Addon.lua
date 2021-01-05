@@ -75,9 +75,10 @@ function createButtons(t)
       temp = ((data.oneOneCounter >= 0) and "+" or "")..data.oneOneCounter
       temp = ""..temp..'/'..temp..""
       barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=1,yJust=0})
+      log(f
       t.obj.createButton(Style.new{
       label=temp, click_function='toggleEditor', function_owner=self,
-      position={(1.1+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(1.1+offset_y)*scaler.y}, height=170, width=barSize, font_size=fSize,
+      position={(1.1+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(1.1+offset_y)*scaler.y}, height=170, width=barSize, font_size=fsize,
       rotation={0,0,90-90*flip}
       })
     elseif editing == pID then
@@ -144,7 +145,7 @@ function updateEditDisp(obj)
     temp = ""..temp..'/'..temp..""
     barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=400,max_len=90,xJust=0,yJust=0})
     obj.editButton({
-    index=0,label=temp,width=barSize, font_size=fSize})
+    index=0,label=temp,width=barSize, font_size=fsize})
     obj.editButton({
     index=1,label=data.moduleMath,tooltip = data.moduleMath == '+-' and 'Add or Subtract '..data.moduleMod or 'Multiply or Divide by '..data.moduleMod})
     obj.editButton({
