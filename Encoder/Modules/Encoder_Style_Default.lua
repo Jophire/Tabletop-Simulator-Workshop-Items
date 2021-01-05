@@ -2,7 +2,7 @@
 by Tipsy Hobbit//STEAM_0:1:13465982
 A simple double button style.
 ]]
-UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Style_Default.lua'
+--UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Style_Default.lua'
 
 sv={pos=0,dir='x',max_x=7,max_y=3}
 STYLE={}
@@ -73,22 +73,27 @@ function createButtons()
     styleList = enc.call("APIlistStyles",nil)
     local x = 0
     local y = 0
-    local count = 0
+    local count = 1
     for k,v in pairs(styleList) do
-      if pos < count and count < pos+sv.max_x*sv_max_y then
+      --print(k)
+      if sv.pos <= count and count < sv.pos+sv.max_x*sv.max_y then
         if dir == 'y' then
           x = count%sv.max_x
-          y = math.ceil(count/sv.max_x)
+          y = math.ceil(count/sv.max_x)-1
         else
           x = count%sv.max_y
-          y = math.ceil(count/sv_max_y)
+          y = math.ceil(count/sv.max_y)-1
         end
         
         t = enc.call("APIgetStyleTable",{styleID=k})
-        t.position = {x*60,0.28,y*60}
+        t.position = {x*1,1.1,y*1}
         t.function_owner = self
         t.click_function = 'setStyle'..k
         t.tooltip = v
+        t.width = 500
+        t.height = 500
+        t.font_size = t.font_size*20
+        t.label = "▣"
         self.createButton(t)
         local n = k
         _G['setStyle'..n] = function(obj,ply)
@@ -99,26 +104,6 @@ function createButtons()
         end
       end
       count = count+1
-    end
-  end
-end
-
-function updateModule(wr)
-  enc = Global.getVar('Encoder')
-  if enc ~= nil then
-    wr = wr.text
-    wrv = string.match(wr,"version = '(.-)'")
-    if wrv == 'DEPRECIATED' then
-      enc.call("APIremoveProperty",{propID=pID})
-      self.destruct()
-    end
-    local ver = enc.call("APIversionComp",{wv=wrv,cv=version})
-    if ''..ver ~= ''..version then
-      broadcastToAll("An update has been found for "..pID..". Reloading Module.")
-      self.script_code = wr
-      self.reload()
-    else
-      broadcastToAll("No update found for "..pID..". Carry on.")
     end
   end
 end
