@@ -140,7 +140,7 @@ function createButtons(t)
       t.obj.createButton(Style.new{
       label=temp, click_function='toggleEditor', function_owner=self,
       position={1.0*flip*scaler.x,0.25*flip*scaler.z,(-1.4+3*0.1)*scaler.y}, height=150, width=77, font_size=0,
-      rotation={0,0,90-90*flip}, color='mtg_colorless', tooltip='Color Identity: Colorless'
+      rotation={0,0,90-90*flip}, color=Color.mtg_colorless, tooltip='Color Identity: Colorless'
       })
     end
   end
