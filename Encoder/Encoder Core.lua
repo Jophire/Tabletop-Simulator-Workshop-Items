@@ -134,7 +134,6 @@ function onLoad(saved_data)
           function() Properties[k] = nil end
           )
             --buildPropFunction(i)
-          end
         end
       end
     end
