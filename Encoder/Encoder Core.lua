@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.13'
+version = '4.4.14'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -84,7 +84,7 @@ Zones = {}
   color = --Player color this zone belongs to.
 ]]
 Styles = {}
-Styles["Basic_Style"] = {name="Basic Style",desc="Comes with the encoder.",styleTable=basicstyleTableDefault}
+Styles["Basic_Style"] = {styleID="Basic_Style",name="Basic Style",desc="Comes with the encoder.",styleTable=basicstyleTableDefault}
 --[[
   styleID = internal name,
   name = '',
@@ -980,8 +980,12 @@ end
 function APIgetGlobalStyle()
   return CORE_VALUE.style
 end
-function APIgetStyleTable()
-  return Styles[CORE_VALUE.style].styleTable
+function APIgetStyleTable(p)
+  if p == nil and p.styleID == nil then
+    return Styles[CORE_VALUE.style].styleTable
+  else
+    return Styles[p.styleID].styleTable
+  end
 end
 
 --##########################
