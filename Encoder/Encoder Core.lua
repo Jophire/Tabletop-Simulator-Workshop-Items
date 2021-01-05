@@ -239,7 +239,6 @@ function onLoad(saved_data)
     end
   end
   )
-  )
   if CORE_VALUE.beta then
     WebRequest.get(URLS['ENCODER_BETA'],self,"updateCheck")
   else
