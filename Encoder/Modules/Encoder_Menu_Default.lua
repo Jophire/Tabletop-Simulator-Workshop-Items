@@ -5,7 +5,7 @@ If no menu has been registered, then the encoder will spawn this from the github
 ]]
 pID="Default_Menu"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
-version = '1.2'
+version = '1.3'
 Style = {}
 function onload()
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
@@ -40,15 +40,11 @@ function registerModule()
   end
 end
 
-function refreshStyle()
-  Style.proto = enc.call("APIgetStyleTable",nil)
-  log(Style.proto,"hmmm")
-end
-
 function createToolMenu(t)
   local o = t.obj
   enc = Global.getVar('Encoder')
   if enc ~= nil then
+    Style.proto = enc.call("APIgetStyleTable",nil)
     local flip = enc.call("APIgetFlip",{obj=o})
     local scaler = {x=1,y=1,z=1}--o.getScale()
     local zpos = 0.28*flip*scaler.z

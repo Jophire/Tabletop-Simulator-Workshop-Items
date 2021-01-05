@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.16'
+version = '4.4.17'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -239,11 +239,6 @@ function onLoad(saved_data)
     end
   end
   )
-  self.addContextMenuItem('Refresh Style', function(p)
-    for k,v in pairs(Menus) do
-      v.funcOwner.call('refreshStyle',_)
-    end
-  end
   )
   if CORE_VALUE.beta then
     WebRequest.get(URLS['ENCODER_BETA'],self,"updateCheck")
@@ -973,7 +968,7 @@ function APIgetGlobalStyle()
   return CORE_VALUE.style
 end
 function APIgetStyleTable(p)
-  if p == nil and p.styleID == nil then
+  if p == nil or p.styleID == nil then
     return Styles[CORE_VALUE.style].styleTable
   else
     return Styles[p.styleID].styleTable
