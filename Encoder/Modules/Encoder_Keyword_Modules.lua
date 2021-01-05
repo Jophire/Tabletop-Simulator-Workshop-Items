@@ -4,7 +4,7 @@ This module adds keyword abilities.
 ]]
 pID = "MTG_Keyword_Abilites"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Keyword_Modules.lua'
-version = '1.7'
+version = '1.7.1'
 KeywordList={
   mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},
   mtg_firststrikecounter={name="First Strike",des=":This creature deals combat damage before creatures without first strike.",val='number',def=0},
@@ -140,7 +140,7 @@ function createButtons(t)
       t.obj.createButton({
       label=temp, click_function='toggleEditor', function_owner=self,
       position={(-0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-0.9+offset_y)*scaler.y}, height=160, width=barSize, font_size=fSize,
-      rotation={0,0,90-90*flip}, tooltip=tooltip,color={r=1,g=1,b=1,a=0.4}
+      rotation={0,0,90-90*flip}, tooltip=tooltip,color={r=1,g=1,b=1,a=0.4},hover_color={1,1,1,0.8}
       })
     elseif editing == pID then
       temp = "Abilities"
@@ -158,7 +158,7 @@ function createButtons(t)
           t.obj.createButton({
           label= temp, click_function='toggleStatus'..k, function_owner=self,
           position={-0*flip,0.28*flip*scaler.z,(-1.2+offset_y+i*0.25)*scaler.y}, height=160, width=barSize, font_size=fsize,
-          rotation={0,0,90-90*flip}, color={r=0,g=0,b=0}, font_color={r=1,g=0,b=0},tooltip=v.." "..KeywordList[k].des
+          rotation={0,0,90-90*flip}, color={r=0,g=0,b=0},hover_color={0.3,0.3,0.3}, font_color={r=1,g=0,b=0},tooltip=v.." "..KeywordList[k].des
           })
         else
           temp =KeywordList[k].name
@@ -166,7 +166,7 @@ function createButtons(t)
           t.obj.createButton({
           label= temp, click_function='toggleStatus'..k, function_owner=self,
           position={-0*flip,0.28*flip*scaler.z,(-1.2+offset_y+i*0.25)*scaler.y}, height=160, width=barSize, font_size=fsize,
-          rotation={0,0,90-90*flip}, color={r=0,g=0,b=0}, font_color={r=1,g=1,b=1},tooltip=v.." "..KeywordList[k].des
+          rotation={0,0,90-90*flip}, color={r=0,g=0,b=0},hover_color={0.3,0.3,0.3}, font_color={r=1,g=1,b=1},tooltip=v.." "..KeywordList[k].des
           })
         end
         i = i+1

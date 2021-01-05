@@ -63,6 +63,9 @@ function registerModule()
     end
   end
 end
+function refreshStyle()
+  Style.proto = enc.call("APIgetStyleTable",nil)
+end
 
 function createButtons(t)
   enc = Global.getVar('Encoder')
@@ -106,9 +109,6 @@ function createButtons(t)
       })
     end
   end
-end
-function refreshStyle()
-  Style.proto = enc.call("APIgetStyleTable",nil)
 end
 
 function toggleEditor(obj,ply)
