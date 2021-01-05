@@ -2,14 +2,13 @@
 --By Tipsy Hobbit
 pID = "MTG_Token"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Token_Addon.lua'
-version = '1.6'
+version = '1.7'
+Style={}
 
 function onload()
-  self.createButton({
-  label="+", click_function='registerModule', function_owner=self,
-  position={0,0.2,-0.5}, height=100, width=100, font_size=100,
-  rotation={0,0,0},tooltip=""
-  })
+  self.addContextMenuItem('Register Module', function(p) 
+    registerModule()
+  end)
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
 end
 function registerModule()
@@ -31,7 +30,22 @@ function registerModule()
     default = false       
     }
     enc.call("APIregisterValue",value)
+    
+    Style.proto = enc.call("APIgetStyleTable",nil)
+    Style.mt = {}
+    Style.mt.__index = Style.proto
+    function Style.new(o)
+      for k,v in pairs(Style.proto) do
+        if o[k] == nil then
+          o[k] = v
+        end
+      end
+      return o
+    end
   end
+end
+function refreshStyle()
+  Style.proto = enc.call("APIgetStyleTable",nil)
 end
 
 function createButtons(t)
@@ -41,7 +55,7 @@ function createButtons(t)
     scaler = {x=1,y=1,z=1}--t.obj.getScale()
     temp = " Token "
     barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=0,yJust=0})
-    t.obj.createButton({
+    t.obj.createButton(Style.new{
     label=temp, click_function='toggleToken', function_owner=self,
     position={(0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-1.65+offset_y)*scaler.y}, height=170, width=barSize, font_size=fSize,
     rotation={0,0,90-90*flip}

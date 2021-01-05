@@ -4,8 +4,8 @@ This module adds color Designators.
 ]]
 pID = "MTG_Colors"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Color_Addon.lua'
-version = '1.4'
-
+version = '1.5'
+Style = {}
 colors={
 w={r=1,g=1,b=1},
 u={r=0,g=0,b=1},
@@ -15,14 +15,11 @@ g={r=0,g=1,b=0}
 }
 
 function onload()
-  self.createButton({
-  label="+", click_function='registerModule', function_owner=self,
-  position={0,0.2,-0.5}, height=100, width=100, font_size=100,
-  rotation={0,0,0},tooltip="Version: "..version
-  })
+  self.addContextMenuItem('Register Module', function(p) 
+    registerModule()
+  end)
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
 end
-
 function registerModule(obj,ply)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
@@ -48,7 +45,22 @@ function registerModule(obj,ply)
     for c,t in pairs(colors) do 
       _G['toggle'..c]=function(obj,ply,alt) toggleStatus(obj,ply,alt,c) end
     end
+    
+    Style.proto = enc.call("APIgetStyleTable",nil)
+    Style.mt = {}
+    Style.mt.__index = Style.proto
+    function Style.new(o)
+      for k,v in pairs(Style.proto) do
+        if o[k] == nil then
+          o[k] = v
+        end
+      end
+      return o
+    end
   end
+end
+function refreshStyle()
+  Style.proto = enc.call("APIgetStyleTable",nil)
 end
 
 function toggleStatus(obj,ply,alt,val)
@@ -77,6 +89,8 @@ function callEditor(obj,ply)
   enc.call("APItoggleProperty",{obj=obj,propID=pID})
   if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
     toggleEditor(obj,nil)
+  else
+    enc.call("APIrebuildButtons",{obj=obj})
   end
 end
 function toggleEditClose(obj,ply)
@@ -106,6 +120,11 @@ function createButtons(t)
           })
           i = i+1
         end
+        t.obj.createButton(Style.new{
+          label=temp, click_function='toggleEditor', function_owner=self,
+          position={1.0*flip*scaler.x,0.27*flip*scaler.z,(-1.4+3*0.1)*scaler.y}, height=52*i, width=77, font_size=0,
+          rotation={0,0,90-90*flip}
+          })
       elseif editing == pID then
         t.obj.createButton({
         label='', click_function='toggle'..c, function_owner=self,
