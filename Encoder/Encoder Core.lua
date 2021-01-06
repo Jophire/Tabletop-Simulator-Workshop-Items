@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.17'
+version = '4.4.18'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -69,7 +69,6 @@ Properties = {}
   }
 ]]
 Values = {}
-Values["obj_owner"] = {valueID="obj_owner",type='color',default='Grey',desc='Who owns this object.'}
 --[[
   valueID = internal name, used by Values as key,
   type = Lua type definition
@@ -111,16 +110,18 @@ function onLoad(saved_data)
 	
 	-- Set Global Encoder variable to the last spawned encoder.
   Global.setVar('Encoder',self)
-
-	
-	-- Make the core pretty.
+  
+  -- Make the core pretty.
   basic_buttons['Name'] = {click_function='doNothing',function_owner=self,label='Encoder',position={-0,0.12,-0.115},rotation={0,0,0},width=0,height=0,font_size=145,color={0,0,0,1},font_color={1,0,0,1}}
   -- Version Display
   barSize,fsize,offset_x,offset_y = updateSize(''..version,60,6.0,1,0)
   basic_buttons['VersionDisp'] = {click_function='doNothing',function_owner=self,label=''..version,position={0.6+offset_x*0.47,0.12,0.05+offset_y},rotation={0,0,0},width=0,height=0,font_size=fsize,color={0,0,0,1},font_color={1,0,0,1}}
 	basic_buttons['toggleUI'] = {click_function='minimize',function_owner=self,label='Toggle UI',position={0+offset_x*0,0.12,0.4+offset_y},rotation={0,0,0},width=300,height=100,font_size=fsize,color={0,0,0,1},font_color={1,0,0,1}}
   
-	--Load up the save data.
+  --Register Default Values
+  APIregisterValue({valueID="obj_owner",type='color',default='Grey',desc='Who owns this object.'})
+	
+  --Load up the save data.
   if saved_data ~= nil and saved_data ~= "" then
     loaded_data = JSON.decode(saved_data)
     if loaded_data.properties ~= nil then 
@@ -453,7 +454,7 @@ function onObjectLeaveScriptingZone(zone, obj)
     self.call(Zones[zone.getGUID()].func_leave,{obj})
   end
 end
-function onObjectLeaveContainer(__,obj)
+function onObjectLeaveContainer(ctr,obj)
   if obj.use_hands == true and EncodedObjects[obj.getGUID()] ~= nil then
     Wait.condition( function() 
     Wait.condition(
