@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Token"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Token_Addon.lua'
-version = '1.7'
+version = '1.7.1'
 Style={}
 
 function onload()
@@ -44,13 +44,11 @@ function registerModule()
     end
   end
 end
-function refreshStyle()
-  Style.proto = enc.call("APIgetStyleTable",nil)
-end
 
 function createButtons(t)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
+    Style.proto = enc.call("APIgetStyleTable",nil)
     flip = enc.call("APIgetFlip",{obj=t.obj})
     scaler = {x=1,y=1,z=1}--t.obj.getScale()
     temp = " Token "

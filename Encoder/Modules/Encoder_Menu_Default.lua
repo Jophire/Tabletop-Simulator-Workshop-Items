@@ -5,7 +5,7 @@ If no menu has been registered, then the encoder will spawn this from the github
 ]]
 pID="Default_Menu"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
-version = '1.4'
+version = '1.4.1'
 Style = {}
 function onload()
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
@@ -54,7 +54,7 @@ function createToolMenu(t)
       o.createButton(Style.new{
       label=">\n>\n>", click_function='toggleToolMenu', function_owner=self,
       position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-      rotation={0,0,90-90*flip},tooltip="Tool Menu"})
+      rotation={0,0,90-90*flip},tooltip="Tool Menu"},color=Style.proto.color.a = 0.3)
     else
       o.createButton(Style.new{
       label="<\n<\n<", click_function='toggleToolMenu', function_owner=self,
@@ -116,7 +116,7 @@ function createPropMenu(t)
       o.createButton(Style.new{
       label="<\n<\n<", click_function='togglePropMenu', function_owner=self,
       position={-1.0*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-      rotation={0,0,90-90*flip},tooltip="Property Menu"})
+      rotation={0,0,90-90*flip},tooltip="Property Menu",color=Style.proto.color.a = 0.3})
     else
       o.createButton(Style.new{
       label=">\n>\n>", click_function='togglePropMenu', function_owner=self,

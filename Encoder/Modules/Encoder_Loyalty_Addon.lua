@@ -4,7 +4,7 @@ This module adds only Loyalty Counters.
 ]]
 pID = "MTG_Loyalty"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Loyalty_Addon.lua'
-version = '1.5.2'
+version = '1.5.3'
 Style={}
 
 function onload()
@@ -61,13 +61,11 @@ function registerModule()
     end
   end
 end
-function refreshStyle()
-  Style.proto = enc.call("APIgetStyleTable",nil)
-end
 
 function createButtons(t)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
+    Style.proto = enc.call("APIgetStyleTable",nil)
     data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
     flip = enc.call("APIgetFlip",{obj=t.obj})
     scaler = {x=1,y=1,z=1}--t.obj.getScale()
