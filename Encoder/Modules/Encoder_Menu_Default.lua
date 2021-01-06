@@ -54,7 +54,7 @@ function createToolMenu(t)
       o.createButton(Style.new{
       label=">\n>\n>", click_function='toggleToolMenu', function_owner=self,
       position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-      rotation={0,0,90-90*flip},tooltip="Tool Menu"},color=Style.proto.color.a = 0.3)
+      rotation={0,0,90-90*flip},tooltip="Tool Menu",color=Style.proto.color.a = 0.3})
     else
       o.createButton(Style.new{
       label="<\n<\n<", click_function='toggleToolMenu', function_owner=self,
