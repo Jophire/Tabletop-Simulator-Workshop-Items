@@ -4,7 +4,7 @@ This module adds keyword abilities.
 ]]
 pID = "MTG_Keyword_Abilites"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Keyword_Modules.lua'
-version = '1.7.1'
+version = '1.7.2'
 KeywordList={
   mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},
   mtg_firststrikecounter={name="First Strike",des=":This creature deals combat damage before creatures without first strike.",val='number',def=0},
@@ -105,6 +105,8 @@ function callEditor(obj,ply)
   enc.call("APItoggleProperty",{obj=obj,propID=pID})
   if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
     toggleEditor(obj,nil)
+  else
+    enc.call("APIrebuildButtons",{obj=obj})
   end
 end
 function toggleEditClose(obj,ply)
@@ -118,6 +120,7 @@ end
 function createButtons(t)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
+    Style.proto = enc.call("APIgetStyleTable",nil)
     data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
     flip = enc.call("APIgetFlip",{obj=t.obj})
     scaler = {x=1,y=1,z=1}--t.obj.getScale()

@@ -4,7 +4,7 @@ This module adds only Status Effects.
 ]]
 pID = "MTG_Status_Effects"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Status_Effects_Addon.lua'
-version = '1.4'
+version = '1.4.1'
 
 StatusList={
   mtg_exert={name="Exerted", des=":Card does not untap the next Controller's untap step.",val='boolean',def=false},
@@ -87,6 +87,8 @@ function callEditor(obj,ply)
   enc.call("APItoggleProperty",{obj=obj,propID=pID})
   if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
     toggleEditor(obj,nil)
+  else
+    enc.call("APIrebuildButtons",{obj=obj})
   end
 end
 function toggleEditClose(obj,ply)

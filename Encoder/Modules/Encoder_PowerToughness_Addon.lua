@@ -3,7 +3,7 @@ by Tipsy Hobbit//STEAM_0:1:13465982
 This module adds only 1/1 Counters
 ]]
 pID = "MTG_Power_Toughness"
-version = '1.2.2'
+version = '1.2.3'
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_PowerToughness_Addon.lua'
 Style={}
 
@@ -136,6 +136,8 @@ function callEditor(obj,ply)
   enc.call("APItoggleProperty",{obj=obj,propID=pID})
   if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
     toggleEditor(obj,nil)
+  else
+    enc.call("APIrebuildButtons",{obj=obj})
   end
 end
 
