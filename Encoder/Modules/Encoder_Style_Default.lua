@@ -4,7 +4,7 @@ A simple double button style.
 ]]
 --UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Style_Default.lua'
 
-sv={pos=0,dir='x',max_x=7,max_y=3}
+sv={pos=0,dir='x',max_x=11,max_y=7,max=0}
 STYLE={}
 
 function onload(sd)
@@ -44,6 +44,14 @@ function onload(sd)
   fire = STYLE.new{color={51/255,3/255,3/255,1},font_color={244/255,182/255,66/255,1},hover_color= {197/255,39/255,15/255,0.9},press_color= {101/255,7/255,7/255,0.7}},
   sage = STYLE.new{color={77/255,93/255,83/255,1},font_color={143/255,151/255,121/255,1},hover_color={115/255,134/255,120/255},press_color={120/255,134/255,107/255,1}}
   }
+  for i=0,100 do
+    local color = {math.random(),math.random(),math.random(),math.random(5,10)/10}
+    local font_color = {math.random(),math.random(),math.random(),math.random(5,10)/10}
+    local hover_color = {math.random(),math.random(),math.random(),math.random(5,10)/10}
+    local press_color = {math.random(),math.random(),math.random(),math.random(5,10)/10}
+    styles['r'..i..'r'] = STYLE.new{color=color,font_color=font_color,hover_color=hover_color,press_color=press_color}
+  end
+    
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
 end
 function onsave()
@@ -70,29 +78,54 @@ end
 function createButtons()
   enc = Global.getVar('Encoder')
   if enc ~= nil then
+    local bw = 1000
+    local bh = 1000
+    local bf = 500
+    self.clearButtons()
+    sty = STYLE.new(enc.call("APIgetStyleTable",nil))
+    sty.position = sv.dir == 'x' and {sv.max_x/2*2,0.1,-9} or {-2,1.1,sv.max_y/2*2}
+    sty.function_owner = self
+    sty.click_function = 'cycUp'
+    sty.tooltip = sv.pos
+    sty.width = bw
+    sty.height = bh
+    sty.font_size = bf
+    sty.label = sv.dir == 'x' and "+" or "+"
+    self.createButton(sty)
+    
+    sty.position = sv.dir == 'x' and {sv.max_x/2*-2,0.1,-9} or {-2,1.1,sv.max_y/2*-2}
+    sty.function_owner = self
+    sty.click_function = 'cycDown'
+    sty.tooltip = sv.pos
+    sty.width = bw
+    sty.height = bh
+    sty.font_size = bf
+    sty.label = sv.dir == 'x' and "-" or "-"
+    self.createButton(sty)
+  
     styleList = enc.call("APIlistStyles",nil)
     local x = 0
     local y = 0
-    local count = 1
+    local count = 0---(sv.max_x*sv.max_y)
     for k,v in pairs(styleList) do
       --print(k)
-      if sv.pos <= count and count < sv.pos+sv.max_x*sv.max_y then
+      if sv.pos <= count and count < sv.pos+sv.max_x*sv.max_y+(sv.dir=='x' and sv.max_y or sv.max_x) then
         if dir == 'y' then
           x = count%sv.max_x
-          y = math.ceil(count/sv.max_x)-1
+          y = math.ceil((count-sv.pos)/sv.max_x)-sv.max_y/2
         else
-          x = count%sv.max_y
-          y = math.ceil(count/sv.max_y)-1
+          y = count%sv.max_y
+          x = math.floor((count-sv.pos)/sv.max_y)-sv.max_x/2
         end
         
         t = enc.call("APIgetStyleTable",{styleID=k})
-        t.position = {x*1,1.1,y*1}
+        t.position = {x*bw/500,0.1,y*bh/500-3}
         t.function_owner = self
         t.click_function = 'setStyle'..k
         t.tooltip = v
-        t.width = 500
-        t.height = 500
-        t.font_size = t.font_size*20
+        t.width = bw
+        t.height = bh
+        t.font_size = bf
         t.label = "▣"
         self.createButton(t)
         local n = k
@@ -105,5 +138,24 @@ function createButtons()
       end
       count = count+1
     end
+    sv.max = count
   end
+end
+
+function cycUp(obj,ply)
+  if sv.pos < sv.max then
+    sv.pos =sv.pos+(sv.dir =='x' and sv.max_y or sv.max_x)
+  else
+    sv.pos = 0
+  end
+  createButtons()
+end
+
+function cycDown(obj,ply)
+  if sv.pos > 0 then
+    sv.pos = sv.pos-(sv.dir =='x' and sv.max_y or sv.max_x)
+  else
+    sv.pos = sv.max ---sv.max_x*sv.max_y+(sv.dir=='x' and sv.max%sv.max_y or sv.max%sv.max_x)
+  end
+  createButtons()
 end
