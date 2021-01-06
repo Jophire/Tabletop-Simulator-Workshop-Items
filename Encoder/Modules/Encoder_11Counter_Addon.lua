@@ -4,7 +4,7 @@ This module adds only 1/1 Counters
 ]]
 pID = "MTG_11_Counters"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_11Counter_Addon.lua'
-version = '1.6'
+version = '1.6.1'
 Style={}
 
 function onload()
@@ -63,13 +63,10 @@ function registerModule()
     end
   end
 end
-function refreshStyle()
-  Style.proto = enc.call("APIgetStyleTable",nil)
-end
 
 function createButtons(t)
-  enc = Global.getVar('Encoder')
   if enc ~= nil then
+    Style.proto = enc.call("APIgetStyleTable",nil)
     data = enc.call("APIobjGetPropData",{obj=t.obj,propID=pID})
     flip = enc.call("APIgetFlip",{obj=t.obj})
     scaler = {x=1,y=1,z=1}--t.obj.getScale()
