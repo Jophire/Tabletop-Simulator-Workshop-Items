@@ -51,10 +51,12 @@ function createToolMenu(t)
     local props = enc.call("APIgetPropsList",{tags={"tool"}})
     md = enc.call("APIobjGetMenuData",{obj=o,menuID='Tool_Menu'})
     if md.open == false then
+      alpha = Style.proto.color
+      alpha.a = 0.3
       o.createButton(Style.new{
       label=">\n>\n>", click_function='toggleToolMenu', function_owner=self,
       position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-      rotation={0,0,90-90*flip},tooltip="Tool Menu",color=Style.proto.color.a = 0.3})
+      rotation={0,0,90-90*flip},tooltip="Tool Menu",color=alpha})
     else
       o.createButton(Style.new{
       label="<\n<\n<", click_function='toggleToolMenu', function_owner=self,
@@ -113,10 +115,12 @@ function createPropMenu(t)
     local props = enc.call("APIgetPropsList",{tags={"untagged","basic"}})
     md = enc.call("APIobjGetMenuData",{obj=o,menuID='Prop_Menu'})      
     if md.open == false then
+      alpha = Style.proto.color
+      alpha.a = 0.3
       o.createButton(Style.new{
       label="<\n<\n<", click_function='togglePropMenu', function_owner=self,
       position={-1.0*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
-      rotation={0,0,90-90*flip},tooltip="Property Menu",color=Style.proto.color.a = 0.3})
+      rotation={0,0,90-90*flip},tooltip="Property Menu",color=alpha})
     else
       o.createButton(Style.new{
       label=">\n>\n>", click_function='togglePropMenu', function_owner=self,
