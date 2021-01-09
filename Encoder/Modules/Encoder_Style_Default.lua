@@ -41,9 +41,26 @@ function onload(sd)
   end
 
   styles ={
-  fire = STYLE.new{color={51/255,3/255,3/255,1},font_color={244/255,182/255,66/255,1},hover_color= {197/255,39/255,15/255,0.9},press_color= {101/255,7/255,7/255,0.7}},
-  sage = STYLE.new{color={77/255,93/255,83/255,1},font_color={143/255,151/255,121/255,1},hover_color={115/255,134/255,120/255},press_color={120/255,134/255,107/255,1}}
+  fire = STYLE.new{color={51,3,3,1},font_color={244,182,66,1},hover_color= {197,39,15,0.9},press_color= {101,7,7,0.7}},
+  sage = STYLE.new{color={77,93,83,1},font_color={143,151,121,1},hover_color={115,134,120,1},press_color={120,134,107,1}}
   }
+  normal = true
+  for k,v in pairs(styles) do
+    for h,j in pairs(v) do
+      normal = true
+      for i=1, #j do
+        if j[i] > 1 then
+          normal = false
+        end
+      end
+      if normal == false then
+        for i=1, 3 do
+          styles[k][h][i] = j[i]/255
+        end
+      end
+    end
+  end
+  
   for i=0,100 do
     local color = {math.random(),math.random(),math.random(),math.random(5,10)/10}
     local font_color = {math.random(),math.random(),math.random(),math.random(5,10)/10}
