@@ -22,7 +22,8 @@ function registerModule()
     menu={
       menuID='Tool_Menu',
       funcOwner=self,
-      activateFunc='createToolMenu'
+      activateFunc='createToolMenu',
+      visible_in_hand=1
     }
     enc.call("APIregisterMenu",menu)
     
@@ -94,7 +95,7 @@ function createToolMenu(t)
             o.createButton(Style.new{
             label=temp, click_function=v.activateFunc, function_owner=v.funcOwner,
             position={(1.05+offset_x)*flip*scaler.x,zpos,(-0.75+((count-md.pos)/3)+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-            rotation={0,0,90-90*flip}
+            rotation={0,0,90-90*flip}, tooltip = enc.call("APIobjIsPropEnabled",{obj=o,propID=h}) == true and "Active" or "Inactive"
             })
           end
           count = count+1

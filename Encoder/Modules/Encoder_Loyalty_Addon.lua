@@ -4,7 +4,7 @@ This module adds only Loyalty Counters.
 ]]
 pID = "MTG_Loyalty"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Loyalty_Addon.lua'
-version = '1.5.4'
+version = '1.5.5'
 Style={}
 
 function onload()
@@ -136,7 +136,7 @@ function updateEditDisp(obj)
     temp = ""..data.loyaltyCounter
     barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=400,max_len=90,xJust=0,yJust=0})
     obj.editButton({
-    index=0,label=temp,width=barSize > 400 and barSize or 400, font_size=fsize})
+    index=0,label=temp,width=barSize > 800 and barSize or 800, font_size=fsize})
     obj.editButton({
     index=1,label=data.moduleMath,
       tooltip = data.moduleMath == '+-' and 'Add or Subtract '..data.moduleMod or 'Multiply or Divide by '..data.moduleMod})

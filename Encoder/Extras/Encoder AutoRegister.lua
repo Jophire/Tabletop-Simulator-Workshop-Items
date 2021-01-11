@@ -7,7 +7,7 @@
 ]]--
 pID = "ENC_AUTOREGISTER"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Extras/Encoder_AutoRegister.lua'
-version = '1.1'
+version = '1.2'
 
 function onLoad()
   Wait.condition(registerModules,function() if Global.getVar("Encoder") ~= nil then return true else return false end end)
@@ -37,8 +37,7 @@ end
 function onObjectDropped(c,object)
   local enc = Global.getVar('Encoder')
   if enc ~= nil then
-    if object.getVar("pID") ~= nil then
-      object.call("registerModule")
+    if object.getVar("pID") ~= nil and object ~= self then
       object.setLock(true)
       
       start = 0

@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Morph"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Moprh_Addon.lua'
-version = '1.8'
+version = '1.9'
 
 function onload()
   self.createButton({
@@ -25,7 +25,7 @@ function registerModule()
 		name = "Morph",
 		values = {'mtg_morphed'},
 		funcOwner = self,
-		tags="basic,face_prop",
+		tags="tool,face_prop",
 		activateFunc ='toggleMorph'
 		}
 		enc.call("APIregisterProperty",properties)

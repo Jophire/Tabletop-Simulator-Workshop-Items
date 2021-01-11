@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.18'
+version = '4.4.20'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -64,6 +64,7 @@ Properties = {}
   funcOwner = obj,
   activateFunc ='callEditor',
   visible = true, --Should this property show up in the menu.
+  visible_in_hand = false, --Should this modules buttons render in player hands.
   tags = '{json list}',--A json list of tags. 'tool,property,hidden'
   xml_index = tableindex
   }
@@ -432,14 +433,13 @@ end
 function hideCardDetails(tar)
   tar= tar[1]
   if EncodedObjects[tar.getGUID()] ~= nil then 
-    tar.clearButtons()
-    tar.clearInputs()  
+    buildButtons(tar,true)  
   end
 end
 function showCardDetails(tar)
   tar = tar[1]
-  if EncodedObjects[tar.getGUID()] ~= nil and tar.getButtons() == nil then
-    buildButtons(tar)
+  if EncodedObjects[tar.getGUID()] ~= nil then
+    buildButtons(tar,false)
   end
 end
 
@@ -458,7 +458,7 @@ function onObjectLeaveContainer(ctr,obj)
   if obj.use_hands == true and EncodedObjects[obj.getGUID()] ~= nil then
     Wait.condition( function() 
     Wait.condition(
-      function() handCheck(obj) end,
+      function() local hand = handCheck(obj) buildButtons(obj,hand) end,
       function() return obj == nil or obj.resting end
     ) end,
     function() return not obj.resting end)
@@ -492,9 +492,13 @@ function onObjectDropped(c,obj)
   
   if EncodedObjects[obj.getGUID()] ~= nil and obj.use_hands == true then
     Wait.condition(
-      function() handCheck(obj) end,
+      function() local hand = handCheck(obj) buildButtons(obj,hand) end,
       function() return obj == nil or obj.resting end
     )
+  end
+  
+  if object.getVar("pID") ~= nil then
+    object.call("registerModule")
   end
 end
 --Use a raycast to check if an object is resting in a hand or not.
@@ -517,9 +521,9 @@ function handCheck(obj)
     --If the card is above 2 and resting, its in a hand. 
     --Or if its resting, but there is nothing below it, its in a hand.
     if dist > 2.0 or c[1] == nil then 
-      hideCardDetails({obj})
+      return true --hideCardDetails({obj})
     else
-      showCardDetails({obj})
+      return false --showCardDetails({obj})
     end
   else
   end
@@ -606,29 +610,41 @@ function buildContextMenu(o)
   o.addContextMenuItem('Flip Menu',function(ply) flipMenu(o,0) end)
 end
 
-function buildButtons(o)
+function buildButtons(o,h)
+  if h == nil then
+    h = handCheck(o)
+  end
   o.clearButtons()
   o.clearInputs()
   if EncodedObjects[o.getGUID()].disable ~= true then
     if EncodedObjects[o.getGUID()].editing == nil then
-      count = 0
       for k,v in pairs(Menus) do
         if v.funcOwner ~= nil then
           if EncodedObjects[o.getGUID()].menus[k] == nil then
             EncodedObjects[o.getGUID()].menus[k] = {open=false,pos=0}
           end
-          v.funcOwner.call(v.activateFunc,{obj=o})
-          count = count+1
+          if v.visible_in_hand == nil then
+            v.visible_in_hand = 0
+          end
+          if h==true and v.visible_in_hand>=1 then
+            v.funcOwner.call(v.activateFunc,{obj=o})
+          elseif h~=true and v.visible_in_hand<=1 then 
+            v.funcOwner.call(v.activateFunc,{obj=o})
+          end
         else
           --log(v.funcOwner,"Missing module for menu "..k,'missing_module')
         end
       end
-      if count == 0 then
-        --log(count,"No menus exist, cannot render to cards.",'missing_module')
-      end
       for k,v in pairs(EncodedObjects[o.getGUID()].encoded) do
         if v == true and Properties[k]~=nil and Properties[k].funcOwner~= nil then
-          Properties[k].funcOwner.call("createButtons",{obj=o})
+          if Properties[k].visible_in_hand == nil then
+            Properties[k].visible_in_hand = 0
+          end
+          if h==true and Properties[k].visible_in_hand>=1 then
+            Properties[k].funcOwner.call("createButtons",{obj=o})
+          elseif h~=true and Properties[k].visible_in_hand<=1 then
+            Properties[k].funcOwner.call("createButtons",{obj=o})
+          end
         end
       end
     else
@@ -895,7 +911,8 @@ function APIregisterMenu(p)
   Menus[p.menuID] = {
     menuID = p.menuID,
     funcOwner = p.funcOwner,
-    activateFunc = p.activateFunc
+    activateFunc = p.activateFunc,
+    visible_in_hand = p.visible_in_hand
    }
 end
 function APIlistMenus()
