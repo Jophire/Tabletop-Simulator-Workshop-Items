@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.20'
+version = '4.4.21'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -497,8 +497,8 @@ function onObjectDropped(c,obj)
     )
   end
   
-  if object.getVar("pID") ~= nil then
-    object.call("registerModule")
+  if obj.getVar("pID") ~= nil then
+    obj.call("registerModule")
   end
 end
 --Use a raycast to check if an object is resting in a hand or not.
