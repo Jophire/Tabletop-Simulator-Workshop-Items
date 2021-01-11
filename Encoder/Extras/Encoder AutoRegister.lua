@@ -10,10 +10,10 @@ UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Worksho
 version = '1.2'
 
 function onLoad()
-  Wait.condition(registerModules,function() if Global.getVar("Encoder") ~= nil then return true else return false end end)
+  Wait.condition(registerModule,function() if Global.getVar("Encoder") ~= nil then return true else return false end end)
 end
 
-function registerModules()
+function registerModule()
   enc = Global.getVar("Encoder")
   if enc ~= nil then
     properties = {
@@ -26,11 +26,6 @@ function registerModules()
     visible = false
     }
     enc.call("APIregisterProperty",properties)
-    for k,v in pairs(enc.getTable("Properties")) do
-      if v.funcOwner ~= nil then
-        v.funcOwner.call("registerModule")
-      end
-    end
   end
 end
 
@@ -56,11 +51,11 @@ function onObjectDropped(c,object)
       enc.setScale(self.getScale()*0.675)
       
       for k,v in pairs(modules) do
-        if v.funcOwner ~= nil then
+        if v.funcOwner ~= nil and v.funcOwner ~= self then
           v.funcOwner.setRotation(self.getRotation())
           offset = Vector(math.cos(start*rev+ao*count*rev)*(radius),0,math.sin(start*rev+ao*count*rev)*(radius))
           v.funcOwner.setPositionSmooth(startPos+offset, false, false)
-          v.funcOwner.setScale(self.getScale()*0.315))
+          v.funcOwner.setScale(self.getScale()*0.315)
           count = count+1
           if count >= (2*math.pi*radius)/1.05-1 then
             radius = radius + 1.1
