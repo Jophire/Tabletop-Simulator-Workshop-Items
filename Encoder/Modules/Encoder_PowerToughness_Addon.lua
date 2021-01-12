@@ -41,6 +41,20 @@ function registerModule()
     }
     enc.call("APIregisterValue",value)
     value = {
+    valueID = 'power_mod', 
+    validType = 'number',
+    desc = 'MTG:Static modifiers to base power.',
+    default = 0       
+    }
+    enc.call("APIregisterValue",value)
+    value = {
+    valueID = 'toughness_mod', 
+    validType = 'number',
+    desc = 'MTG:Static modifiers to base toughness.',
+    default = 0       
+    }
+    enc.call("APIregisterValue",value)
+    value = {
     valueID = 'moduleMod', 
     validType = 'number',
     desc = 'The value used in conjunction by moduleMath to change values by.',   

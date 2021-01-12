@@ -4,32 +4,30 @@ This module adds keyword abilities.
 ]]
 pID = "MTG_Keyword_Abilites"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Keyword_Modules.lua'
-version = '1.7.2'
+version = '1.7.4'
 KeywordList={
-  mtg_tramplecounter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},
-  mtg_firststrikecounter={name="First Strike",des=":This creature deals combat damage before creatures without first strike.",val='number',def=0},
-  mtg_doublestrikecounter={name="Double Strike",des=":This creature deals both first-strike and regular combat damage.",val='number',def=0},
-  mtg_laststrikecounter={name="Last Strike",des=":This creature deals combat damage after creatures without last strike.",val='number',def=0},
-  mtg_molassesstrikecounter={name="Molasses Strike",des=":This creature deals both last-strike and regular combat damage.",val='number',def=0},
-  mtg_deathtouchcounter={name="Deathtouch",des=":Any amount of damage this deals to a creature is enough to destroy it.",val='number',def=0},
-  mtg_hexproofcounter={name="Hexproof",des=":This permanent can't be the target of spells or abilities your opponents control.",val='number',def=0},
-  mtg_flyingcounter={name="Flying",des=":This creature can't be blocked except by creatures with flying and/or reach.",val='number',def=0},
-  mtg_reachcounter={name="Reach",des=":This creature can block creatures with flying.",val='number',def=0},
-  mtg_vigilancecounter={name="Vigilance",des=":Attacking doesn't cause this creature to tap.",val='number',def=0},
-  mtg_menacecounter={name="Menace",des=":This creature can't be blocked except by two or more creatures.",val='number',def=0},
-  mtg_lifelinkcounter={name="Lifelink",des=":Damage dealt by this creature also causes you to gain that much life.",val='number',def=0},
-  mtg_indestructiblecounter={name="Indestructible",des=":Effects that say 'destroy' don’t destroy this.",val='number',def=0},
-  mtg_defendercounter={name="Defender",des=":This creature can't attack.",val='number',def=0},
-  mtg_hastecounter={name="Haste",des=":This creature does not suffer from summoning sickness.",val='number',def=0}
+  mtg_trample_counter={name="Trample",des=":This creature can deal excess combat damage to player or planeswalker it's attacking.",val='number',def=0},
+  mtg_firststrike_counter={name="First Strike",des=":This creature deals combat damage before creatures without first strike.",val='number',def=0},
+  mtg_doublestrike_counter={name="Double Strike",des=":This creature deals both first-strike and regular combat damage.",val='number',def=0},
+  mtg_laststrike_counter={name="Last Strike",des=":This creature deals combat damage after creatures without last strike.",val='number',def=0},
+  mtg_molassesstrike_counter={name="Molasses Strike",des=":This creature deals both last-strike and regular combat damage.",val='number',def=0},
+  mtg_deathtouch_counter={name="Deathtouch",des=":Any amount of damage this deals to a creature is enough to destroy it.",val='number',def=0},
+  mtg_hexproof_counter={name="Hexproof",des=":This permanent can't be the target of spells or abilities your opponents control.",val='number',def=0},
+  mtg_flying_counter={name="Flying",des=":This creature can't be blocked except by creatures with flying and/or reach.",val='number',def=0},
+  mtg_reach_counter={name="Reach",des=":This creature can block creatures with flying.",val='number',def=0},
+  mtg_vigilance_counter={name="Vigilance",des=":Attacking doesn't cause this creature to tap.",val='number',def=0},
+  mtg_menace_counter={name="Menace",des=":This creature can't be blocked except by two or more creatures.",val='number',def=0},
+  mtg_lifelink_counter={name="Lifelink",des=":Damage dealt by this creature also causes you to gain that much life.",val='number',def=0},
+  mtg_indestructible_counter={name="Indestructible",des=":Effects that say 'destroy' don’t destroy this.",val='number',def=0},
+  mtg_defender_counter={name="Defender",des=":This creature can't attack.",val='number',def=0},
+  mtg_haste_counter={name="Haste",des=":This creature does not suffer from summoning sickness.",val='number',def=0}
 }
-
+Style={}
 
 function onload()
-  self.createButton({
-  label="+", click_function='registerModule', function_owner=self,
-  position={0,0.2,-0.5}, height=100, width=100, font_size=100,
-  rotation={0,0,0},tooltip="Version: "..version
-  })
+  self.addContextMenuItem('Register Module', function(p) 
+    registerModule()
+  end)
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
 end
 
@@ -59,6 +57,17 @@ function registerModule(obj,ply)
       enc.call("APIregisterValue",value)
       local g = k
       _G['toggleStatus'..g] = function(o,p,a) toggleStatus(o,p,a,g) end
+    end
+    Style.proto = enc.call("APIgetStyleTable",nil)
+    Style.mt = {}
+    Style.mt.__index = Style.proto
+    function Style.new(o)
+      for k,v in pairs(Style.proto) do
+        if o[k] == nil then
+          o[k] = v
+        end
+      end
+      return o
     end
   end
 end
@@ -143,7 +152,7 @@ function createButtons(t)
       t.obj.createButton({
       label=temp, click_function='toggleEditor', function_owner=self,
       position={(-0+offset_x)*flip*scaler.x,0.28*flip*scaler.z,(-0.9+offset_y)*scaler.y}, height=160, width=barSize, font_size=fSize,
-      rotation={0,0,90-90*flip}, tooltip=tooltip,color={r=1,g=1,b=1,a=0.4},hover_color={1,1,1,0.8}
+      rotation={0,0,90-90*flip}, tooltip=tooltip,color={1,1,1,0.4},hover_color={1,1,1,0.8}
       })
     elseif editing == pID then
       temp = "Abilities"
