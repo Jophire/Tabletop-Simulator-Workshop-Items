@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Morph"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Moprh_Addon.lua'
-version = '1.9'
+version = '1.10'
 
 function onload()
   self.createButton({
@@ -32,7 +32,7 @@ function registerModule()
     value = {
     valueID = 'mtg_morphed',
     validType = 'boolean',
-    desc = 'MTG: Morphed permanents are 3/3 creature morphs with Morph:flip this card face up.',
+    desc = 'MTG: Morphed permanents are 2/2 creature morphs with Morph:flip this card face up.',
     default = false
     }
     enc.call("APIregisterValue",value)
@@ -70,6 +70,7 @@ function tMorph(obj,ply)
     data = enc.call("APIobjGetPropData",{obj=obj,propID=pID})
     if data.mtg_morphed ~= true then
       obj.setName(" Morph ")
+      obj.setDescription(" Morph ")
       data.mtg_morphed = true
       if flip > 0 then
         enc.call("APIFlip",{obj=obj})
@@ -88,7 +89,8 @@ function tMorph(obj,ply)
       end
     else
       data.mtg_morphed = false
-      obj.setName(enc.call("APIgetOName",{obj=obj}))
+      obj.setName(enc.call("APIobjGetOName",{obj=obj}))
+      obj.setDescription(enc.call("APIobjGetODesc",{obj=ojb}))
       enc.call("APIobjDisableProp",{obj=obj,propID=pID})
       if flip < 0 then
         enc.call("APIFlip",{obj=obj})
@@ -108,7 +110,7 @@ function tMorph(obj,ply)
       local selection =Player[ply].getSelectedObjects()
       if selection ~= nil then
         for k,v in pairs(selection) do
-          if v ~= tar and enc.call("APIobjExists",{obj=v}) == true then 
+          if v ~= obj and enc.call("APIobjExists",{obj=v}) == true then 
             tMorph(v,0)
           end
         end
