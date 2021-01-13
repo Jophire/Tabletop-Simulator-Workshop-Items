@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.21'
+version = '4.4.24'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -38,6 +38,7 @@ Object Structure
 EncodedObjects[objID] = {
 	this = Object
 	oName = Original Name
+  oDesc = Original Description
   values = {valueID = value}
 	encoded = {propID = boolean}
   menus = {}
@@ -547,6 +548,7 @@ function encodeObject(o)
     EncodedObjects[o.getGUID()] = {
     this = o,
     oName = o.getName(),
+    oDesc = o.getDescription(),
     values = {},
     encoded = {},
     menus = {},
@@ -1326,9 +1328,13 @@ function APIdisableEncoding(p)
 		buildButtons(p.obj)
   end
 end
-function APIgetOName(p)
+function APIobjGetOName(p)
 	return EncodedObjects[p.obj.getGUID()].oName
 end
+function APIobjGetODesc(p)
+	return EncodedObjects[p.obj.getGUID()].oDesc
+end
+
 --Compares two version strings '###.##.###.##' which is made up of any number of digits and periods.
 function APIversionComp(p)
   return versionComp(p.wv,p.cv)
