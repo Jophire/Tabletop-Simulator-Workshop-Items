@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Morph"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Moprh_Addon.lua'
-version = '1.10'
+version = '1.11'
 
 function onload()
   self.createButton({
@@ -90,7 +90,7 @@ function tMorph(obj,ply)
     else
       data.mtg_morphed = false
       obj.setName(enc.call("APIobjGetOName",{obj=obj}))
-      obj.setDescription(enc.call("APIobjGetODesc",{obj=ojb}))
+      obj.setDescription(enc.call("APIobjGetODesc",{obj=obj}))
       enc.call("APIobjDisableProp",{obj=obj,propID=pID})
       if flip < 0 then
         enc.call("APIFlip",{obj=obj})
