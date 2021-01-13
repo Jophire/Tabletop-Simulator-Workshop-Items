@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.24'
+version = '4.4.25'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -807,7 +807,7 @@ function APIregisterProperty(p)
   xml_index = tableindex
   }]]
   Properties[p.propID] = deepcopy(p)
-  print(Properties[p.propID].propID.." Registered")
+  log(nil,Properties[p.propID].propID.." Registered",0)
   --buildPropFunction(p.propID)
 	--updateUI()
 end
