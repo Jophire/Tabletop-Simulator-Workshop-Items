@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.25'
+version = '4.4.26'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -493,7 +493,7 @@ function onObjectDropped(c,obj)
   
   if EncodedObjects[obj.getGUID()] ~= nil and obj.use_hands == true then
     Wait.condition(
-      function() local hand = handCheck(obj) buildButtons(obj,hand) end,
+      function() if obj ~= nil then local hand = handCheck(obj) buildButtons(obj,hand) end end,
       function() return obj == nil or obj.resting end
     )
   end
