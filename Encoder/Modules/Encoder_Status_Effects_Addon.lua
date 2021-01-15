@@ -4,14 +4,14 @@ This module adds only Status Effects.
 ]]
 pID = "MTG_Status_Effects"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Status_Effects_Addon.lua'
-version = '1.4.1'
+version = '1.4.2'
 
 StatusList={
   mtg_exert={name="Exerted", des=":Card does not untap the next Controller's untap step.",val='boolean',def=false},
   mtg_frozen={name="Frozen", des=":Card does not untap during the untap step as long as this effect is in effect.",val='boolean',def=false},
   mtg_detain={name="Detained", des=":Creature can't block, attack, or activate abilities till %Color%'s next turn.",val='color',def=''},
   mtg_monstrous={name="Monstrous", des=":This creature has been made monstrous.",val='boolean',def=false},
-  mtg_goad={name="Goaded", des=":This creature must attack a player other then 'Color' if able.",val='color',def='',func=function() return Turns.turn_color end}
+  mtg_goad={name="Goaded", des=":This creature must attack a player other then %Color% if able.",val='color',def='',func=function() return Turns.turn_color end}
 }
 
 
