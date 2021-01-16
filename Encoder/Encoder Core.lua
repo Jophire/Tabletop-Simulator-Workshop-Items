@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.26'
+version = '4.4.28'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -518,7 +518,7 @@ function handCheck(obj)
         dist = v.distance < dist and v.distance or dist
       end
     end
-    log(dist,'Card Distance above surface.')
+    --log(dist,'Card Distance above surface.')
     --If the card is above 2 and resting, its in a hand. 
     --Or if its resting, but there is nothing below it, its in a hand.
     if dist > 2.0 or c[1] == nil then 
@@ -527,6 +527,7 @@ function handCheck(obj)
       return false --showCardDetails({obj})
     end
   else
+    return nil
   end
 end
 
@@ -616,6 +617,7 @@ function buildButtons(o,h)
   if h == nil then
     h = handCheck(o)
   end
+  if o==nil then return end
   o.clearButtons()
   o.clearInputs()
   if EncodedObjects[o.getGUID()].disable ~= true then
