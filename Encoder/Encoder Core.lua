@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.30'
+version = '4.4.32'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -1352,6 +1352,11 @@ function APIdisableEncoding(p)
     EncodedObjects[p.obj.getGUID()].disable = true
     p.obj.clearButtons()
     p.obj.clearInputs()
+  end
+end
+function APIenableEncoding(p)
+  if EncodedObjects[p.obj.getGUID()] ~= nil then
+    EncodedObjects[p.obj.getGUID()].disable = false
 		buildButtons(p.obj)
   end
 end
