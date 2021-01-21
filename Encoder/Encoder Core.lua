@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.34'
+version = '4.4.35'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -82,6 +82,7 @@ local Zones = {}
   name=Zone name
   func_enter = function to call on enter
   func_leave = function to call on exit,
+  funcOwner = what object owns the functions,
   color = --Player color this zone belongs to.
 ]]
 local Styles = {}
@@ -143,13 +144,17 @@ function onLoad(saved_data)
       end
     end
     if loaded_data.zones ~= nil then
-      Zones = JSON.decode(loaded_data.zones)
-      for k,v in pairs(Zones) do
-        Wait.condition(
-        function() end,
-        function() return getObjectFromGUID(k) ~= nil end,
-        0.1,
-        function() Zones[k] = nil end)
+      for k,v in pairs(loaded_data.zones) do
+        if v ~= nil and v~= "" then
+          Zones[k] = JSON.decode(v)
+          Zones[k].funcOwner = getObjectFromGUID(Zones[k].funcOwner)
+          local i = k
+          Wait.condition(
+          function() end,
+          function() return getObjectFromGUID(i) ~= nil and Zones[i].funcOwner ~= nil end,
+          0.2,
+          function() Zones[i] = nil end)
+        end
       end
     end
     if loaded_data.values ~= nil then
@@ -268,7 +273,7 @@ function onSave()
   local data_to_save = {}
   data_to_save["cards"] = {}
   data_to_save["properties"] = {}
-  data_to_save["zones"] = JSON.encode(Zones)
+  data_to_save["zones"] = {}
   data_to_save["values"] = {}
   data_to_save["players"] = JSON.encode(Players)
   data_to_save["menus"] = {}
@@ -281,6 +286,14 @@ function onSave()
       EncodedObjects[i].this = ""
       data_to_save["cards"][i] = JSON.encode(EncodedObjects[i])
       EncodedObjects[i].this = tempThis
+    end
+  end
+  for i,v in pairs(Zones) do
+    if Zones[i].funcOwner ~= nil then
+      local tempThis = Zones[i].funcOwner
+      Zones[i].funcOwner = Zones[i].funcOwner.getGUID()
+      data_to_save["zones"][i] = JSON.encode(Zones[i])
+      Zones[i].funcOwner = tempThis
     end
   end
   for i,v in pairs(Properties) do
@@ -402,6 +415,7 @@ function buildZones()
           name = j..'_Hand_'..ind,
           func_enter = 'hideCardDetails',
           func_leave = 'showCardDetails',
+          funcOwner = self,
           color = j
           }
           end
@@ -1003,6 +1017,12 @@ end
 --##########################
 --#ZONE FUNCTIONS
 function APIregisterZone(p)
+  Zones[p.guid] = {
+    name=p.name,
+    func_enter = p.func_enter,
+    func_leave = p.func_exit,
+    funcOwner = p.funcOwner,
+    color = p.color}
 end
 function APIlistZones()
   return Zones
