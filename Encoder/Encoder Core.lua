@@ -32,7 +32,7 @@ basicstyleTableDefault = {
 }
 
 
-EncodedObjects = {}
+local EncodedObjects = {}
 --[[
 Object Structure
 EncodedObjects[objID] = {
@@ -46,7 +46,7 @@ EncodedObjects[objID] = {
   flip = 1
   disabled = false
 ]]
-Players = {}
+local Players = {}
 --[[
   For attaching values to player colors instead of objects.
   {ply=color} is how color is referenced in data for the api.
@@ -57,7 +57,7 @@ Players = {}
     editing = nil
   }
 ]]
-Properties = {}
+local Properties = {}
 --[[
   propID = internal name,
   name = external name,
@@ -70,21 +70,21 @@ Properties = {}
   xml_index = tableindex
   }
 ]]
-Values = {}
+local Values = {}
 --[[
   valueID = internal name, used by Values as key,
   type = Lua type definition
   default = 'default_value'
   desc = A description for other module creators to understand the values use.
 ]]
-Zones = {}
+local Zones = {}
 --[[
   name=Zone name
   func_enter = function to call on enter
   func_leave = function to call on exit,
   color = --Player color this zone belongs to.
 ]]
-Styles = {}
+local Styles = {}
 Styles["Basic_Style"] = {styleID="Basic_Style",name="Basic Style",desc="Comes with the encoder.",styleTable=basicstyleTableDefault}
 --[[
   styleID = internal name,
@@ -92,7 +92,7 @@ Styles["Basic_Style"] = {styleID="Basic_Style",name="Basic Style",desc="Comes wi
   desc = '',
   styleTable = buttonTable
 ]]
-Menus = {}
+local Menus = {}
 --[[
   menuID = internal name,
   funcOwner = obj,
@@ -1013,7 +1013,6 @@ function APItoggleProperty(p)
     toggleProperty(p.ply,p.propID)
   end
 end
-
 --OBJECT FUNCTIONS
 --registers a new object to be encoded.
 function APIencodeObject(p)
@@ -1031,6 +1030,15 @@ function APIobjDisabled(p)
   end
   return false
 end
+function APIobjReset(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    for k,v in pairs(EncodeObjects[target].encoded) do
+      APIobjResetProp({obj=p,propID=k})
+    end
+  end
+end
+
 --Is a given Property enabled: {obj=obj,propID=propID}
 function APIobjIsPropEnabled(p)
   local target = p.obj.getGUID()
@@ -1077,6 +1085,17 @@ function APIobjDisableProp(p)
     end
   end
 end
+--Rest Prop
+function APIobjResetProp(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    EncodedObjects[target].encoded[p.propID] = false
+    for k,v in pairs(Properties[p.propID].values) do
+      EncodedObjects[target].values[v] = Values[v].default
+    end
+  end
+end
+
 --Get or Set a single value based on valueID. Returns the value.
 --{obj=obj,valueID=valueID,data={valueID=value}}
 function APIobjGetValueData(p)
@@ -1371,3 +1390,10 @@ function deepcopy(orig)
     return copy
 end
 
+function garbageCollect()
+  for k,v in pairs(EncodedObjects) do
+    if v.this == nil then
+      EncodedObjects[k] = nil
+    end
+  end
+end
