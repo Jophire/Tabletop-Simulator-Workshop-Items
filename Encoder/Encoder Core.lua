@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.28'
+version = '4.4.30'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -32,7 +32,7 @@ basicstyleTableDefault = {
 }
 
 
-EncodedObjects = {}
+local EncodedObjects = {}
 --[[
 Object Structure
 EncodedObjects[objID] = {
@@ -46,7 +46,7 @@ EncodedObjects[objID] = {
   flip = 1
   disabled = false
 ]]
-Players = {}
+local Players = {}
 --[[
   For attaching values to player colors instead of objects.
   {ply=color} is how color is referenced in data for the api.
@@ -57,7 +57,7 @@ Players = {}
     editing = nil
   }
 ]]
-Properties = {}
+local Properties = {}
 --[[
   propID = internal name,
   name = external name,
@@ -70,21 +70,21 @@ Properties = {}
   xml_index = tableindex
   }
 ]]
-Values = {}
+local Values = {}
 --[[
   valueID = internal name, used by Values as key,
   type = Lua type definition
   default = 'default_value'
   desc = A description for other module creators to understand the values use.
 ]]
-Zones = {}
+local Zones = {}
 --[[
   name=Zone name
   func_enter = function to call on enter
   func_leave = function to call on exit,
   color = --Player color this zone belongs to.
 ]]
-Styles = {}
+local Styles = {}
 Styles["Basic_Style"] = {styleID="Basic_Style",name="Basic Style",desc="Comes with the encoder.",styleTable=basicstyleTableDefault}
 --[[
   styleID = internal name,
@@ -92,7 +92,7 @@ Styles["Basic_Style"] = {styleID="Basic_Style",name="Basic Style",desc="Comes wi
   desc = '',
   styleTable = buttonTable
 ]]
-Menus = {}
+local Menus = {}
 --[[
   menuID = internal name,
   funcOwner = obj,
@@ -490,14 +490,14 @@ function onObjectDropped(c,obj)
   if ver == version and mod_name == 'Encoder' or Global.getVar('Encoder') == nil then
     Global.setVar('Encoder',self)
   end
-  
+  if EncodedObjects[obj.getGUID()].disable ~= true then
   if EncodedObjects[obj.getGUID()] ~= nil and obj.use_hands == true then
     Wait.condition(
       function() if obj ~= nil then local hand = handCheck(obj) buildButtons(obj,hand) end end,
       function() return obj == nil or obj.resting end
     )
   end
-  
+  end
   if obj.getVar("pID") ~= nil then
     obj.call("registerModule")
   end
@@ -618,9 +618,9 @@ function buildButtons(o,h)
     h = handCheck(o)
   end
   if o==nil then return end
-  o.clearButtons()
-  o.clearInputs()
   if EncodedObjects[o.getGUID()].disable ~= true then
+    o.clearButtons()
+    o.clearInputs()
     if EncodedObjects[o.getGUID()].editing == nil then
       for k,v in pairs(Menus) do
         if v.funcOwner ~= nil then
@@ -684,10 +684,14 @@ function disableEncoding(o,p)
       if EncodedObjects[v.getGUID()] ~= nil and v ~= o then
         EncodedObjects[v.getGUID()].disable = true
         v.setName(EncodedObjects[v.getGUID()].oName)
+        v.clearButtons()
+        v.clearInputs()
         buildButtons(v)
       end
     end
   end
+  o.clearButtons()
+  o.clearInputs()
   buildButtons(o)
 end
 function flipMenu(o,p)
@@ -1009,7 +1013,6 @@ function APItoggleProperty(p)
     toggleProperty(p.ply,p.propID)
   end
 end
-
 --OBJECT FUNCTIONS
 --registers a new object to be encoded.
 function APIencodeObject(p)
@@ -1027,6 +1030,15 @@ function APIobjDisabled(p)
   end
   return false
 end
+function APIobjReset(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    for k,v in pairs(EncodeObjects[target].encoded) do
+      APIobjResetProp({obj=p,propID=k})
+    end
+  end
+end
+
 --Is a given Property enabled: {obj=obj,propID=propID}
 function APIobjIsPropEnabled(p)
   local target = p.obj.getGUID()
@@ -1073,6 +1085,17 @@ function APIobjDisableProp(p)
     end
   end
 end
+--Rest Prop
+function APIobjResetProp(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    EncodedObjects[target].encoded[p.propID] = false
+    for k,v in pairs(Properties[p.propID].values) do
+      EncodedObjects[target].values[v] = Values[v].default
+    end
+  end
+end
+
 --Get or Set a single value based on valueID. Returns the value.
 --{obj=obj,valueID=valueID,data={valueID=value}}
 function APIobjGetValueData(p)
@@ -1327,6 +1350,8 @@ end
 function APIdisableEncoding(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     EncodedObjects[p.obj.getGUID()].disable = true
+    p.obj.clearButtons()
+    p.obj.clearInputs()
 		buildButtons(p.obj)
   end
 end
@@ -1365,3 +1390,10 @@ function deepcopy(orig)
     return copy
 end
 
+function garbageCollect()
+  for k,v in pairs(EncodedObjects) do
+    if v.this == nil then
+      EncodedObjects[k] = nil
+    end
+  end
+end
