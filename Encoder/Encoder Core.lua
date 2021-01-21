@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.32'
+version = '4.4.34'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -490,8 +490,8 @@ function onObjectDropped(c,obj)
   if ver == version and mod_name == 'Encoder' or Global.getVar('Encoder') == nil then
     Global.setVar('Encoder',self)
   end
-  if EncodedObjects[obj.getGUID()].disable ~= true then
-  if EncodedObjects[obj.getGUID()] ~= nil and obj.use_hands == true then
+  if EncodedObjects[obj.getGUID()] ~= nil and EncodedObjects[obj.getGUID()].disable ~= true then
+  if obj.use_hands == true then
     Wait.condition(
       function() if obj ~= nil then local hand = handCheck(obj) buildButtons(obj,hand) end end,
       function() return obj == nil or obj.resting end
@@ -998,6 +998,20 @@ function APIgetStyleTable(p)
   else
     return Styles[p.styleID].styleTable
   end
+end
+
+--##########################
+--#ZONE FUNCTIONS
+function APIregisterZone(p)
+end
+function APIlistZones()
+  return Zones
+end
+function APIgetZone(p)
+  return Zones[p.guid]
+end
+function APIisZone(p)
+  return Zones[p.guid] ~= nil
 end
 
 --##########################
