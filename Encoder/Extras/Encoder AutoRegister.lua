@@ -6,8 +6,8 @@
   By: Tipsy Hobbit
 ]]--
 pID = "ENC_AUTOREGISTER"
-UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Extras/Encoder_AutoRegister.lua'
-version = '1.2'
+UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Extras/Encoder%20AutoRegister.lua'
+version = '1.2.1'
 
 function onLoad()
   Wait.condition(registerModule,function() if Global.getVar("Encoder") ~= nil then return true else return false end end)

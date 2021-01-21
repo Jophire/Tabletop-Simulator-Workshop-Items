@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.28'
+version = '4.4.30'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -490,14 +490,14 @@ function onObjectDropped(c,obj)
   if ver == version and mod_name == 'Encoder' or Global.getVar('Encoder') == nil then
     Global.setVar('Encoder',self)
   end
-  
+  if EncodedObjects[obj.getGUID()].disable ~= true then
   if EncodedObjects[obj.getGUID()] ~= nil and obj.use_hands == true then
     Wait.condition(
       function() if obj ~= nil then local hand = handCheck(obj) buildButtons(obj,hand) end end,
       function() return obj == nil or obj.resting end
     )
   end
-  
+  end
   if obj.getVar("pID") ~= nil then
     obj.call("registerModule")
   end
@@ -618,9 +618,9 @@ function buildButtons(o,h)
     h = handCheck(o)
   end
   if o==nil then return end
-  o.clearButtons()
-  o.clearInputs()
   if EncodedObjects[o.getGUID()].disable ~= true then
+    o.clearButtons()
+    o.clearInputs()
     if EncodedObjects[o.getGUID()].editing == nil then
       for k,v in pairs(Menus) do
         if v.funcOwner ~= nil then
@@ -684,10 +684,14 @@ function disableEncoding(o,p)
       if EncodedObjects[v.getGUID()] ~= nil and v ~= o then
         EncodedObjects[v.getGUID()].disable = true
         v.setName(EncodedObjects[v.getGUID()].oName)
+        v.clearButtons()
+        v.clearInputs()
         buildButtons(v)
       end
     end
   end
+  o.clearButtons()
+  o.clearInputs()
   buildButtons(o)
 end
 function flipMenu(o,p)
@@ -1327,6 +1331,8 @@ end
 function APIdisableEncoding(p)
   if EncodedObjects[p.obj.getGUID()] ~= nil then
     EncodedObjects[p.obj.getGUID()].disable = true
+    p.obj.clearButtons()
+    p.obj.clearInputs()
 		buildButtons(p.obj)
   end
 end
