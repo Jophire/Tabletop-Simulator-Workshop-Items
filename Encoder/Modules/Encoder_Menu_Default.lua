@@ -5,7 +5,7 @@ If no menu has been registered, then the encoder will spawn this from the github
 ]]
 pID="Default_Menu"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
-version = '1.4.2'
+version = '1.4.3'
 Style = {}
 function onload()
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
@@ -26,6 +26,13 @@ function registerModule()
       visible_in_hand=1
     }
     enc.call("APIregisterMenu",menu)
+    menu={
+      menuID='Enc_Menu',
+      funcOwner=self,
+      activateFunc='createEncMenu',
+      visible_in_hand=1
+    }
+    enc.call("APIregisterMenu",menu)
     
     Style.proto = enc.call("APIgetStyleTable",nil)
     Style.mt = {}
@@ -41,6 +48,54 @@ function registerModule()
   end
 end
 
+function createEncMenu(t)
+local o = t.obj
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    Style.proto = enc.call("APIgetStyleTable",nil)
+    local flip = enc.call("APIgetFlip",{obj=o})
+    local scaler = {x=1,y=1,z=1}--o.getScale()
+    local zpos = 0.28*flip*scaler.z
+    tmd = enc.call("APIobjGetMenuData",{obj=o,menuID='Tool_Menu'})
+    emd = enc.call("APIobjGetMenuData",{obj=o,menuID='Enc_Menu'})
+    if tmd.open == true then
+      if emd.open == false then
+        alpha = Style.proto.color
+        alpha.a = 0.3
+        o.createButton(Style.new{
+        label="▼▼▼", click_function='toggleEncMenu', function_owner=self,
+        position={0*flip*scaler.x,zpos,1.3*scaler.y}, height=10, width=250, font_size=60,
+        rotation={0,0,90-90*flip},tooltip="Encoder Menu",color=alpha})
+      else
+        o.createButton(Style.new{
+        label="▲▲▲", click_function='toggleEncMenu', function_owner=self,
+        position={0*flip*scaler.x,zpos,1.3*scaler.y}, height=10, width=250, font_size=60,
+        rotation={0,0,90-90*flip},tooltip="Encoder Menu",color=alpha})
+        temp = " Reset Modules"
+        barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
+        o.createButton(Style.new{
+        label=temp, click_function='resetEncoding', function_owner=self,
+        position={(-1+offset_x)*flip*scaler.x,zpos,(1.6+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
+        rotation={0,0,90-90*flip}
+        })
+        temp = "Disable Encoding"
+        barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
+        o.createButton(Style.new{
+        label=temp, click_function='disableEncoding', function_owner=enc,
+        position={(-1+offset_x)*flip*scaler.x,zpos,(1.8+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
+        rotation={0,0,90-90*flip},font_color={1,0,0,1}
+        })
+        temp = " Remove Encoding"
+        barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
+        o.createButton(Style.new{
+        label=temp, click_function='removeEncoding', function_owner=self,
+        position={(-1+offset_x)*flip*scaler.x,zpos,(2+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
+        rotation={0,0,90-90*flip},font_color={0.7,0,0,1}
+        })
+      end
+    end
+  end
+end
 function createToolMenu(t)
   local o = t.obj
   enc = Global.getVar('Encoder')
@@ -55,21 +110,14 @@ function createToolMenu(t)
       alpha = Style.proto.color
       alpha.a = 0.3
       o.createButton(Style.new{
-      label=">\n>\n>", click_function='toggleToolMenu', function_owner=self,
+      label="►\n►\n►", click_function='toggleToolMenu', function_owner=self,
       position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
       rotation={0,0,90-90*flip},tooltip="Tool Menu",color=alpha})
     else
       o.createButton(Style.new{
-      label="<\n<\n<", click_function='toggleToolMenu', function_owner=self,
+      label="◄\n◄\n◄", click_function='toggleToolMenu', function_owner=self,
       position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
       rotation={0,0,90-90*flip},tooltip="Tool Menu"
-      })
-      temp = "Disable Encoding"
-      barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
-      o.createButton(Style.new{
-      label=temp, click_function='disableEncoding', function_owner=enc,
-      position={(1.05+offset_x)*flip*scaler.x,zpos,(1.5+offset_y)*scaler.y}, height=100, width=barSize, font_size=fsize,
-      rotation={0,0,90-90*flip},font_color={1,0,0,1}
       })
       temp = "↿     ↾"
       barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
@@ -82,14 +130,14 @@ function createToolMenu(t)
       barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
       o.createButton(Style.new{
       label=temp, click_function='CMscrollDown', function_owner=self,
-      position={(1.05+offset_x)*flip*scaler.x,zpos,1*scaler.y}, height=100, width=barSize, font_size=fsize,
+      position={(1.05+offset_x)*flip*scaler.x,zpos,1.25*scaler.y}, height=100, width=barSize, font_size=fsize,
       rotation={0,0,90-90*flip}
       })
       local count = 0
       for h,j in pairs(props) do
         v = enc.call("APIgetProp",{propID=h})
         if v.visible~=false and v.funcOwner ~= nil then
-          if md.pos <= count and count < md.pos+6 then
+          if md.pos <= count and count < md.pos+7 then
             temp = v.name
             barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
             o.createButton(Style.new{
@@ -104,7 +152,6 @@ function createToolMenu(t)
     end
   end
 end
-
 function createPropMenu(t)
   local o = t.obj
   enc = Global.getVar('Encoder')
@@ -119,12 +166,12 @@ function createPropMenu(t)
       alpha = Style.proto.color
       alpha.a = 0.3
       o.createButton(Style.new{
-      label="<\n<\n<", click_function='togglePropMenu', function_owner=self,
+      label="◄\n◄\n◄", click_function='togglePropMenu', function_owner=self,
       position={-1.0*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
       rotation={0,0,90-90*flip},tooltip="Property Menu",color=alpha})
     else
       o.createButton(Style.new{
-      label=">\n>\n>", click_function='togglePropMenu', function_owner=self,
+      label="►\n►\n►", click_function='togglePropMenu', function_owner=self,
       position={-1.0*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
       rotation={0,0,90-90*flip},tooltip="Property Menu"
       })
@@ -170,6 +217,26 @@ function createPropMenu(t)
   end
 end
 
+
+--[[function crBT(o,tab)
+  █████
+
+
+end
+]]
+function resetEncoding(o,p)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    enc.call("APIobjReset",{obj=o})
+  end
+end
+function removeEncoding(o,p)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    enc.call("APIobjRemove",{obj=o})
+  end
+end
+
 function toggleToolMenu(o)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
@@ -181,6 +248,13 @@ function togglePropMenu(o)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
     enc.call("APIobjToggleMenu",{obj=o,menuID="Prop_Menu"})
+    enc.call("APIrebuildButtons",{obj=o})
+  end
+end
+function toggleEncMenu(o)
+  enc = Global.getVar('Encoder')
+  if enc ~= nil then
+    enc.call("APIobjToggleMenu",{obj=o,menuID="Enc_Menu"})
     enc.call("APIrebuildButtons",{obj=o})
   end
 end
