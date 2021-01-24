@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.38'
+version = '4.4.40'
 version_string = "Localized Encoder Data. Please use the api to get/set data."
 change_log = [[Fixed bug in APIobjReset.
 Added APIobjRemove({obj=obj}) removes target object from the encoding tables.
@@ -948,6 +948,9 @@ function APIlistMenus()
   end
   return data
 end
+function APIgetMenu(p)
+  return Menus[p.menuID]
+end
 --Get or Set menu data of a given object.
 --{obj=obj,menuID=menu ID,data=data}
 function APIobjGetMenuData(p)
@@ -1081,7 +1084,7 @@ function APIobjRemove(p)
   p.obj.clearButtons()
   p.obj.clearInputs()
   p.obj.setVar("noencode","Will no longer be encoded.")
-  table.remove(EncodeObjects,p.obj.getGUID())
+  table.remove(EncodedObjects,p.obj.getGUID())
 end
 
 --Is a given Property enabled: {obj=obj,propID=propID}
