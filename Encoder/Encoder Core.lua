@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.35'
+version = '4.4.36'
 version_string = "Player,Menu and Style update."
 
 URLS={
@@ -31,7 +31,7 @@ basicstyleTableDefault = {
   tooltip=""
 }
 
-
+--Use the API to access these.
 local EncodedObjects = {}
 --[[
 Object Structure
@@ -1068,9 +1068,16 @@ function APIobjReset(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
     for k,v in pairs(EncodeObjects[target].encoded) do
-      APIobjResetProp({obj=p,propID=k})
+      APIobjResetProp({obj=p.obj,propID=k})
     end
   end
+end
+--To remove items accidentaly added.
+function APIobjRemove(p)
+  p.obj.clearButtons()
+  p.obj.clearInputs()
+  p.obj.setVar("noencode","Will no longer be encoded.")
+  table.remove(EncodeObjects,p.obj.getGUID())
 end
 
 --Is a given Property enabled: {obj=obj,propID=propID}
