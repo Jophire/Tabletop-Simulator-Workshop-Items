@@ -1,8 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.37'
-version_string = "Localized Encoder Data. Please use the api to get/set data."
+version = '4.4.378 "Localized Encoder Data. Please use the api to get/set data."
 change_log = [[Fixed bug in APIobjReset.
 Added APIobjRemove({obj=obj}) removes target object from the encoding tables.
 --Also sets noencode to a debug message for the target object.
@@ -1071,7 +1070,7 @@ end
 function APIobjReset(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
-    for k,v in pairs(EncodeObjects[target].encoded) do
+    for k,v in pairs(EncodedObjects[target].encoded) do
       APIobjResetProp({obj=p.obj,propID=k})
     end
   end
