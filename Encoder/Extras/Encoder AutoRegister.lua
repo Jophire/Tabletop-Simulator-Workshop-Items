@@ -7,7 +7,7 @@
 ]]--
 pID = "ENC_AUTOREGISTER"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Extras/Encoder%20AutoRegister.lua'
-version = '1.2.2'
+version = '1.2.3'
 
 function onLoad()
   Wait.condition(registerModule,function() if Global.getVar("Encoder") ~= nil then return true else return false end end)
@@ -37,11 +37,11 @@ function onObjectDropped(c,object)
       
       start = 0
       modules = {}
-      for k,v in pairs(enc.call("APIgetPropList",nil)) do
-        table.insert(k,enc.call("APIgetProp",{propID=k}))
+      for k,v in pairs(enc.call("APIgetPropsList",nil)) do
+        table.insert(modules,enc.call("APIgetProp",{propID=k}))
       end
       for k,v in pairs(enc.call("APIlistMenus",nil)) do
-        table.insert(k,v)
+        table.insert(modules,v)
       end
       count = 0
       

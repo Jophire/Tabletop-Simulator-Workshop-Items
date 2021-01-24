@@ -42,12 +42,12 @@ function onObjectHover(ply,obj)
       UI.show(MPID..ply.."Display")
     end
     if obj.getVar("pID") ~= nil then
-      data = enc.getTable("Properties")
-      if data[obj.getVar("pID")] ~= nil then
-        data = data[obj.getVar("pID")]
+      pID = obj.getVar("pID")
+      if enc.call("APIpropertyExists",{propID=pID}) then
+        data = enc.call("APIgetProp",{propID=pID})
         UI.setAttribute(MPID..ply.."Text","text",printOutData(data))
         UI.show(MPID..ply.."Display")
-      end
+      end 
     end
   else
     UI.hide(MPID..ply.."Display")
