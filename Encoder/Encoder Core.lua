@@ -133,7 +133,7 @@ function onLoad(saved_data)
     loaded_data = JSON.decode(saved_data)
     if loaded_data.properties ~= nil then 
       for i,v in pairs(loaded_data.properties) do
-        if i ~= nil and v ~= nil and v ~= "" then
+        if v ~= nil and v ~= "" then
           Properties[i] = JSON.decode(v)
           Properties[i].funcOwner = getObjectFromGUID(Properties[i].funcOwner)
           local k = i
