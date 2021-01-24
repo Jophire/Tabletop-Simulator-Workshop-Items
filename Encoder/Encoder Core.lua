@@ -1,8 +1,12 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.36'
-version_string = "Player,Menu and Style update."
+version = '4.4.37'
+version_string = "Localized Encoder Data. Please use the api to get/set data."
+change_log = [[Fixed bug in APIobjReset.
+Added APIobjRemove({obj=obj}) removes target object from the encoding tables.
+--Also sets noencode to a debug message for the target object.
+]]
 
 URLS={
   ENCODER='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Encoder%20Core.lua',
@@ -110,7 +114,7 @@ function onLoad(saved_data)
   basic_buttons = {}
 	-- Version Display
   broadcastToAll(mod_name.." "..version..postfix,{0.2,0.2,0.2})
-	
+	self.setDescription(change_log)
 	-- Set Global Encoder variable to the last spawned encoder.
   Global.setVar('Encoder',self)
   
