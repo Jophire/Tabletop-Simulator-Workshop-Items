@@ -5,7 +5,7 @@ If no menu has been registered, then the encoder will spawn this from the github
 ]]
 pID="Default_Menu"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
-version = '1.4.3'
+version = '1.4.4'
 Style = {}
 function onload()
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
@@ -228,6 +228,7 @@ function resetEncoding(o,p)
   enc = Global.getVar('Encoder')
   if enc ~= nil then
     enc.call("APIobjReset",{obj=o})
+    enc.call("APIrebuildButtons",{obj=o})
   end
 end
 function removeEncoding(o,p)
