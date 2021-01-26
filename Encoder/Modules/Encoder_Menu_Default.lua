@@ -5,7 +5,7 @@ If no menu has been registered, then the encoder will spawn this from the github
 ]]
 pID="Default_Menu"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
-version = '1.4.4'
+version = '1.4.5'
 Style = {}
 function onload()
   Wait.condition(registerModule,function() return Global.getVar('Encoder') ~= nil and true or false end)
@@ -58,18 +58,18 @@ local o = t.obj
     local zpos = 0.28*flip*scaler.z
     tmd = enc.call("APIobjGetMenuData",{obj=o,menuID='Tool_Menu'})
     emd = enc.call("APIobjGetMenuData",{obj=o,menuID='Enc_Menu'})
+    alpha = Style.proto.color
+    alpha.a = 0.1
     if tmd.open == true then
       if emd.open == false then
-        alpha = Style.proto.color
-        alpha.a = 0.3
         o.createButton(Style.new{
         label="▼▼▼", click_function='toggleEncMenu', function_owner=self,
-        position={0*flip*scaler.x,zpos,1.3*scaler.y}, height=10, width=250, font_size=60,
+        position={0*flip*scaler.x,zpos,1.4*scaler.y}, height=10, width=250, font_size=60,
         rotation={0,0,90-90*flip},tooltip="Encoder Menu",color=alpha})
       else
         o.createButton(Style.new{
         label="▲▲▲", click_function='toggleEncMenu', function_owner=self,
-        position={0*flip*scaler.x,zpos,1.3*scaler.y}, height=10, width=250, font_size=60,
+        position={0*flip*scaler.x,zpos,1.4*scaler.y}, height=10, width=250, font_size=60,
         rotation={0,0,90-90*flip},tooltip="Encoder Menu",color=alpha})
         temp = " Reset Modules"
         barSize,fsize,offset_x,offset_y = enc.call('APIformatButton',{str=temp,font_size=90,max_len=90,xJust=-1,yJust=0})
@@ -106,17 +106,17 @@ function createToolMenu(t)
     local zpos = 0.28*flip*scaler.z
     local props = enc.call("APIgetPropsList",{tags={"tool"}})
     md = enc.call("APIobjGetMenuData",{obj=o,menuID='Tool_Menu'})
+    alpha = Style.proto.color
+    alpha.a = 0.1
     if md.open == false then
-      alpha = Style.proto.color
-      alpha.a = 0.3
       o.createButton(Style.new{
       label="►\n►\n►", click_function='toggleToolMenu', function_owner=self,
-      position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
+      position={1.05*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
       rotation={0,0,90-90*flip},tooltip="Tool Menu",color=alpha})
     else
       o.createButton(Style.new{
       label="◄\n◄\n◄", click_function='toggleToolMenu', function_owner=self,
-      position={1*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
+      position={1.05*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
       rotation={0,0,90-90*flip},tooltip="Tool Menu"
       })
       temp = "↿     ↾"
@@ -162,17 +162,17 @@ function createPropMenu(t)
     local zpos = 0.28*flip*scaler.z
     local props = enc.call("APIgetPropsList",{tags={"untagged","basic"}})
     md = enc.call("APIobjGetMenuData",{obj=o,menuID='Prop_Menu'})      
+    alpha = Style.proto.color
+    alpha.a = 0.1
     if md.open == false then
-      alpha = Style.proto.color
-      alpha.a = 0.3
       o.createButton(Style.new{
       label="◄\n◄\n◄", click_function='togglePropMenu', function_owner=self,
-      position={-1.0*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
+      position={-1.05*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
       rotation={0,0,90-90*flip},tooltip="Property Menu",color=alpha})
     else
       o.createButton(Style.new{
       label="►\n►\n►", click_function='togglePropMenu', function_owner=self,
-      position={-1.0*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
+      position={-1.05*flip*scaler.x,zpos,-0.7*scaler.y}, height=250, width=10, font_size=60,
       rotation={0,0,90-90*flip},tooltip="Property Menu"
       })
       temp = " Flip "

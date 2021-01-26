@@ -4,7 +4,7 @@ This module adds only 1/1 Counters
 ]]
 pID = "MTG_11_Counters"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_11Counter_Addon.lua'
-version = '1.6.1'
+version = 'DEPRECIATED'
 Style={}
 
 function onload()

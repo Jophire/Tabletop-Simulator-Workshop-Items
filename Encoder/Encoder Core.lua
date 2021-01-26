@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.40'
+version = '4.4.41'
 version_string = "Localized Encoder Data. Please use the api to get/set data."
 change_log = [[Fixed bug in APIobjReset.
 Added APIobjRemove({obj=obj}) removes target object from the encoding tables.
@@ -677,11 +677,17 @@ function buildButtons(o,h)
       flip = EncodedObjects[o.getGUID()].flip
       temp = " X "
       barSize,fsize,offset_x,offset_y = updateSize(temp,90,90,0,0)
-      o.createButton({
+      ob = {
       label=temp, click_function='closeEditor', function_owner=self,
       position={(-1.1+offset_x)*flip,0.28*flip,(1.4+offset_y)}, height=100, width=barSize, font_size=fsize,
       rotation={0,0,90-90*flip}
-      })
+      }
+      for k,v in APIgetStyleTable() do
+        if ob[k] == nil then
+          ob[k] = v
+        end
+      end
+      o.createButton(ob)
     end
   end
 end
