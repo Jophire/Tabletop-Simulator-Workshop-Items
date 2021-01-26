@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.42'
+version = '4.4.43'
 version_string = "Localized Encoder Data. Please use the api to get/set data."
 change_log = [[Fixed bug in APIobjReset.
 Added APIobjRemove({obj=obj}) removes target object from the encoding tables.
@@ -249,6 +249,10 @@ function onLoad(saved_data)
     else
       Player[p].broadcast('Please ask the server host or an admin to check for updates.')
     end
+  end
+  )
+  self.addContextMenuItem('Clean Tables', function(p) 
+    garbageCollect()
   end
   )
   if CORE_VALUE.beta then
@@ -1453,6 +1457,21 @@ function garbageCollect()
   for k,v in pairs(EncodedObjects) do
     if v.this == nil then
       EncodedObjects[k] = nil
+    end
+  end
+  for k,v in pairs(Properties) do
+    if v.funcOwner == nil then
+      Properties[k] = nil
+    end
+  end
+  for k,v in pairs(Zones) do
+    if v.funcOwner == nil then
+      Zones[k] = nil
+    end
+  end
+  for k,v in pairs(Menus) do
+    if v.funcOwner == nil then
+      Menus[k] = nil
     end
   end
 end
