@@ -1,11 +1,9 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.43'
-version_string = "Localized Encoder Data. Please use the api to get/set data."
-change_log = [[Fixed bug in APIobjReset.
-Added APIobjRemove({obj=obj}) removes target object from the encoding tables.
---Also sets noencode to a debug message for the target object.
+version = '4.4.5'
+version_string = "Updated to fix small bug with latest TTS version."
+change_log = [[Updated .tag to .type .
 ]]
 
 URLS={
@@ -59,6 +57,7 @@ local Players = {}
     values = {valueID = value}
     encoded = {propID = boolean}
     editing = nil
+    style = nil
   }
 ]]
 local Properties = {}
@@ -536,7 +535,7 @@ function handCheck(obj)
     c = Physics.cast(params)
     dist = 10000
     for k,v in pairs(c) do
-      if v.hit_object.tag == 'Surface' or v.hit_object.interactable == false  then
+      if v.hit_object.type == 'Surface' or v.hit_object.interactable == false  then
         dist = v.distance < dist and v.distance or dist
       end
     end
@@ -1024,11 +1023,18 @@ function APIgetGlobalStyle()
   return CORE_VALUE.style
 end
 function APIgetStyleTable(p)
-  if p == nil or p.styleID == nil then
-    return Styles[CORE_VALUE.style].styleTable
-  else
-    return Styles[p.styleID].styleTable
+  if p ~= nil then
+    if p.styleID ~= nil then
+      if Styles[p.styleID] ~= nil then
+        return Styles[p.styleID].styleTable
+      end
+    elseif p.color ~= nil and Players[p.color].style ~= nil then
+      if Styles[Players[p.color].style] ~= nil then
+        return Styles[Players[p.color].style].styleTable
+      end
+    end
   end
+  return Styles[CORE_VALUE.style].styleTable
 end
 
 --##########################
