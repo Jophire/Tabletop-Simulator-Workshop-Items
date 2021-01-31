@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.4.5'
+version = '4.5'
 version_string = "Updated to fix small bug with latest TTS version."
 change_log = [[Updated .tag to .type .
 ]]
@@ -416,7 +416,7 @@ function buildZones()
         params.position = h.position
         params.rotation = h.rotation
         hs = Vector(h.scale.x,h.scale.y,h.scale.z)
-        params.scale = hs*(4/3)
+        params.scale = hs
         params.sound = false
         params.callback_function = function(obj) Zones[obj.guid] = {
           name = j..'_Hand_'..ind,
