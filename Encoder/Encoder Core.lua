@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.5.1'
+version = '4.5.3'
 version_string = "Updated to fix small bug with latest TTS version."
 change_log = [[Updated .tag to .type .
 ]]
@@ -122,7 +122,7 @@ function onLoad(saved_data)
   -- Version Display
   barSize,fsize,offset_x,offset_y = updateSize(''..version,60,6.0,1,0)
   basic_buttons['VersionDisp'] = {click_function='doNothing',function_owner=self,label=''..version,position={0.6+offset_x*0.47,0.12,0.05+offset_y},rotation={0,0,0},width=0,height=0,font_size=fsize,color={0,0,0,1},font_color={1,0,0,1}}
-	basic_buttons['toggleUI'] = {click_function='minimize',function_owner=self,label='Toggle UI',position={0+offset_x*0,0.12,0.4+offset_y},rotation={0,0,0},width=300,height=100,font_size=fsize,color={0,0,0,1},font_color={1,0,0,1}}
+	--basic_buttons['toggleUI'] = {click_function='minimize',function_owner=self,label='Toggle UI',position={0+offset_x*0,0.12,0.4+offset_y},rotation={0,0,0},width=300,height=100,font_size=fsize,color={0,0,0,1},font_color={1,0,0,1}}
   
   --Register Default Values
   APIregisterValue({valueID="obj_owner",type='color',default='Grey',desc='Who owns this object.'})
@@ -288,6 +288,7 @@ function onSave()
   
   for i,v in pairs(EncodedObjects) do
     --Removing Object reference before encoding.
+    EncodedObjects[i].this = getObjectFromGUID(i)
     if EncodedObjects[i].this ~= nil then
       local tempThis = EncodedObjects[i].this
       EncodedObjects[i].this = ""
@@ -477,18 +478,22 @@ function onObjectLeaveScriptingZone(zone, obj)
   end
 end
 function onObjectLeaveContainer(ctr,obj)
-  if obj.use_hands == true and EncodedObjects[obj.getGUID()] ~= nil then
-    Wait.condition( function() 
-    Wait.condition(
-      function() local hand = handCheck(obj) buildButtons(obj,hand) end,
-      function() return obj == nil or obj.resting end
-    ) end,
-    function() return not obj.resting end)
+  if EncodedObjects[obj.getGUID()] ~= nil then
+    EncodedObjects[obj.getGUID()].this = getObjectFromGUID(obj.getGUID())
+    if obj.use_hands == true then
+      Wait.condition( function() 
+      Wait.condition(
+        function() local hand = handCheck(obj) buildButtons(obj,hand) end,
+        function() return obj == nil or obj.resting end
+      ) end,
+      function() return not obj.resting end)
+    end
   end
 end
 function onObjectDestroyed(obj)
   if obj == self then
-    for i,v in pairs(EncodedObjects) do 
+    for i,v in pairs(EncodedObjects) do
+      EncodedObjects[i].this = getObjectFromGUID(i)
       v.this.clearButtons()
       v.this.setName(v.name)
       v.this.clearContextMenu()
@@ -983,6 +988,12 @@ function APIobjSetMenuData(p)
     end
   end
 end
+function APIobjGetMenus(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    return EncodedObjects[target].menus
+  end
+end
 function APIobjToggleMenu(p)
   local target = p.obj.getGUID()
   if EncodedObjects[target] ~= nil then
@@ -1104,6 +1115,25 @@ function APIobjRemove(p)
   EncodedObjects[p.obj.getGUID()] = nil
   return e
 end
+--Clones object p.obj data to p.clone
+function APIobjCloneData(p)
+  local new_target = p.obj.getGUID()
+  local target = p.data.getGUID()
+  if EncodedObjects[target] ~= nil then
+    if EncodedObjects[new_target] == nil then
+      encodeObject(p.new_obj)
+    end
+    EncodedObjects[new_target] = deepcopy(EncodedObjects[target])
+    EncodedObjects[new_target].this = p.new_obj
+  end
+end
+function APIobjUpdateThis(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    EncodedObjects[target].this = getObjectFromGUID(target)
+  end
+end
+
 
 --Is a given Property enabled: {obj=obj,propID=propID}
 function APIobjIsPropEnabled(p)
@@ -1464,7 +1494,9 @@ end
 function garbageCollect()
   for k,v in pairs(EncodedObjects) do
     if v.this == nil then
-      EncodedObjects[k] = nil
+      if getObjectFromGUID(k) == nil then
+        EncodedObjects[k] = nil
+      end
     end
   end
   for k,v in pairs(Properties) do
