@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.5'
+version = '4.5.1'
 version_string = "Updated to fix small bug with latest TTS version."
 change_log = [[Updated .tag to .type .
 ]]
@@ -1100,7 +1100,9 @@ function APIobjRemove(p)
   p.obj.clearButtons()
   p.obj.clearInputs()
   p.obj.setVar("noencode","Will no longer be encoded.")
-  table.remove(EncodedObjects,p.obj.getGUID())
+  local e = EncodedObjects[p.obj.getGUID()]
+  EncodedObjects[p.obj.getGUID()] = nil
+  return e
 end
 
 --Is a given Property enabled: {obj=obj,propID=propID}
