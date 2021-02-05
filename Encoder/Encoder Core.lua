@@ -478,18 +478,22 @@ function onObjectLeaveScriptingZone(zone, obj)
   end
 end
 function onObjectLeaveContainer(ctr,obj)
-  if obj.use_hands == true and EncodedObjects[obj.getGUID()] ~= nil then
-    Wait.condition( function() 
-    Wait.condition(
-      function() local hand = handCheck(obj) buildButtons(obj,hand) end,
-      function() return obj == nil or obj.resting end
-    ) end,
-    function() return not obj.resting end)
+  if EncodedObjects[obj.getGUID()] ~= nil then
+    EncodedObjects[obj.getGUID()].this = getObjectFromGUID(obj.getGUID())
+    if obj.use_hands == true then
+      Wait.condition( function() 
+      Wait.condition(
+        function() local hand = handCheck(obj) buildButtons(obj,hand) end,
+        function() return obj == nil or obj.resting end
+      ) end,
+      function() return not obj.resting end)
+    end
   end
 end
 function onObjectDestroyed(obj)
   if obj == self then
-    for i,v in pairs(EncodedObjects) do 
+    for i,v in pairs(EncodedObjects) do
+      EncodedObjects[i].this = getObjectFromGUID(i)
       v.this.clearButtons()
       v.this.setName(v.name)
       v.this.clearContextMenu()
