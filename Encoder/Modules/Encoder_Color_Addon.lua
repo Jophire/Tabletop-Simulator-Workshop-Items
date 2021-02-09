@@ -4,7 +4,7 @@ This module adds color Designators.
 ]]
 pID = "MTG_Colors"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Color_Addon.lua'
-version = '1.5.3'
+version = '1.12'
 Style = {}
 colors={
 w={c=Color(0.988,0.988,0.757),n="White"},
@@ -92,12 +92,17 @@ function toggleEditor(obj,ply)
     enc.call("APIrebuildButtons",{obj=obj})
   end
 end
-function callEditor(obj,ply)
-  enc.call("APItoggleProperty",{obj=obj,propID=pID})
-  if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
-    toggleEditor(obj,nil)
+function callEditor(obj,ply,alt)
+  if type(obj) == 'Table' then obj=obj[1] ply=obj[2] alt=obj[3] end
+  if alt then
+    enc.call("APIobjResetProp",{obj=obj,propID=pID})
   else
-    enc.call("APIrebuildButtons",{obj=obj})
+    enc.call("APItoggleProperty",{obj=obj,propID=pID})
+    if enc.call("APIobjIsPropEnabled",{obj=obj,propID=pID}) then
+      toggleEditor(obj,nil)
+    else
+      enc.call("APIrebuildButtons",{obj=obj})
+    end
   end
 end
 function toggleEditClose(obj,ply)

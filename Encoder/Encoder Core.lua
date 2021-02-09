@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.5.3'
+version = '4.5.4'
 version_string = "Updated to fix small bug with latest TTS version."
 change_log = [[Updated .tag to .type .
 ]]
@@ -1160,6 +1160,16 @@ function APIobjSetProps(p)
   if EncodedObjects[target] ~= nil then
     EncodedObjects[target].encoded = p.data
   end
+end
+--Call target properties activateFunc: {obj=obj,propID=propID,color=player.color,data=alt_click}
+function APIobjCallProp(p)
+  local target = p.obj.getGUID()
+  if EncodedObjects[target] ~= nil then
+    local prop = Properties[p.propID]
+    if prop ~= nil then
+      prop.funcOwner.call(prop.activateFunc,{p.obj,p.color or nil,p.data or false})
+    end
+  end 
 end
 --Enable target prop: {obj=obj,propID=propID}
 function APIobjEnableProp(p)

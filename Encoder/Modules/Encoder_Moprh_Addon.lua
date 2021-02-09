@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Morph"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Moprh_Addon.lua'
-version = '1.11'
+version = '1.12'
 
 function onload()
   self.createButton({
@@ -58,7 +58,8 @@ function createButtons(t)
   end
 end
 
-function toggleMorph(obj,ply)
+function toggleMorph(obj,ply,alt)
+  if type(obj) == 'Table' then obj=obj[1] ply=obj[2] alt=obj[3] end
   enc.call("APItoggleProperty",{obj=obj,propID=pID})
   tMorph(obj,ply)
 end

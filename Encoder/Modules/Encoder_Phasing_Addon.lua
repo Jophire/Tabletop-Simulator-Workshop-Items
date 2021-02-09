@@ -2,7 +2,7 @@
 --By Tipsy Hobbit
 pID = "MTG_Phase"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Phasing_Addon.lua'
-version = '1.10'
+version = '1.12'
 
 function onload()
   self.createButton({
