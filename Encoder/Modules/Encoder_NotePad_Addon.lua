@@ -2,7 +2,7 @@
 --by Tipsy Hobbit//STEAM_0:1:13465982
 pID = "notepad"
 UPDATE_URL='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_NotePad_Addon.lua'
-version = '1.6'
+version = '1.12'
 
 function onload()
   self.createButton({
@@ -36,9 +36,14 @@ function registerModule()
   end
 end
 
-function toggleProp(obj,ply)
-  enc.call("APItoggleProperty",{obj=obj,propID=pID})
-  enc.call("APIrebuildButtons",{obj=obj})
+function toggleProp(obj,ply,alt)
+  if type(obj) == 'Table' then obj=obj[1] ply=obj[2] alt=obj[3] end
+  if alt then
+    enc.call("APIobjResetProp",{obj=obj,propID=pID})
+  else
+    enc.call("APItoggleProperty",{obj=obj,propID=pID})
+    enc.call("APIrebuildButtons",{obj=obj})
+  end
 end
 
 function createButtons(t)
