@@ -1,9 +1,9 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.5.4'
-version_string = "Updated to fix small bug with latest TTS version."
-change_log = [[Updated .tag to .type .
+version = '4.5.6'
+version_string = "No longer save styles."
+change_log = [[Removed the style data table from the save data.
 ]]
 
 URLS={
@@ -209,9 +209,6 @@ function onLoad(saved_data)
         --log(CORE_VALUE.menu_count,"No menus currently exist.","missing_module")
       end
     end
-    if loaded_data.styles ~= nil then
-      Styles = JSON.decode(loaded_data.styles)
-    end
   end
     
   for k,v in pairs(Player.getColors()) do
@@ -284,7 +281,6 @@ function onSave()
   data_to_save["values"] = {}
   data_to_save["players"] = JSON.encode(Players)
   data_to_save["menus"] = {}
-  data_to_save["styles"] = JSON.encode(Styles)
   
   for i,v in pairs(EncodedObjects) do
     --Removing Object reference before encoding.
