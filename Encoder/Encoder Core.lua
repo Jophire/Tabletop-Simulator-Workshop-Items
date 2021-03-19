@@ -6,18 +6,22 @@ version_string = "No longer save styles."
 change_log = [[Removed the style data table from the save data.
 ]]
 
+--Important URLs for tracking updates, as-well-as downloading xml menus for the encoder.
 URLS={
   ENCODER='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Encoder%20Core.lua',
   ENCODER_BETA='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/Encoder%20Core.lua',
   XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json',
   BASIC_MENU='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
   }
+  
+--Base values of the encoder.
 CORE_VALUE = {
   menu_count = 0,
   style_count = 0,
   beta = false,
   style = "Basic_Style"
 }
+--Basic Style used by default when creating buttons.
 basicstyleTableDefault = {
   label='',
   position={0,0.28,0},
@@ -60,7 +64,7 @@ local Players = {}
     style = nil
   }
 ]]
-local Properties = {}
+local Properties = {} --Modules add properties for the encoder to call and display.
 --[[
   propID = internal name,
   name = external name,
@@ -73,14 +77,14 @@ local Properties = {}
   xml_index = tableindex
   }
 ]]
-local Values = {}
+local Values = {} --Properties rely on registered values to keep track of data.
 --[[
   valueID = internal name, used by Values as key,
   type = Lua type definition
   default = 'default_value'
   desc = A description for other module creators to understand the values use.
 ]]
-local Zones = {}
+local Zones = {} --Zones created by the encoder.
 --[[
   name=Zone name
   func_enter = function to call on enter
@@ -96,7 +100,7 @@ Styles["Basic_Style"] = {styleID="Basic_Style",name="Basic Style",desc="Comes wi
   desc = '',
   styleTable = buttonTable
 ]]
-local Menus = {}
+local Menus = {} --Menu Modules are always drawn.
 --[[
   menuID = internal name,
   funcOwner = obj,
@@ -257,6 +261,7 @@ function onLoad(saved_data)
     WebRequest.get(URLS['ENCODER'],self,"updateCheck")
   end
   
+  --In the event that there are no menus registered, download the default menu.
   Wait.frames(function()
     buildZones()
     if CORE_VALUE.menu_count == 0 then
@@ -327,7 +332,9 @@ function onSave()
   return saved_data
 end
 
-function callVersionCheck(p)
+-- Calls the version check for the encoder, and any modules
+-- which support an update check.
+function callVersionCheck()
   if CORE_VALUE.beta then
     WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
   else
@@ -347,6 +354,7 @@ function callVersionCheck(p)
   end
 end
 
+--Just checks if an update is available without actually updating.
 function updateCheck(wr)
   wr = wr.text
   local ver = versionComp(string.match(wr,"version = '(.-)'"),version)
@@ -356,6 +364,7 @@ function updateCheck(wr)
     broadcastToAll("No update found at this time. Carry on.")
   end
 end
+--The callVersionCheck callback for the encoder webrequest.
 function versionCheck(wr)
   wr = wr.text
   local ver = versionComp(string.match(wr,"version = '(.-)'"),version)
@@ -371,6 +380,8 @@ function versionCheck(wr)
     broadcastToAll("No update found at this time. Carry on.")
   end
 end
+--Compares two version strings of "(/d*.+)*"
+--Examples: 1, 1.2, 0.1111.2, 0.0.0.0.1, 192.168.0.1
 function versionComp(a,b)
   --First does the pattern only contain ([0-9]+)%.?
   --Pattern for versioning ##.##.##.##
@@ -429,6 +440,7 @@ function buildZones()
     end
   end
 end
+--Spawns in the default menu module if no menu module exists.
 function getMenuModule(wr)
   local wr = wr.text
   params = {}
@@ -525,6 +537,8 @@ function onObjectDropped(c,obj)
   end
 end
 --Use a raycast to check if an object is resting in a hand or not.
+--Currently has a problem with tables that have multiple points of
+--  impact during a raycast.
 function handCheck(obj)
   if obj ~= nil and obj.getLock() == false and obj.held_by_color == nil then
     params = {
@@ -553,9 +567,11 @@ function handCheck(obj)
   end
 end
 
+--Does nothing, required for buttons.
 function doNothing()
 end
 
+--Create the encoders own buttons.
 function createEncoderButtons()
   for i,v in pairs(basic_buttons) do
     self.createButton(v)
@@ -585,6 +601,7 @@ function encodeObject(o)
   end
   return false
 end
+--Encodes a given player color, preping them for use with the api.
 function encodePlayer(c)
   if Players[c] == nil then
     Players[c] = {
@@ -600,7 +617,7 @@ function encodePlayer(c)
   end
   return false
 end
-
+--Helper function for creating uniform button sizes.
 function updateSize(text,font_size,max_len,x_just,y_just)
   local temp = ''..text
   local size = 0
@@ -631,10 +648,13 @@ function updateSize(text,font_size,max_len,x_just,y_just)
   return barSize,fsize,offset_x,offset_y
 end
 
+--Creates the context menu option for flipping a card for registered objects.
 function buildContextMenu(o)
   o.addContextMenuItem('Flip Menu',function(ply) flipMenu(o,0) end)
 end
 
+--Calls the menus/property modules createButtons funciton 
+--  when updating a given object.
 function buildButtons(o,h)
   if h == nil then
     h = handCheck(o)
@@ -695,6 +715,8 @@ function buildButtons(o,h)
     end
   end
 end
+--Safety button in the event that an api user does not add a
+-- way to give back control of buttons to the encoder.
 function closeEditor(o)
   if type(o) == 'String' then
     Players[o].editing = nil
@@ -703,6 +725,8 @@ function closeEditor(o)
   end
   buildButtons(o)
 end
+
+--Disables encoding of a card.
 function disableEncoding(o,p)
   EncodedObjects[o.getGUID()].disable = true
   o.setName(EncodedObjects[o.getGUID()].oName)
@@ -722,6 +746,7 @@ function disableEncoding(o,p)
   o.clearInputs()
   buildButtons(o)
 end
+--Flips the menu for the front face to the backface and reverse.
 function flipMenu(o,p)
   local flip = EncodedObjects[o.getGUID()].flip
   if flip ~= 1 then
@@ -743,6 +768,7 @@ function flipMenu(o,p)
   end
   buildButtons(o)
 end
+--Turn target property on or off, calling the relevant Module functions.
 function toggleProperty(o,p)
   if EncodedObjects[o.getGUID()] ~= nil then
     local prop = EncodedObjects[o.getGUID()].encoded[p]
