@@ -1,9 +1,9 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.5.6'
+version = '4.6.0'
 version_string = "No longer save styles."
-change_log = [[Removed the style data table from the save data.
+change_log = [[NEW functions remove need for spawning zones~
 ]]
 
 --Important URLs for tracking updates, as-well-as downloading xml menus for the encoder.
@@ -403,41 +403,29 @@ function versionComp(a,b)
   return b
 end
 
--- NEW- Creates scripting zones around each players hands.
+-- NEW- Registers each players hands as a zone for the encoder to track.
 -- This is used to more reliably hide/reveal card buttons as it transitions zones.
 function buildZones()
-  ZtoG = {}
-  for k,v in pairs(Zones) do
-    ZtoG[v.name]=k
-  end
-  for k,v in pairs(Player.getColors()) do
-    if v ~= "Grey" then
-    for i=1,Player[v].getHandCount() do
-      z = getObjectFromGUID(ZtoG[v..'_Hand_'..i])
-      if z == nil then
-        --error('Missing hand zone for '..v..''..i)
-        h = Player[v].getHandTransform(i)
-        local j = v
-        local ind = i
-        params = {}
-        params.type = "scriptingTrigger"
-        params.position = h.position
-        params.rotation = h.rotation
-        hs = Vector(h.scale.x,h.scale.y,h.scale.z)
-        params.scale = hs
-        params.sound = false
-        params.callback_function = function(obj) Zones[obj.guid] = {
-          name = j..'_Hand_'..ind,
-          func_enter = 'hideCardDetails',
-          func_leave = 'showCardDetails',
-          funcOwner = self,
-          color = j
-          }
-          end
-        spawnObject(params)
-      end
+  local hands = {}
+  local color = nil
+  for k,v in pairs(Hands.getHands()) do
+    --Hand Color
+    color = v.getColorTint()
+    color['a'] = 1
+    color = color:toString()
+    --How many hands of this color have shown up. Init to 0 if nil.
+    if hands[color] == nil then
+      hands[color] = 0
     end
-    end
+    hands[color] = hands[color]+1
+    --Zone id is hand color + hand count for that color.
+    id = color.."_"..hands[color]
+    Zones[v.guid] = {
+        name = id,
+        func_enter = 'hideCardDetails',
+        func_leave = 'showCardDetails',
+        funcOwner = self,
+        color = color}
   end
 end
 --Spawns in the default menu module if no menu module exists.
@@ -475,12 +463,13 @@ function showCardDetails(tar)
 end
 
 -- Event Triggers
-function onObjectEnterScriptingZone(zone, obj)
+function onObjectEnterZone(zone, obj)
   if Zones[zone.getGUID()] ~= nil then
+    log("Object has entered zone: "..Zones[zone.getGUID()].name)
     self.call(Zones[zone.getGUID()].func_enter,{obj})
   end
 end
-function onObjectLeaveScriptingZone(zone, obj)
+function onObjectLeaveZone(zone, obj)
   if Zones[zone.getGUID()] ~= nil then
     self.call(Zones[zone.getGUID()].func_leave,{obj})
   end
@@ -513,7 +502,7 @@ function onObjectDestroyed(obj)
 		end
     for k,v in pairs(Zones) do
       o = getObjectFromGUID(k)
-      if o ~= nil then
+      if o ~= nil and o.type ~= "Hand" then
         o.destruct()
       end
     end
@@ -541,30 +530,14 @@ end
 --  impact during a raycast.
 function handCheck(obj)
   if obj ~= nil and obj.getLock() == false and obj.held_by_color == nil then
-    params = {
-      origin = obj.getPosition(),
-      direction = Vector(0,-1,0),
-      type=1,
-      debug=false
-    }
-    c = Physics.cast(params)
-    dist = 10000
-    for k,v in pairs(c) do
-      if v.hit_object.type == 'Surface' or v.hit_object.interactable == false  then
-        dist = v.distance < dist and v.distance or dist
+    for k,v in pairs(obj.getZones()) do
+      if Zones[v.guid] ~= nil and v.type == "Hand" then
+        --log("In hand: "..Zones[v.guid].name)
+        return true
       end
     end
-    --log(dist,'Card Distance above surface.')
-    --If the card is above 2 and resting, its in a hand. 
-    --Or if its resting, but there is nothing below it, its in a hand.
-    if dist > 2.0 or c[1] == nil then 
-      return true --hideCardDetails({obj})
-    else
-      return false --showCardDetails({obj})
-    end
-  else
-    return nil
   end
+  return false
 end
 
 --Does nothing, required for buttons.
