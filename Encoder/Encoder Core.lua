@@ -1,23 +1,27 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.5.6'
+version = '4.6.0'
 version_string = "No longer save styles."
-change_log = [[Removed the style data table from the save data.
+change_log = [[NEW functions remove need for spawning zones~
 ]]
 
+--Important URLs for tracking updates, as-well-as downloading xml menus for the encoder.
 URLS={
   ENCODER='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Encoder%20Core.lua',
   ENCODER_BETA='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/Encoder%20Core.lua',
   XML='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/update_branch/Encoder/XML.json',
   BASIC_MENU='https://raw.githubusercontent.com/Jophire/Tabletop-Simulator-Workshop-Items/master/Encoder/Modules/Encoder_Menu_Default.lua'
   }
+  
+--Base values of the encoder.
 CORE_VALUE = {
   menu_count = 0,
   style_count = 0,
   beta = false,
   style = "Basic_Style"
 }
+--Basic Style used by default when creating buttons.
 basicstyleTableDefault = {
   label='',
   position={0,0.28,0},
@@ -60,7 +64,7 @@ local Players = {}
     style = nil
   }
 ]]
-local Properties = {}
+local Properties = {} --Modules add properties for the encoder to call and display.
 --[[
   propID = internal name,
   name = external name,
@@ -73,14 +77,14 @@ local Properties = {}
   xml_index = tableindex
   }
 ]]
-local Values = {}
+local Values = {} --Properties rely on registered values to keep track of data.
 --[[
   valueID = internal name, used by Values as key,
   type = Lua type definition
   default = 'default_value'
   desc = A description for other module creators to understand the values use.
 ]]
-local Zones = {}
+local Zones = {} --Zones created by the encoder.
 --[[
   name=Zone name
   func_enter = function to call on enter
@@ -96,7 +100,7 @@ Styles["Basic_Style"] = {styleID="Basic_Style",name="Basic Style",desc="Comes wi
   desc = '',
   styleTable = buttonTable
 ]]
-local Menus = {}
+local Menus = {} --Menu Modules are always drawn.
 --[[
   menuID = internal name,
   funcOwner = obj,
@@ -257,6 +261,7 @@ function onLoad(saved_data)
     WebRequest.get(URLS['ENCODER'],self,"updateCheck")
   end
   
+  --In the event that there are no menus registered, download the default menu.
   Wait.frames(function()
     buildZones()
     if CORE_VALUE.menu_count == 0 then
@@ -327,7 +332,9 @@ function onSave()
   return saved_data
 end
 
-function callVersionCheck(p)
+-- Calls the version check for the encoder, and any modules
+-- which support an update check.
+function callVersionCheck()
   if CORE_VALUE.beta then
     WebRequest.get(URLS['ENCODER_BETA'],self,"versionCheck")
   else
@@ -347,6 +354,7 @@ function callVersionCheck(p)
   end
 end
 
+--Just checks if an update is available without actually updating.
 function updateCheck(wr)
   wr = wr.text
   local ver = versionComp(string.match(wr,"version = '(.-)'"),version)
@@ -356,6 +364,7 @@ function updateCheck(wr)
     broadcastToAll("No update found at this time. Carry on.")
   end
 end
+--The callVersionCheck callback for the encoder webrequest.
 function versionCheck(wr)
   wr = wr.text
   local ver = versionComp(string.match(wr,"version = '(.-)'"),version)
@@ -371,6 +380,8 @@ function versionCheck(wr)
     broadcastToAll("No update found at this time. Carry on.")
   end
 end
+--Compares two version strings of "(/d*.+)*"
+--Examples: 1, 1.2, 0.1111.2, 0.0.0.0.1, 192.168.0.1
 function versionComp(a,b)
   --First does the pattern only contain ([0-9]+)%.?
   --Pattern for versioning ##.##.##.##
@@ -392,43 +403,32 @@ function versionComp(a,b)
   return b
 end
 
--- NEW- Creates scripting zones around each players hands.
+-- NEW- Registers each players hands as a zone for the encoder to track.
 -- This is used to more reliably hide/reveal card buttons as it transitions zones.
 function buildZones()
-  ZtoG = {}
-  for k,v in pairs(Zones) do
-    ZtoG[v.name]=k
-  end
-  for k,v in pairs(Player.getColors()) do
-    if v ~= "Grey" then
-    for i=1,Player[v].getHandCount() do
-      z = getObjectFromGUID(ZtoG[v..'_Hand_'..i])
-      if z == nil then
-        --error('Missing hand zone for '..v..''..i)
-        h = Player[v].getHandTransform(i)
-        local j = v
-        local ind = i
-        params = {}
-        params.type = "scriptingTrigger"
-        params.position = h.position
-        params.rotation = h.rotation
-        hs = Vector(h.scale.x,h.scale.y,h.scale.z)
-        params.scale = hs
-        params.sound = false
-        params.callback_function = function(obj) Zones[obj.guid] = {
-          name = j..'_Hand_'..ind,
-          func_enter = 'hideCardDetails',
-          func_leave = 'showCardDetails',
-          funcOwner = self,
-          color = j
-          }
-          end
-        spawnObject(params)
-      end
+  local hands = {}
+  local color = nil
+  for k,v in pairs(Hands.getHands()) do
+    --Hand Color
+    color = v.getColorTint()
+    color['a'] = 1
+    color = color:toString()
+    --How many hands of this color have shown up. Init to 0 if nil.
+    if hands[color] == nil then
+      hands[color] = 0
     end
-    end
+    hands[color] = hands[color]+1
+    --Zone id is hand color + hand count for that color.
+    id = color.."_"..hands[color]
+    Zones[v.guid] = {
+        name = id,
+        func_enter = 'hideCardDetails',
+        func_leave = 'showCardDetails',
+        funcOwner = self,
+        color = color}
   end
 end
+--Spawns in the default menu module if no menu module exists.
 function getMenuModule(wr)
   local wr = wr.text
   params = {}
@@ -463,12 +463,13 @@ function showCardDetails(tar)
 end
 
 -- Event Triggers
-function onObjectEnterScriptingZone(zone, obj)
+function onObjectEnterZone(zone, obj)
   if Zones[zone.getGUID()] ~= nil then
+    --log("Object has entered zone: "..Zones[zone.getGUID()].name)
     self.call(Zones[zone.getGUID()].func_enter,{obj})
   end
 end
-function onObjectLeaveScriptingZone(zone, obj)
+function onObjectLeaveZone(zone, obj)
   if Zones[zone.getGUID()] ~= nil then
     self.call(Zones[zone.getGUID()].func_leave,{obj})
   end
@@ -501,7 +502,7 @@ function onObjectDestroyed(obj)
 		end
     for k,v in pairs(Zones) do
       o = getObjectFromGUID(k)
-      if o ~= nil then
+      if o ~= nil and o.type ~= "Hand" then
         o.destruct()
       end
     end
@@ -525,37 +526,25 @@ function onObjectDropped(c,obj)
   end
 end
 --Use a raycast to check if an object is resting in a hand or not.
+--Currently has a problem with tables that have multiple points of
+--  impact during a raycast.
 function handCheck(obj)
   if obj ~= nil and obj.getLock() == false and obj.held_by_color == nil then
-    params = {
-      origin = obj.getPosition(),
-      direction = Vector(0,-1,0),
-      type=1,
-      debug=false
-    }
-    c = Physics.cast(params)
-    dist = 10000
-    for k,v in pairs(c) do
-      if v.hit_object.type == 'Surface' or v.hit_object.interactable == false  then
-        dist = v.distance < dist and v.distance or dist
+    for k,v in pairs(obj.getZones()) do
+      if Zones[v.guid] ~= nil and v.type == "Hand" then
+        --log("In hand: "..Zones[v.guid].name)
+        return true
       end
     end
-    --log(dist,'Card Distance above surface.')
-    --If the card is above 2 and resting, its in a hand. 
-    --Or if its resting, but there is nothing below it, its in a hand.
-    if dist > 2.0 or c[1] == nil then 
-      return true --hideCardDetails({obj})
-    else
-      return false --showCardDetails({obj})
-    end
-  else
-    return nil
   end
+  return false
 end
 
+--Does nothing, required for buttons.
 function doNothing()
 end
 
+--Create the encoders own buttons.
 function createEncoderButtons()
   for i,v in pairs(basic_buttons) do
     self.createButton(v)
@@ -585,6 +574,7 @@ function encodeObject(o)
   end
   return false
 end
+--Encodes a given player color, preping them for use with the api.
 function encodePlayer(c)
   if Players[c] == nil then
     Players[c] = {
@@ -600,7 +590,7 @@ function encodePlayer(c)
   end
   return false
 end
-
+--Helper function for creating uniform button sizes.
 function updateSize(text,font_size,max_len,x_just,y_just)
   local temp = ''..text
   local size = 0
@@ -631,10 +621,13 @@ function updateSize(text,font_size,max_len,x_just,y_just)
   return barSize,fsize,offset_x,offset_y
 end
 
+--Creates the context menu option for flipping a card for registered objects.
 function buildContextMenu(o)
   o.addContextMenuItem('Flip Menu',function(ply) flipMenu(o,0) end)
 end
 
+--Calls the menus/property modules createButtons funciton 
+--  when updating a given object.
 function buildButtons(o,h)
   if h == nil then
     h = handCheck(o)
@@ -695,6 +688,8 @@ function buildButtons(o,h)
     end
   end
 end
+--Safety button in the event that an api user does not add a
+-- way to give back control of buttons to the encoder.
 function closeEditor(o)
   if type(o) == 'String' then
     Players[o].editing = nil
@@ -703,6 +698,8 @@ function closeEditor(o)
   end
   buildButtons(o)
 end
+
+--Disables encoding of a card.
 function disableEncoding(o,p)
   EncodedObjects[o.getGUID()].disable = true
   o.setName(EncodedObjects[o.getGUID()].oName)
@@ -722,6 +719,7 @@ function disableEncoding(o,p)
   o.clearInputs()
   buildButtons(o)
 end
+--Flips the menu for the front face to the backface and reverse.
 function flipMenu(o,p)
   local flip = EncodedObjects[o.getGUID()].flip
   if flip ~= 1 then
@@ -743,6 +741,7 @@ function flipMenu(o,p)
   end
   buildButtons(o)
 end
+--Turn target property on or off, calling the relevant Module functions.
 function toggleProperty(o,p)
   if EncodedObjects[o.getGUID()] ~= nil then
     local prop = EncodedObjects[o.getGUID()].encoded[p]
