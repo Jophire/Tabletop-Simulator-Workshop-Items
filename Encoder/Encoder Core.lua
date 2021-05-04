@@ -1,7 +1,7 @@
 --By Tipsy Hobbit
 mod_name = "Encoder"
 postfix = ''
-version = '4.6.0'
+version = '4.6.1'
 version_string = "No longer save styles."
 change_log = [[NEW functions remove need for spawning zones~
 ]]
@@ -410,9 +410,7 @@ function buildZones()
   local color = nil
   for k,v in pairs(Hands.getHands()) do
     --Hand Color
-    color = v.getColorTint()
-    color['a'] = 1
-    color = color:toString()
+    color = v.getValue()
     --How many hands of this color have shown up. Init to 0 if nil.
     if hands[color] == nil then
       hands[color] = 0
