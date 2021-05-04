@@ -465,7 +465,7 @@ end
 -- Event Triggers
 function onObjectEnterZone(zone, obj)
   if Zones[zone.getGUID()] ~= nil then
-    log("Object has entered zone: "..Zones[zone.getGUID()].name)
+    --log("Object has entered zone: "..Zones[zone.getGUID()].name)
     self.call(Zones[zone.getGUID()].func_enter,{obj})
   end
 end
