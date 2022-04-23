@@ -36,7 +36,7 @@ function registerModule()
     properties = {
     propID = pID,	--The modules unique internal name.
     name = "Example Module", --The visible name located in the api menu.
-    values = {'example1','example2'} --The values you will be sending and requesting with APIobjGetValues APIobjSetValues
+    values = {'example1','example2'}, --The values you will be sending and requesting with APIobjGetValues APIobjSetValues
     funcOwner = self, --Who owns the triggering function. Generally will be self,
 											--but you could make it target other objects.
     tags="list,of,tags", --Used by menus to decide if this belongs in it.
